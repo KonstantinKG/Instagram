@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Instagram.WebApi", "Instagram.WebApi\Instagram.WebApi.csproj", "{7AC64E25-AE50-4232-832B-19E5375F896D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Instagram.Contracts", "Instagram.Contracts\Instagram.Contracts.csproj", "{B46A4AB0-D1B6-4908-98C2-B8313FE4CCE4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Instagram.Application", "Instagram.Application\Instagram.Application.csproj", "{6CDBBC03-840B-486D-B74B-C9F87E3B9056}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Instagram.Domain", "Instagram.Domain\Instagram.Domain.csproj", "{B3112AEC-DF8E-44A2-8D7B-D9ECCCDFAF12}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Instagram.Infrastructure", "Instagram.Infrastructure\Instagram.Infrastructure.csproj", "{0E4BD71F-9AB5-408E-B058-D7D8B3E509CB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7AC64E25-AE50-4232-832B-19E5375F896D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AC64E25-AE50-4232-832B-19E5375F896D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AC64E25-AE50-4232-832B-19E5375F896D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AC64E25-AE50-4232-832B-19E5375F896D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B46A4AB0-D1B6-4908-98C2-B8313FE4CCE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B46A4AB0-D1B6-4908-98C2-B8313FE4CCE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B46A4AB0-D1B6-4908-98C2-B8313FE4CCE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B46A4AB0-D1B6-4908-98C2-B8313FE4CCE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CDBBC03-840B-486D-B74B-C9F87E3B9056}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CDBBC03-840B-486D-B74B-C9F87E3B9056}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CDBBC03-840B-486D-B74B-C9F87E3B9056}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CDBBC03-840B-486D-B74B-C9F87E3B9056}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3112AEC-DF8E-44A2-8D7B-D9ECCCDFAF12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3112AEC-DF8E-44A2-8D7B-D9ECCCDFAF12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3112AEC-DF8E-44A2-8D7B-D9ECCCDFAF12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3112AEC-DF8E-44A2-8D7B-D9ECCCDFAF12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E4BD71F-9AB5-408E-B058-D7D8B3E509CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E4BD71F-9AB5-408E-B058-D7D8B3E509CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E4BD71F-9AB5-408E-B058-D7D8B3E509CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E4BD71F-9AB5-408E-B058-D7D8B3E509CB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
