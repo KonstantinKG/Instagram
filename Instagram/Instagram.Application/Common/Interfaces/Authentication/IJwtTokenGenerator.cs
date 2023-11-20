@@ -1,6 +1,8 @@
-﻿namespace Instagram.Application.Common.Interfaces.Authentication;
+﻿using Instagram.Domain.Entities;
+
+namespace Instagram.Application.Common.Interfaces.Authentication;
 
 public interface IJwtTokenGenerator
 {
-    public string GenerateToken(Guid userId, string name);
+    public string GenerateToken(User user);
 }

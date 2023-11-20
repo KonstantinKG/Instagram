@@ -2,7 +2,8 @@
 using System.Security.Claims;
 using System.Text;
 using Instagram.Application.Common.Interfaces.Authentication;
-using Instagram.Infrastructure.Services;
+using Instagram.Application.Common.Interfaces.Services;
+using Instagram.Domain.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -10,16 +11,16 @@ namespace Instagram.Infrastructure.Authentication;
 
 public class JwtTokenGenerator : IJwtTokenGenerator
 {
-    private readonly DateTimeProvider _dateTimeProvider;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly JwtSettings _jwtSettings;
 
-    public JwtTokenGenerator(DateTimeProvider dateTimeProvider, IOptions<JwtSettings> jwtOptions)
+    public JwtTokenGenerator(IDateTimeProvider dateTimeProvider, IOptions<JwtSettings> jwtOptions)
     {
         _dateTimeProvider = dateTimeProvider;
         _jwtSettings = jwtOptions.Value;
     }
     
-    public string GenerateToken(Guid userId, string name)
+    public string GenerateToken(User user)
     {
         var signinSecurityKey = new SigningCredentials(
             new SymmetricSecurityKey(
@@ -30,8 +31,8 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-            new Claim(JwtRegisteredClaimNames.GivenName, name),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.GivenName, user.Name),
             new Claim(JwtRegisteredClaimNames.FamilyName, "empty"),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };

@@ -19,11 +19,11 @@ public class AuthenticationController : ControllerBase
     [Route("login")]
     public IActionResult Login(LoginRequest request)
     {
-        var serviceResult = _authenticationService.Login();
+        var serviceResult = _authenticationService.Login(request.Email, request.Password);
         var response = new AuthenticationResponse(
-            serviceResult.Id,
-            serviceResult.Name,
-            serviceResult.Email,
+            serviceResult.User.Id,
+            serviceResult.User.Name,
+            serviceResult.User.Email,
             serviceResult.Token
         );
         return Ok(response);
@@ -33,12 +33,12 @@ public class AuthenticationController : ControllerBase
     [Route("register")]
     public IActionResult Register(RegisterRequest request)
     {
-        var serviceResult = _authenticationService.Register();
+        var serviceResult = _authenticationService.Register(request.Name, request.Email, request.Password);
 
         var response = new AuthenticationResponse(
-            serviceResult.Id,
-            serviceResult.Name,
-            serviceResult.Email,
+            serviceResult.User.Id,
+            serviceResult.User.Name,
+            serviceResult.User.Email,
             serviceResult.Token
         );
 

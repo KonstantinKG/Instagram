@@ -1,8 +1,8 @@
-﻿namespace Instagram.Application.Services.Authentication;
+﻿using Instagram.Domain.Entities;
+
+namespace Instagram.Application.Services.Authentication;
 
 public record AuthenticationResult(
-    Guid Id,
-    string Name,
-    string Email, 
+    User User,
     string Token
     );
