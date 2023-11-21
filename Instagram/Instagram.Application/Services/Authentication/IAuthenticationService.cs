@@ -1,7 +1,9 @@
-﻿namespace Instagram.Application.Services.Authentication;
+﻿using ErrorOr;
+
+namespace Instagram.Application.Services.Authentication;
 
 public interface IAuthenticationService
 {
-    public AuthenticationResult Login(string name, string password);
-    public AuthenticationResult Register(string name, string email, string password);
+    public ErrorOr<AuthenticationResult> Login(LoginCommand command);
+    public ErrorOr<AuthenticationResult> Register(RegisterCommand command);
 }

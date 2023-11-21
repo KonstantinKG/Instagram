@@ -1,5 +1,7 @@
-﻿using Instagram.Application.Common.Interfaces.Authentication;
+﻿using ErrorOr;
+using Instagram.Application.Common.Interfaces.Authentication;
 using Instagram.Application.Common.Interfaces.Persistence;
+using Instagram.Domain.Common.Errors;
 using Instagram.Domain.Entities;
 
 namespace Instagram.Application.Services.Authentication;
@@ -15,16 +17,16 @@ public class AuthenticationService : IAuthenticationService
         _userRepository = userRepository;
     }
     
-    public AuthenticationResult Login(string email, string password)
+    public ErrorOr<AuthenticationResult> Login(LoginCommand command)
     {
-        if (_userRepository.GetUserByEmail(email) is not User user)
+        if (_userRepository.GetUserByEmail(command.Email) is not User user)
         {
-            throw new Exception("User with given email already exists");
+            return Errors.User.InvalidCredentials;
         }
         
-        if (user.Password != password)
+        if (user.Password != command.Password)
         {
-            throw new Exception("Password is incorrect");
+            return Errors.User.InvalidCredentials;
         }
 
         var token = _jwtTokenGenerator.GenerateToken(user);
@@ -34,20 +36,20 @@ public class AuthenticationService : IAuthenticationService
         );
     }
 
-    public AuthenticationResult Register(string name, string email, string password)
+    public ErrorOr<AuthenticationResult> Register(RegisterCommand command)
     {
-        if (_userRepository.GetUserByEmail(email) is not null)
+        if (_userRepository.GetUserByEmail(command.Email) is not null)
         {
-            throw new Exception("User with given email already exists");
+            return Errors.User.DuplicateEmail;
         }
         
         var userId = Guid.NewGuid();
         var user = new User()
         {
             Id = userId,
-            Name = name,
-            Email = email,
-            Password = password
+            Name = command.Name,
+            Email = command.Email,
+            Password = command.Password
         };
         
         _userRepository.AddUser(user);

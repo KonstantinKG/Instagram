@@ -1,47 +1,46 @@
-﻿using Instagram.Application.Services.Authentication;
+﻿using ErrorOr;
+using Instagram.Application.Services.Authentication;
 using Instagram.Contracts.Authentication;
+using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Instagram.WebApi.Controllers;
 
-[ApiController]
 [Route("auth")]
-public class AuthenticationController : ControllerBase
+public class AuthenticationController : ApiController
 {
     private readonly IAuthenticationService _authenticationService;
+    private readonly IMapper _mapper;
 
-    public AuthenticationController(IAuthenticationService authenticationService)
+    public AuthenticationController(IAuthenticationService authenticationService, IMapper mapper)
     {
         _authenticationService = authenticationService;
+        _mapper = mapper;
     }
 
     [HttpPost]
     [Route("login")]
     public IActionResult Login(LoginRequest request)
     {
-        var serviceResult = _authenticationService.Login(request.Email, request.Password);
-        var response = new AuthenticationResponse(
-            serviceResult.User.Id,
-            serviceResult.User.Name,
-            serviceResult.User.Email,
-            serviceResult.Token
+        var loginCommand = _mapper.Map<LoginCommand>(request);
+        ErrorOr<AuthenticationResult> serviceResult = _authenticationService.Login(loginCommand);
+
+        return serviceResult.Match(
+            result => Ok(_mapper.Map<AuthenticationResponse>(result)),
+            errors => Problem(errors)
         );
-        return Ok(response);
     }
 
     [HttpPost]
     [Route("register")]
     public IActionResult Register(RegisterRequest request)
     {
-        var serviceResult = _authenticationService.Register(request.Name, request.Email, request.Password);
+        var registerCommand = _mapper.Map<RegisterCommand>(request);
+        ErrorOr<AuthenticationResult> serviceResult = _authenticationService.Register(registerCommand);
 
-        var response = new AuthenticationResponse(
-            serviceResult.User.Id,
-            serviceResult.User.Name,
-            serviceResult.User.Email,
-            serviceResult.Token
+        return serviceResult.Match(
+            result => Ok(_mapper.Map<AuthenticationResponse>(result)),
+            errors => Problem(errors)
         );
-
-        return Ok(response);
     }
 }
