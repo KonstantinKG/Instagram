@@ -1,4 +1,4 @@
-﻿namespace Instagram.Application.Services.Authentication;
+﻿namespace Instagram.Application.Services.Authentication.Commands.Register;
 
 public record RegisterCommand(
     string Name,

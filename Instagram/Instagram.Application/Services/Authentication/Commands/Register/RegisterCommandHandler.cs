@@ -1,43 +1,27 @@
 ﻿using ErrorOr;
 using Instagram.Application.Common.Interfaces.Authentication;
 using Instagram.Application.Common.Interfaces.Persistence;
+using Instagram.Application.Services.Authentication.Common;
 using Instagram.Domain.Common.Errors;
 using Instagram.Domain.Entities;
 
-namespace Instagram.Application.Services.Authentication;
+namespace Instagram.Application.Services.Authentication.Commands.Register;
 
-public class AuthenticationService : IAuthenticationService
+public class RegisterCommandHandler
 {
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IUserRepository _userRepository;
 
-    public AuthenticationService(IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository)
+    public RegisterCommandHandler(IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository)
     {
         _jwtTokenGenerator = jwtTokenGenerator;
         _userRepository = userRepository;
     }
-    
-    public ErrorOr<AuthenticationResult> Login(LoginCommand command)
+
+    public async Task<ErrorOr<AuthenticationResult>> Handle(RegisterCommand command, CancellationToken cancellationToken)
     {
-        if (_userRepository.GetUserByEmail(command.Email) is not User user)
-        {
-            return Errors.User.InvalidCredentials;
-        }
+        await Task.CompletedTask;
         
-        if (user.Password != command.Password)
-        {
-            return Errors.User.InvalidCredentials;
-        }
-
-        var token = _jwtTokenGenerator.GenerateToken(user);
-        return new AuthenticationResult(
-            user,
-            token
-        );
-    }
-
-    public ErrorOr<AuthenticationResult> Register(RegisterCommand command)
-    {
         if (_userRepository.GetUserByEmail(command.Email) is not null)
         {
             return Errors.User.DuplicateEmail;

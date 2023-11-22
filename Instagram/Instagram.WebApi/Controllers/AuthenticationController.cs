@@ -1,5 +1,7 @@
 ﻿using ErrorOr;
-using Instagram.Application.Services.Authentication;
+using Instagram.Application.Services.Authentication.Commands.Register;
+using Instagram.Application.Services.Authentication.Common;
+using Instagram.Application.Services.Authentication.Queries.Login;
 using Instagram.Contracts.Authentication;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -9,21 +11,21 @@ namespace Instagram.WebApi.Controllers;
 [Route("auth")]
 public class AuthenticationController : ApiController
 {
-    private readonly IAuthenticationService _authenticationService;
     private readonly IMapper _mapper;
 
-    public AuthenticationController(IAuthenticationService authenticationService, IMapper mapper)
+    public AuthenticationController(IMapper mapper)
     {
-        _authenticationService = authenticationService;
         _mapper = mapper;
     }
 
     [HttpPost]
     [Route("login")]
-    public IActionResult Login(LoginRequest request)
+    public async Task<IActionResult> Login(LoginRequest request)
     {
-        var loginCommand = _mapper.Map<LoginCommand>(request);
-        ErrorOr<AuthenticationResult> serviceResult = _authenticationService.Login(loginCommand);
+        var loginQuery = _mapper.Map<LoginQuery>(request);
+        var handler = HttpContext.RequestServices.GetRequiredService<LoginQueryHandler>();
+        var pipeline = HttpContext.RequestServices.GetRequiredService<LoginQueryPipeline>();
+        ErrorOr<AuthenticationResult> serviceResult = await pipeline.Pipe(loginQuery, handler.Handle);
 
         return serviceResult.Match(
             result => Ok(_mapper.Map<AuthenticationResponse>(result)),
@@ -33,10 +35,12 @@ public class AuthenticationController : ApiController
 
     [HttpPost]
     [Route("register")]
-    public IActionResult Register(RegisterRequest request)
+    public async Task<IActionResult> Register(RegisterRequest request)
     {
         var registerCommand = _mapper.Map<RegisterCommand>(request);
-        ErrorOr<AuthenticationResult> serviceResult = _authenticationService.Register(registerCommand);
+        var handler = HttpContext.RequestServices.GetRequiredService<RegisterCommandHandler>();
+        var pipeline = HttpContext.RequestServices.GetRequiredService<RegisterCommandPipeline>();
+        ErrorOr<AuthenticationResult> serviceResult = await pipeline.Pipe(registerCommand, handler.Handle);
 
         return serviceResult.Match(
             result => Ok(_mapper.Map<AuthenticationResponse>(result)),

@@ -1,8 +1,6 @@
 using Instagram.Application;
 using Instagram.Infrastructure;
 using Instagram.WebApi;
-using Instagram.WebApi.Common.Errors;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,11 +9,6 @@ builder.Services
     .AddPresentation()
     .AddApplication()
     .AddInfrastructure(builder.Configuration);
-
-
-// Swagger
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -29,6 +22,7 @@ if (app.Environment.IsDevelopment())
 app.UseExceptionHandler("/error");
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
