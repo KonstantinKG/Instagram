@@ -4,11 +4,13 @@ using Instagram.Application.Services.Authentication.Common;
 using Instagram.Application.Services.Authentication.Queries.Login;
 using Instagram.Contracts.Authentication;
 using MapsterMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Instagram.WebApi.Controllers;
 
 [Route("auth")]
+[AllowAnonymous]
 public class AuthenticationController : ApiController
 {
     private readonly IMapper _mapper;

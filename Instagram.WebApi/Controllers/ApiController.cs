@@ -1,10 +1,12 @@
 ﻿using ErrorOr;
 using Instagram.WebApi.Common.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Instagram.WebApi.Controllers;
 
 [ApiController]
+[Authorize]
 public class ApiController : ControllerBase
 {
     protected IActionResult Problem(List<Error> errors)
