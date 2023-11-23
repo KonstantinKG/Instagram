@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Instagram.Application.Common.Interfaces.Authentication;
 using Instagram.Application.Common.Interfaces.Services;
-using Instagram.Domain.Entities;
+using Instagram.Domain.Aggregates.UserAggregate;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -31,9 +31,8 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.GivenName, user.Name),
-            new Claim(JwtRegisteredClaimNames.FamilyName, "empty"),
+            new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

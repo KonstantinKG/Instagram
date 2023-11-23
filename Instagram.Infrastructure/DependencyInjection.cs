@@ -4,8 +4,11 @@ using Instagram.Application.Common.Interfaces.Persistence;
 using Instagram.Application.Common.Interfaces.Services;
 using Instagram.Infrastructure.Authentication;
 using Instagram.Infrastructure.Persistence;
+using Instagram.Infrastructure.Persistence.Connections;
+using Instagram.Infrastructure.Persistence.Repositories;
 using Instagram.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -19,10 +22,21 @@ public static class DependencyInjection
         this IServiceCollection services,
         ConfigurationManager configuration)
     {
-        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddPersistence(configuration);
         services.AddAuth(configuration);
         
+        return services;
+    }
+
+    public static IServiceCollection AddPersistence(this IServiceCollection services, ConfigurationManager configuration)
+    {
+        var dbConnections = new DbConnections();
+        configuration.Bind(DbConnections.SectionName, dbConnections);
+        
+        services.AddDbContext<InstagramDbContext>(options => options.UseNpgsql(dbConnections.Postgres));
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        services.AddScoped<IUserRepository, UserRepository>();
+
         return services;
     }
     

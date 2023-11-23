@@ -1,4 +1,4 @@
-﻿using Instagram.Domain.Entities;
+﻿using Instagram.Domain.Aggregates.UserAggregate;
 
 namespace Instagram.Application.Services.Authentication.Common;
 

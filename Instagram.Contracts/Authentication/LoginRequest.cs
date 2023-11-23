@@ -2,6 +2,6 @@
 
 public record LoginRequest
 (
-    string Email,
+    string Identity,
     string Password
     );

@@ -1,7 +1,8 @@
 ﻿namespace Instagram.Contracts.Authentication;
 
 public record RegisterRequest(
-    string Name,
+    string Username,
+    string Fullname,
     string Email,
     string Password
 );

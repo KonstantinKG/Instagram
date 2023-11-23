@@ -2,8 +2,8 @@
 using Instagram.Application.Common.Interfaces.Authentication;
 using Instagram.Application.Common.Interfaces.Persistence;
 using Instagram.Application.Services.Authentication.Common;
+using Instagram.Domain.Aggregates.UserAggregate;
 using Instagram.Domain.Common.Errors;
-using Instagram.Domain.Entities;
 
 namespace Instagram.Application.Services.Authentication.Commands.Register;
 
@@ -20,23 +20,27 @@ public class RegisterCommandHandler
 
     public async Task<ErrorOr<AuthenticationResult>> Handle(RegisterCommand command, CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
-        
-        if (_userRepository.GetUserByEmail(command.Email) is not null)
+        if (await _userRepository.GetUserBy(u=> 
+                    u.Username == command.Username ||
+                    u.Email == command.Email) is User existingUser)
         {
-            return Errors.User.DuplicateEmail;
+            List<Error> errors = new ();
+            if (existingUser.Username == command.Username) 
+                errors.Add(Error.Conflict(description: "Пользователь с данным именем уже существует."));
+            if (existingUser.Email == command.Email) 
+                errors.Add(Error.Conflict(description: "Пользователь с данной почтой уже существует."));
+            return errors;
         }
         
-        var userId = Guid.NewGuid();
-        var user = new User()
-        {
-            Id = userId,
-            Name = command.Name,
-            Email = command.Email,
-            Password = command.Password
-        };
+        var user = User.Create(
+            username: command.Username,
+            fullname: command.Fullname,
+            email: command.Email,
+            phone: null,
+            password: command.Password
+        );
         
-        _userRepository.AddUser(user);
+        await _userRepository.AddUser(user);
         
 
         var token = _jwtTokenGenerator.GenerateToken(user);

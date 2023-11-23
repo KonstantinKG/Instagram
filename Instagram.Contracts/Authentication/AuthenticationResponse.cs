@@ -1,8 +1,10 @@
 ﻿namespace Instagram.Contracts.Authentication;
 
 public record AuthenticationResponse(
-    Guid Id,
-    string Name,
+    long Id,
+    string Username,
+    string Fullname,
     string Email,
+    string? Phone,
     string Token
     );

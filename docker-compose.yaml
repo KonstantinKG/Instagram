@@ -1,0 +1,29 @@
+
+services:
+
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-d", "public", "-U", "postgres", "-h", "db"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  
+  dotnet:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - 5054:5054
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  data:

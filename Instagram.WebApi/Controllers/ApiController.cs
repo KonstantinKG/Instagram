@@ -23,6 +23,6 @@ public class ApiController : ControllerBase
 
         HttpContext.Items[HttpContextItemKeys.Errors] = errors;
         
-        return Problem(statusCode: statusCode, title: firstError.Description);
+        return Problem(statusCode: statusCode);
     }
 }
