@@ -98,7 +98,7 @@ public class InstagramProblemDetailsFactory : ProblemDetailsFactory
 
         if (httpContext?.Items[HttpContextItemKeys.Errors] is List<Error> errors)
         {
-            problemDetails.Extensions.Add("errors", errors.Select(e => e.Description));
+            problemDetails.Extensions.Add("errors", errors.Select(e => e.Code));
         }
         
         _configure?.Invoke(new() { HttpContext = httpContext!, ProblemDetails = problemDetails });

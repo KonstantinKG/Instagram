@@ -1,13 +1,19 @@
 ﻿using System.Text;
 using Instagram.Application.Common.Interfaces.Authentication;
-using Instagram.Application.Common.Interfaces.Persistence;
+using Instagram.Application.Common.Interfaces.Persistence.CommandRepositories;
+using Instagram.Application.Common.Interfaces.Persistence.QueryRepositories;
 using Instagram.Application.Common.Interfaces.Services;
 using Instagram.Infrastructure.Authentication;
-using Instagram.Infrastructure.Persistence;
 using Instagram.Infrastructure.Persistence.Connections;
-using Instagram.Infrastructure.Persistence.Repositories;
+using Instagram.Infrastructure.Persistence.Dapper.Common;
+using Instagram.Infrastructure.Persistence.Dapper.Repositories;
+using Instagram.Infrastructure.Persistence.EF.Contexts;
+using Instagram.Infrastructure.Persistence.EF.Repositories;
 using Instagram.Infrastructure.Services;
+using Instagram.Infrastructure.Services.FileDownloaderService;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,19 +30,26 @@ public static class DependencyInjection
     {
         services.AddPersistence(configuration);
         services.AddAuth(configuration);
+        services.AddFileDownloader(configuration);
         
         return services;
     }
 
     public static IServiceCollection AddPersistence(this IServiceCollection services, ConfigurationManager configuration)
     {
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        
         var dbConnections = new DbConnections();
         configuration.Bind(DbConnections.SectionName, dbConnections);
-        
-        services.AddDbContext<InstagramDbContext>(options => options.UseNpgsql(dbConnections.Postgres));
-        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddSingleton(dbConnections);
 
+        services.AddScoped<DapperContext>();
+        services.AddDbContext<UserDbContext>(options => options.UseNpgsql(dbConnections.Postgres));
+        
+        
+        services.AddScoped<IUserCommandRepository, UserCommandRepository>();
+        services.AddScoped<IUserQueryRepository, UserQueryRepository>();
+        
         return services;
     }
     
@@ -62,6 +75,19 @@ public static class DependencyInjection
                 IssuerSigningKey = new SymmetricSecurityKey(
                     Encoding.UTF8.GetBytes(jwtSettings.Secret))
             });
+
+        return services;
+    }
+
+
+    public static IServiceCollection AddFileDownloader(
+        this IServiceCollection services,
+        ConfigurationManager configuration)
+    {
+        services.Configure<FileDownloaderSettings>(configuration.GetSection(FileDownloaderSettings.SectionName));
+        services.AddSingleton<FileDownloaderSettings>();
+
+        services.AddSingleton<IFileDownloader, FileDownloader>();
 
         return services;
     }

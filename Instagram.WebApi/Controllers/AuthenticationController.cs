@@ -27,7 +27,7 @@ public class AuthenticationController : ApiController
         var loginQuery = _mapper.Map<LoginQuery>(request);
         var handler = HttpContext.RequestServices.GetRequiredService<LoginQueryHandler>();
         var pipeline = HttpContext.RequestServices.GetRequiredService<LoginQueryPipeline>();
-        ErrorOr<AuthenticationResult> serviceResult = await pipeline.Pipe(loginQuery, handler.Handle);
+        ErrorOr<AuthenticationResult> serviceResult = await pipeline.Pipe(loginQuery, handler.Handle, CancellationToken.None);
 
         return serviceResult.Match(
             result => Ok(_mapper.Map<AuthenticationResponse>(result)),

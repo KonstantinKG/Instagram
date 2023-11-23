@@ -1,8 +1,11 @@
 ﻿using ErrorOr;
 using Instagram.Application.Common.Interfaces.Authentication;
 using Instagram.Application.Common.Interfaces.Persistence;
+using Instagram.Application.Common.Interfaces.Persistence.CommandRepositories;
+using Instagram.Application.Common.Interfaces.Persistence.QueryRepositories;
 using Instagram.Application.Services.Authentication.Common;
 using Instagram.Domain.Aggregates.UserAggregate;
+using Instagram.Domain.Aggregates.UserAggregate.Entities;
 using Instagram.Domain.Common.Errors;
 
 namespace Instagram.Application.Services.Authentication.Commands.Register;
@@ -10,25 +13,35 @@ namespace Instagram.Application.Services.Authentication.Commands.Register;
 public class RegisterCommandHandler
 {
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
-    private readonly IUserRepository _userRepository;
+    private readonly IUserCommandRepository _userCommandRepository;
+    private readonly IUserQueryRepository _userQueryRepository;
 
-    public RegisterCommandHandler(IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository)
+    public RegisterCommandHandler(
+        IJwtTokenGenerator jwtTokenGenerator,
+        IUserQueryRepository userQueryRepository,
+        IUserCommandRepository userCommandRepository)
     {
         _jwtTokenGenerator = jwtTokenGenerator;
-        _userRepository = userRepository;
+        _userQueryRepository = userQueryRepository;
+        _userCommandRepository = userCommandRepository;
     }
 
     public async Task<ErrorOr<AuthenticationResult>> Handle(RegisterCommand command, CancellationToken cancellationToken)
     {
-        if (await _userRepository.GetUserBy(u=> 
-                    u.Username == command.Username ||
-                    u.Email == command.Email) is User existingUser)
+        
+        if (await _userQueryRepository.GetUserByIdentity(
+                command.Username,
+                command.Email,
+                null)
+            is User existingUser)
         {
             List<Error> errors = new ();
+            
             if (existingUser.Username == command.Username) 
-                errors.Add(Error.Conflict(description: "Пользователь с данным именем уже существует."));
+                errors.Add(Errors.User.UniqueUsername);
+            
             if (existingUser.Email == command.Email) 
-                errors.Add(Error.Conflict(description: "Пользователь с данной почтой уже существует."));
+                errors.Add(Errors.User.UniqueEmail);
             return errors;
         }
         
@@ -37,16 +50,16 @@ public class RegisterCommandHandler
             fullname: command.Fullname,
             email: command.Email,
             phone: null,
-            password: command.Password
+            password: command.Password,
+            UserProfile.Empty()
         );
         
-        await _userRepository.AddUser(user);
-        
+        await _userCommandRepository.AddUser(user);
 
         var token = _jwtTokenGenerator.GenerateToken(user);
         return new AuthenticationResult(
-            user,
-            token
+            token,
+            "not implemented"
         );
     }
 }

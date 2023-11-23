@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
 
+using Instagram.Domain.Common.Errors;
+
 namespace Instagram.Application.Services.Authentication.Commands.Register;
 
 public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
