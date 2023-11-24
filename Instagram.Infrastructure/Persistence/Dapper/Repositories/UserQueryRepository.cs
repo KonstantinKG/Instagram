@@ -20,11 +20,12 @@ public class UserQueryRepository : IUserQueryRepository
     {
         var connection = _context.CreateConnection();
         var parameters = new { Id = id };
-        var sql = @"
-                       SELECT * FROM users u 
-                       INNER JOIN profiles p ON p.user_id = u.id
-                       WHERE u.id = @Id;
-                   ";
+        const string sql = 
+            """
+                SELECT * FROM users u
+                INNER JOIN profiles p ON p.user_id = u.id
+                WHERE u.id = @Id;
+            """;
         
         var users = await connection.QueryAsync<User, UserProfile, User>(sql, (user, profile) =>
         {
@@ -39,16 +40,35 @@ public class UserQueryRepository : IUserQueryRepository
     {
         var connection = _context.CreateConnection();
         var parameters = new { Username = username, Email = email, Phone = phone };
-        var sql = @"
-            SELECT * FROM users
-            WHERE 
-                (@Username IS NOT NULL AND username = @Username)
-                OR 
-                (@Email IS NOT NULL AND email = @Email)
-                OR 
-                (@Phone IS NOT NULL AND phone = @Phone);
-        ";
+        const string sql = 
+            """
+               SELECT * FROM users
+               WHERE
+                   (@Username IS NOT NULL AND username = @Username)
+                   OR
+                   (@Email IS NOT NULL AND email = @Email)
+                   OR
+                   (@Phone IS NOT NULL AND phone = @Phone);
+           """;
 
         return await connection.QuerySingleOrDefaultAsync<User>(sql, parameters);
+    }
+
+    public async Task<List<User>> GetAllUsers()
+    {
+        var connection = _context.CreateConnection();
+        const string sql = 
+            @"
+                SELECT * FROM users u
+                INNER JOIN profiles p ON p.user_id = u.id
+                ORDER BY u.id
+            ";
+        
+        var users = await connection.QueryAsync<User, UserProfile, User>(sql, (user, profile) =>
+        {
+            user.SetProfile(profile);
+            return user;
+        }, splitOn: "id");
+        return users.ToList();
     }
 }

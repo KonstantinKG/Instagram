@@ -1,5 +1,5 @@
 ﻿namespace Instagram.Contracts.User.Common;
 
-public record UserProfile(
+public record UserProfileResponse(
     string? Image,
     string? Bio);

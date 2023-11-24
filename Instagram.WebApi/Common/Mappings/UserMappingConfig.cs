@@ -1,7 +1,8 @@
-﻿using Instagram.Application.Common.Interfaces.Services;
-using Instagram.Application.Services.UserService.Commands;
+﻿using Instagram.Application.Services.UserService.Commands;
+using Instagram.Application.Services.UserService.Queries.GetAllUsers;
 using Instagram.Application.Services.UserService.Queries.GetUser;
 using Instagram.Contracts.User;
+using Instagram.Domain.Aggregates.UserAggregate;
 using Instagram.Infrastructure.Services;
 
 using Mapster;
@@ -20,5 +21,12 @@ public class UserMappingConfig : IRegister
             .Map(dest => dest.Image , src => src.request.Image != null ? new AppFileProxy(src.request.Image) : null)
             .Map(dest => dest.UserId, src => src.userId)
             .Map(dest => dest, src => src.request);
+
+        config.NewConfig<GetAllUsersResult, GetAllUsersResponse>()
+            .Map(dest => dest.Users, src => src.Users);
+
+        config.NewConfig<User, GetAllUser>()
+            .Map(dest => dest.Image, src => src.Profile.Image)
+            .Map(dest => dest, src => src);
     }
 }

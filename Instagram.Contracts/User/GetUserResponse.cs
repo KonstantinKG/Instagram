@@ -7,5 +7,5 @@ public record GetUserResponse(
     string Fullname,
     string? Email,
     string? Phone,
-    UserProfile Profile
+    UserProfileResponse Profile
     );

@@ -3,6 +3,7 @@
 using ErrorOr;
 
 using Instagram.Application.Services.UserService.Commands;
+using Instagram.Application.Services.UserService.Queries.GetAllUsers;
 using Instagram.Application.Services.UserService.Queries.GetUser;
 using Instagram.Contracts.User;
 
@@ -32,6 +33,19 @@ public class UserController : ApiController
 
         return serviceResult.Match(
             result => Ok(_mapper.Map<GetUserResponse>(result)),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpGet]
+    [Route("all")]
+    public async Task<IActionResult> All()
+    {
+        var handler = HttpContext.RequestServices.GetRequiredService<GetAllUsersQueryHandler>();
+        ErrorOr<GetAllUsersResult> serviceResult = await handler.Handle(CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(_mapper.Map<GetAllUsersResponse>(result)),
             errors => Problem(errors)
         );
     }
