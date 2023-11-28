@@ -7,6 +7,5 @@ public class LoginQueryValidator : AbstractValidator<LoginQuery>
 {
     public LoginQueryValidator()
     {
-        RuleFor(x => x.Password).MinimumLength(8);
     }
 }

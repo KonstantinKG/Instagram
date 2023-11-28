@@ -16,11 +16,17 @@ public class GetAllUsersQueryHandler
         _userQueryRepository = userQueryRepository;
     }
     
-    public async Task<ErrorOr<GetAllUsersResult>> Handle(CancellationToken cancellationToken)
+    public async Task<ErrorOr<GetAllUsersResult>> Handle(GetAllUsersQuery query,  CancellationToken cancellationToken)
     {
         try
         {
-            var users = await _userQueryRepository.GetAllUsers();
+            const int limit = 15;
+            var offset = (query.Page - 1) * limit;
+            
+            var users = await _userQueryRepository.GetAllUsers(
+                offset,
+                limit
+                );
             return new GetAllUsersResult(users);
         }
         catch (Exception)

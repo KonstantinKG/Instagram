@@ -1,4 +1,4 @@
-﻿namespace Instagram.Contracts.User;
+﻿namespace Instagram.Contracts.User.GetAllUsersContracts;
 
 public record GetAllUsersResponse(
     List<GetAllUser> Users

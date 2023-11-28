@@ -1,4 +1,7 @@
 ﻿using ErrorOr;
+
+using Instagram.Application.Services.Authentication.Commands.Logout;
+using Instagram.Application.Services.Authentication.Commands.Refresh;
 using Instagram.Application.Services.Authentication.Commands.Register;
 using Instagram.Application.Services.Authentication.Common;
 using Instagram.Application.Services.Authentication.Queries.Login;
@@ -10,7 +13,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Instagram.WebApi.Controllers;
 
 [Route("auth")]
-[AllowAnonymous]
 public class AuthenticationController : ApiController
 {
     private readonly IMapper _mapper;
@@ -21,6 +23,7 @@ public class AuthenticationController : ApiController
     }
 
     [HttpPost]
+    [AllowAnonymous]
     [Route("login")]
     public async Task<IActionResult> Login(LoginRequest request)
     {
@@ -36,6 +39,7 @@ public class AuthenticationController : ApiController
     }
 
     [HttpPost]
+    [AllowAnonymous]
     [Route("register")]
     public async Task<IActionResult> Register(RegisterRequest request)
     {
@@ -46,6 +50,38 @@ public class AuthenticationController : ApiController
 
         return serviceResult.Match(
             result => Ok(_mapper.Map<AuthenticationResponse>(result)),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpPost]
+    [AllowAnonymous]
+    [Route("refresh")]
+    public async Task<IActionResult> Refresh(RefreshRequest request)
+    {
+        var refreshCommand = _mapper.Map<RefreshCommand>(request);
+        var handler = HttpContext.RequestServices.GetRequiredService<RefreshCommandHandler>();
+        ErrorOr<AuthenticationResult> serviceResult = await handler.Handle(refreshCommand, CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(_mapper.Map<AuthenticationResponse>(result)),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpPost]
+    [Authorize]
+    [Route("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        var sessionId = HttpContext.User.Claims.First(c => c.Type == "sid").Value;
+        
+        var command = new LogoutCommand(sessionId);
+        var handler = HttpContext.RequestServices.GetRequiredService<LogoutCommandHandler>();
+        ErrorOr<bool> serviceResult = await handler.Handle(command, CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(),
             errors => Problem(errors)
         );
     }

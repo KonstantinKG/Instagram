@@ -33,7 +33,7 @@ public class UserQueryRepository : IUserQueryRepository
             return user;
         }, parameters, splitOn: "id");
 
-        return users.First();
+        return users.FirstOrDefault();
     }
 
     public async Task<User?> GetUserByIdentity(string? username, string? email, string? phone)
@@ -54,21 +54,30 @@ public class UserQueryRepository : IUserQueryRepository
         return await connection.QuerySingleOrDefaultAsync<User>(sql, parameters);
     }
 
-    public async Task<List<User>> GetAllUsers()
+    public async Task<List<User>> GetAllUsers(int offset, int limit)
     {
         var connection = _context.CreateConnection();
+        var parameters = new { Offset = offset, Limit = limit };
         const string sql = 
             @"
                 SELECT * FROM users u
                 INNER JOIN profiles p ON p.user_id = u.id
                 ORDER BY u.id
+                LIMIT @limit
+                OFFSET @offset
             ";
         
-        var users = await connection.QueryAsync<User, UserProfile, User>(sql, (user, profile) =>
-        {
-            user.SetProfile(profile);
-            return user;
-        }, splitOn: "id");
+        var users = await connection.QueryAsync<User, UserProfile, User>(
+            sql,
+            (user, profile) =>
+            {
+                user.SetProfile(profile);
+                return user;
+            }, 
+            parameters,
+            splitOn: "id"
+        );
+        
         return users.ToList();
     }
 }

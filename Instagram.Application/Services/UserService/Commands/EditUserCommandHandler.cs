@@ -27,13 +27,11 @@ public class EditUserCommandHandler
 
     public async Task<ErrorOr<bool>> Handle(EditUserCommand command, CancellationToken cancellationToken)
     {
-        var userId = long.Parse(command.UserId);
-        
         if (await _userQueryRepository.GetUserByIdentity(
                 command.Username,
                 command.Email,
                 command.Phone)
-            is User existingUser && existingUser.Id != userId)
+            is User existingUser && existingUser.Id != command.UserId)
         {
             List<Error> errors = new ();
             
@@ -54,7 +52,7 @@ public class EditUserCommandHandler
             imagePath = await _fileDownloader.Download(command.Image, "profiles");
         
         
-        var user = await _userQueryRepository.GetUserById(userId);
+        var user = await _userQueryRepository.GetUserById(command.UserId);
         if (user is null)
             return Errors.User.UserNotFound;
 
@@ -67,7 +65,7 @@ public class EditUserCommandHandler
             user.Password,
             user.Profile
         );
-        newUser.SetId(userId);
+        newUser.SetId(command.UserId);
 
         var newProfile = UserProfile.Create(imagePath, command.Bio);
         newProfile.SetId(user.Profile.Id);

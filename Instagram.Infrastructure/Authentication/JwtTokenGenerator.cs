@@ -1,9 +1,9 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
+
 using Instagram.Application.Common.Interfaces.Authentication;
 using Instagram.Application.Common.Interfaces.Services;
-using Instagram.Domain.Aggregates.UserAggregate;
+
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -19,30 +19,45 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         _dateTimeProvider = dateTimeProvider;
         _jwtSettings = jwtOptions.Value;
     }
-    
-    public string GenerateToken(User user)
+
+    public string GenerateAccessToken(TokenParameters parameters)
     {
-        var signinSecurityKey = new SigningCredentials(
-            new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_jwtSettings.Secret)
-            ),
-            SecurityAlgorithms.HmacSha256
+        var expiryMinutes = Convert.ToDouble(_jwtSettings.AccessTokenExpiryMinutes); 
+        var validTo = _dateTimeProvider.UtcNow.AddMinutes(expiryMinutes);
+        return GenerateToken(parameters, validTo);
+    }
+    
+    public string GenerateRefreshToken(TokenParameters parameters)
+    {
+        var expiryMinutes = Convert.ToDouble(_jwtSettings.RefreshTokenExpiryMinutes);
+        var validTo = _dateTimeProvider.UtcNow.AddMinutes(expiryMinutes);
+        return GenerateToken(parameters, validTo);
+    }
+
+    public string GenerateToken(TokenParameters parameters, DateTime validTo)
+    {
+        var securityKey = new RsaSecurityKey(RsaKeyGenerator.RsaKey);
+        
+        var signingCredentials = new SigningCredentials(
+            securityKey,
+            SecurityAlgorithms.RsaSha256
         );
         
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sid, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
+            new Claim(JwtRegisteredClaimNames.Sid, parameters.SessionId),
+            new Claim(JwtRegisteredClaimNames.NameId, parameters.Id),
+            new Claim(JwtRegisteredClaimNames.UniqueName, parameters.Username),
+            new Claim(JwtRegisteredClaimNames.Email, parameters.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
-
+        
         var securityToken = new JwtSecurityToken(
             issuer: _jwtSettings.Issuer,
             audience: _jwtSettings.Audience,
-            expires: _dateTimeProvider.UtcNow.AddMinutes(Convert.ToDouble(_jwtSettings.ExpirationTimeInMinutes)),
+            expires: validTo,
             claims: claims,
-            signingCredentials: signinSecurityKey
+            signingCredentials: signingCredentials
         );
 
         return new JwtSecurityTokenHandler().WriteToken(securityToken);

@@ -1,9 +1,14 @@
-﻿using ErrorOr;
+﻿using System.Security.Cryptography;
+using System.Text;
+
+using ErrorOr;
 using Instagram.Application.Common.Interfaces.Authentication;
 using Instagram.Application.Common.Interfaces.Persistence.QueryRepositories;
 using Instagram.Application.Services.Authentication.Common;
 using Instagram.Domain.Aggregates.UserAggregate;
 using Instagram.Domain.Common.Errors;
+
+using Microsoft.AspNetCore.Identity;
 
 namespace Instagram.Application.Services.Authentication.Queries.Login;
 
@@ -11,11 +16,22 @@ public class LoginQueryHandler
 {
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IUserQueryRepository _userQueryRepository;
+    private readonly IJwtTokenRepository _jwtTokenRepository;
+    private readonly IJwtTokenHasher _jwtTokenHasher;
+    private readonly IPasswordHasher<object> _passwordHasher;
 
-    public LoginQueryHandler(IJwtTokenGenerator jwtTokenGenerator, IUserQueryRepository userQueryRepository)
+    public LoginQueryHandler(
+        IJwtTokenGenerator jwtTokenGenerator,
+        IUserQueryRepository userQueryRepository,
+        IJwtTokenRepository jwtTokenRepository,
+        IPasswordHasher<object> passwordHasher,
+        IJwtTokenHasher jwtTokenHasher)
     {
         _jwtTokenGenerator = jwtTokenGenerator;
         _userQueryRepository = userQueryRepository;
+        _jwtTokenRepository = jwtTokenRepository;
+        _passwordHasher = passwordHasher;
+        _jwtTokenHasher = jwtTokenHasher;
     }
     
     public async Task<ErrorOr<AuthenticationResult>> Handle(LoginQuery query, CancellationToken cancellationToken)
@@ -28,16 +44,29 @@ public class LoginQueryHandler
         {
             return Errors.User.InvalidCredentials;
         }
-        
-        if (user.Password != query.Password)
+
+        var verificationResult = _passwordHasher.VerifyHashedPassword(new object(), user.Password, query.Password);
+        if (verificationResult == PasswordVerificationResult.Failed)
         {
             return Errors.User.InvalidCredentials;
         }
 
-        var token = _jwtTokenGenerator.GenerateToken(user);
+        var userSessionId = Guid.NewGuid().ToString();
+        var tokenParameters = new TokenParameters(
+            user.Id.ToString(),
+            userSessionId,
+            user.Username,
+            user.Email
+        );
+        var accessToken = _jwtTokenGenerator.GenerateAccessToken(tokenParameters);
+        var refreshToken = _jwtTokenGenerator.GenerateRefreshToken(tokenParameters);
+
+        var tokenHash = _jwtTokenHasher.HashToken(refreshToken);
+        await _jwtTokenRepository.InsertToken(user.Id, userSessionId, tokenHash);
+        
         return new AuthenticationResult(
-            token,
-            "not implemented"
+            accessToken,
+            refreshToken
         );
     }
 }

@@ -6,5 +6,5 @@ public interface IUserQueryRepository
 {
     Task<User?> GetUserById(long id);
     Task<User?> GetUserByIdentity(string? username, string? email, string? phone);
-    Task<List<User>> GetAllUsers();
+    Task<List<User>> GetAllUsers(int offset, int limit);
 }

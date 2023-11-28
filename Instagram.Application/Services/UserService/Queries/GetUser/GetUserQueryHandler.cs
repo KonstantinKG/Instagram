@@ -18,8 +18,7 @@ public class GetUserQueryHandler
     
     public async Task<ErrorOr<GetUserResult>> Handle(GetUserQuery query, CancellationToken cancellationToken)
     {
-        var userId = long.Parse(query.UserId);
-        if (await _userQueryRepository.GetUserById(userId) is not User user)
+        if (await _userQueryRepository.GetUserById(query.UserId) is not User user)
         {
             return Errors.User.UserNotFound;
         }

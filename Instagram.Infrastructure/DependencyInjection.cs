@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Instagram.Application.Common.Interfaces.Authentication;
+﻿using Instagram.Application.Common.Interfaces.Authentication;
 using Instagram.Application.Common.Interfaces.Persistence.CommandRepositories;
 using Instagram.Application.Common.Interfaces.Persistence.QueryRepositories;
 using Instagram.Application.Common.Interfaces.Services;
@@ -13,7 +12,7 @@ using Instagram.Infrastructure.Services;
 using Instagram.Infrastructure.Services.FileDownloaderService;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,8 +44,8 @@ public static class DependencyInjection
 
         services.AddScoped<DapperContext>();
         services.AddDbContext<UserDbContext>(options => options.UseNpgsql(dbConnections.Postgres));
-        
-        
+
+        services.AddScoped<IJwtTokenRepository, JwtTokenRepository>();
         services.AddScoped<IUserCommandRepository, UserCommandRepository>();
         services.AddScoped<IUserQueryRepository, UserQueryRepository>();
         
@@ -62,18 +61,27 @@ public static class DependencyInjection
 
         services.AddSingleton(Options.Create(jwtSettings));
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddSingleton<IJwtTokenValidator, JwtTokenValidator>();
+        services.AddSingleton<IJwtTokenHasher, JwtTokenHasher>();
+        services.AddSingleton<IJwtTokenHasher, JwtTokenHasher>();
+        services.AddSingleton<IPasswordHasher<object>, PasswordHasher<object>>();
+        services.AddSingleton<RsaKeyGenerator>();
         
         services.AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters()
+            .AddJwtBearer(options =>
             {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtSettings.Issuer,
-                ValidAudience = jwtSettings.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(jwtSettings.Secret))
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidAudience = jwtSettings.Audience,
+                    IssuerSigningKey = new RsaSecurityKey(RsaKeyGenerator.RsaKey)
+                };
+                options.MapInboundClaims = false;
             });
 
         return services;
