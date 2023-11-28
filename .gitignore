@@ -5,6 +5,7 @@
 
 # Development
 *.Development.json
+Migrations
 
 # User-specific files
 *.rsuser
