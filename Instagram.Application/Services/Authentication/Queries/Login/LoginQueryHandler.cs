@@ -58,6 +58,7 @@ public class LoginQueryHandler
             user.Username,
             user.Email
         );
+        
         var accessToken = _jwtTokenGenerator.GenerateAccessToken(tokenParameters);
         var refreshToken = _jwtTokenGenerator.GenerateRefreshToken(tokenParameters);
 

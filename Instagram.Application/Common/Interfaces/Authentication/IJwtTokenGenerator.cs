@@ -1,4 +1,4 @@
-﻿using Instagram.Domain.Aggregates.UserAggregate;
+﻿using Microsoft.IdentityModel.Tokens;
 
 namespace Instagram.Application.Common.Interfaces.Authentication;
 
@@ -6,7 +6,7 @@ public interface IJwtTokenGenerator
 {
     public string GenerateAccessToken(TokenParameters parameters);
     public string GenerateRefreshToken(TokenParameters parameters);
-    public string GenerateToken(TokenParameters parameters, DateTime validTo);
+    public string RotateRefreshToken(TokenParameters parameters, SecurityToken validatedToken);
 }
 
 public record TokenParameters

@@ -34,10 +34,16 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         return GenerateToken(parameters, validTo);
     }
 
-    public string GenerateToken(TokenParameters parameters, DateTime validTo)
+
+    public string RotateRefreshToken(TokenParameters parameters, SecurityToken validatedToken)
+    {
+        return GenerateToken(parameters, validatedToken.ValidTo);
+    }
+
+    private string GenerateToken(TokenParameters parameters, DateTime validTo)
     {
         var securityKey = new RsaSecurityKey(RsaKeyGenerator.RsaKey);
-        
+
         var signingCredentials = new SigningCredentials(
             securityKey,
             SecurityAlgorithms.RsaSha256

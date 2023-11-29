@@ -1,7 +1,6 @@
 ﻿using Instagram.Application.Services.UserService.Commands;
 using Instagram.Application.Services.UserService.Queries.GetAllUsers;
 using Instagram.Application.Services.UserService.Queries.GetUser;
-using Instagram.Contracts.User;
 using Instagram.Contracts.User.EditUserContracts;
 using Instagram.Contracts.User.GetAllUsersContracts;
 using Instagram.Contracts.User.GetUserContracts;

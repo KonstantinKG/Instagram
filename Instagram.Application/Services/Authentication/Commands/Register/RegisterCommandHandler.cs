@@ -78,6 +78,7 @@ public class RegisterCommandHandler
             user.Username,
             user.Email
         );
+        
         var accessToken = _jwtTokenGenerator.GenerateAccessToken(tokenParameters);
         var refreshToken = _jwtTokenGenerator.GenerateRefreshToken(tokenParameters);
 
