@@ -25,7 +25,7 @@ services:
     ports:
       - 5054:5054
     volumes:
-      - migrations:/var/lib/Instagram.Infrastructure/Migrations
+      - ./Instagram.Infrastructure/Migrations/:/app/Instagram.Infrastructure/Migrations/
     restart: on-failure
     depends_on:
       db:
@@ -33,4 +33,3 @@ services:
 
 volumes:
   postgresql-data:
-  migrations:
