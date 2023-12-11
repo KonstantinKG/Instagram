@@ -4,11 +4,11 @@ using Instagram.Infrastructure.Persistence.EF.Configurations;
 
 using Microsoft.EntityFrameworkCore;
 
-namespace Instagram.Infrastructure.Persistence.EF.Contexts;
+namespace Instagram.Infrastructure.Persistence.EF;
 
-public class UserDbContext : DbContext
+public class EfContext : DbContext
 {
-    public UserDbContext(DbContextOptions<UserDbContext> options) 
+    public EfContext(DbContextOptions<EfContext> options) 
         : base(options)
     {
         

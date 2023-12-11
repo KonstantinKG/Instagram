@@ -1,15 +1,14 @@
 ﻿using Instagram.Application.Common.Interfaces.Persistence;
 using Instagram.Application.Common.Interfaces.Persistence.CommandRepositories;
 using Instagram.Domain.Aggregates.UserAggregate;
-using Instagram.Infrastructure.Persistence.EF.Contexts;
 
 namespace Instagram.Infrastructure.Persistence.EF.Repositories;
 
 public class UserCommandRepository : IUserCommandRepository
 {
-    private readonly UserDbContext _context;
+    private readonly EfContext _context;
 
-    public UserCommandRepository(UserDbContext context)
+    public UserCommandRepository(EfContext context)
     {
         _context = context;
     }

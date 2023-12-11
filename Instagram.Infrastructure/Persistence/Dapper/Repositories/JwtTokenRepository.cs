@@ -3,7 +3,6 @@
 using Instagram.Application.Common.Interfaces.Persistence.QueryRepositories;
 using Instagram.Domain.Aggregates.TokenAggregate;
 using Instagram.Domain.Aggregates.UserAggregate.Entities;
-using Instagram.Infrastructure.Persistence.Dapper.Common;
 
 namespace Instagram.Infrastructure.Persistence.Dapper.Repositories;
 

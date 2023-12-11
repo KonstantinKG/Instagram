@@ -1,8 +1,10 @@
 ﻿using System.Data;
+
 using Instagram.Infrastructure.Persistence.Connections;
+
 using Npgsql;
 
-namespace Instagram.Infrastructure.Persistence.Dapper.Common;
+namespace Instagram.Infrastructure.Persistence.Dapper;
 
 public class DapperContext
 {

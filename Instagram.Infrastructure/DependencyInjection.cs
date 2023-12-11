@@ -4,9 +4,9 @@ using Instagram.Application.Common.Interfaces.Persistence.QueryRepositories;
 using Instagram.Application.Common.Interfaces.Services;
 using Instagram.Infrastructure.Authentication;
 using Instagram.Infrastructure.Persistence.Connections;
-using Instagram.Infrastructure.Persistence.Dapper.Common;
+using Instagram.Infrastructure.Persistence.Dapper;
 using Instagram.Infrastructure.Persistence.Dapper.Repositories;
-using Instagram.Infrastructure.Persistence.EF.Contexts;
+using Instagram.Infrastructure.Persistence.EF;
 using Instagram.Infrastructure.Persistence.EF.Repositories;
 using Instagram.Infrastructure.Services;
 using Instagram.Infrastructure.Services.FileDownloaderService;
@@ -43,7 +43,7 @@ public static class DependencyInjection
         services.AddSingleton(dbConnections);
 
         services.AddScoped<DapperContext>();
-        services.AddDbContext<UserDbContext>(options => options.UseNpgsql(dbConnections.Postgres));
+        services.AddDbContext<EfContext>(options => options.UseNpgsql(dbConnections.Postgres));
 
         services.AddScoped<IJwtTokenRepository, JwtTokenRepository>();
         services.AddScoped<IUserCommandRepository, UserCommandRepository>();
