@@ -1,36 +1,50 @@
-﻿using Instagram.Domain.Common.Models;
+﻿using Instagram.Domain.Aggregates.PostAggregate.ValueObjects;
+using Instagram.Domain.Common.Models;
 
 namespace Instagram.Domain.Aggregates.PostAggregate.Entities;
 
-public class PostGallery : Entity<long>
+public class PostGallery : Entity<PostGalleryId>
 {
-    public long PostId { get; private set; }
     public string File { get; private set; }
     public string? Description { get; private set; }
     public string? Labels { get; private set; }
 
     private PostGallery(
-        long postId,
+        PostGalleryId id,
         string file,
         string? description,
         string? labels
         )
+    : base(id)
     {
-        PostId = postId;
         File = file;
         Description = description;
         Labels = labels;
     }
     
     public static PostGallery Create(
-        long postId,
         string file,
         string? description,
         string? labels
         )
     {
         return new PostGallery(
-            postId,
+            PostGalleryId.Create(), 
+            file,
+            description,
+            labels
+            );
+    }
+    
+    public static PostGallery Fill(
+        Guid id,
+        string file,
+        string? description,
+        string? labels
+        )
+    {
+        return new PostGallery(
+            PostGalleryId.Fill(id), 
             file,
             description,
             labels

@@ -1,9 +1,10 @@
 ﻿using Instagram.Domain.Aggregates.UserAggregate.Entities;
+using Instagram.Domain.Aggregates.UserAggregate.ValueObjects;
 using Instagram.Domain.Common.Models;
 
 namespace Instagram.Domain.Aggregates.UserAggregate;
 
-public sealed class User : AggregateRoot<long>
+public sealed class User : AggregateRoot<UserId>
 {
     public string Username { get; private set; }
     public string Fullname { get; private set; }
@@ -15,14 +16,15 @@ public sealed class User : AggregateRoot<long>
 
 
     private User(
+        UserId id,
         string username,
         string fullname,
         string email,
         string? phone,
         string password,
         UserProfile profile)
+    : base(id)
     {
-        Id = default!;
         Username = username;
         Fullname = fullname;
         Email = email;
@@ -40,6 +42,27 @@ public sealed class User : AggregateRoot<long>
         UserProfile profile)
     {
         return new User(
+            UserId.Create(),
+            username,
+            fullname,
+            email,
+            phone,
+            password,
+            profile
+        );
+    }
+    
+    public static User Fill(
+        Guid id,
+        string username,
+        string fullname,
+        string email,
+        string? phone,
+        string password,
+        UserProfile profile)
+    {
+        return new User(
+            UserId.Fill(id),
             username,
             fullname,
             email,

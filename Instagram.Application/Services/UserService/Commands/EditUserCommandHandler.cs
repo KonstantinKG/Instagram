@@ -31,7 +31,7 @@ public class EditUserCommandHandler
                 command.Username,
                 command.Email,
                 command.Phone)
-            is User existingUser && existingUser.Id != command.UserId)
+            is User existingUser && existingUser.Id.Value.ToString() != command.UserId)
         {
             List<Error> errors = new ();
             
@@ -57,7 +57,8 @@ public class EditUserCommandHandler
             return Errors.User.UserNotFound;
 
 
-        var newUser = User.Create(
+        var newUser = User.Fill(
+            Guid.Parse(command.UserId),
             command.Username,
             command.Fullname,
             command.Email,
@@ -65,7 +66,6 @@ public class EditUserCommandHandler
             user.Password,
             user.Profile
         );
-        newUser.SetId(command.UserId);
 
         var newProfile = UserProfile.Create(imagePath, command.Bio);
         newProfile.SetId(user.Profile.Id);

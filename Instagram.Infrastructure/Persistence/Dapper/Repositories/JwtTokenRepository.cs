@@ -30,7 +30,7 @@ public class JwtTokenRepository : IJwtTokenRepository
         return token;
     }
 
-    public async Task InsertToken(long userId, string sessionId, string tokenHash)
+    public async Task InsertToken(string userId, string sessionId, string tokenHash)
     {
         var connection = _context.CreateConnection();
         var parameters = new { UserId = userId, SessionId = sessionId, TokenHash = tokenHash };
@@ -54,7 +54,7 @@ public class JwtTokenRepository : IJwtTokenRepository
         var token = await connection.ExecuteAsync(sql, parameters);
     }
 
-    public async Task DeleteAllUserTokens(long userId)
+    public async Task DeleteAllUserTokens(string userId)
     {
         var connection = _context.CreateConnection();
         var parameters = new { UserId = userId };

@@ -28,8 +28,7 @@ public class UserController : ApiController
     public async Task<IActionResult> Get([FromQuery] GetUserRequest request)
     {
         var requestUserId = request.UserId;
-        var claimsUserIdText = HttpContext.User.Claims.First(x => x.Type == "nameid").Value;
-        var claimsUserId = long.Parse(claimsUserIdText); 
+        var claimsUserId =  HttpContext.User.Claims.First(x => x.Type == "nameid").Value;
 
         var userId = requestUserId ?? claimsUserId;
         var getUserQuery = new GetUserQuery(userId);

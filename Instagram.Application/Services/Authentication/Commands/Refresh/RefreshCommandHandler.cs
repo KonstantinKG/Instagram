@@ -55,7 +55,7 @@ public class RefreshCommandHandler
         var accessToken = _jwtTokenGenerator.GenerateAccessToken(tokenParameters);
         var refreshToken = _jwtTokenGenerator.RotateRefreshToken(tokenParameters, validatedRefreshToken!);
 
-        var userId = long.Parse(tokenParameters.Id);
+        var userId = tokenParameters.Id;
         var newTokenHash = _jwtTokenHasher.HashToken(refreshToken);
         
         await _jwtTokenRepository.DeleteToken(oldTokenHash);

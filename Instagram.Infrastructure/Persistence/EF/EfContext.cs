@@ -1,4 +1,7 @@
-﻿using Instagram.Domain.Aggregates.TokenAggregate;
+﻿using Instagram.Domain.Aggregates.LocationAggregate;
+using Instagram.Domain.Aggregates.PostAggregate;
+using Instagram.Domain.Aggregates.TagAggregate;
+using Instagram.Domain.Aggregates.TokenAggregate;
 using Instagram.Domain.Aggregates.UserAggregate;
 using Instagram.Infrastructure.Persistence.EF.Configurations;
 
@@ -15,6 +18,9 @@ public class EfContext : DbContext
     }
 
     public DbSet<User> Users { get; set; } = null!;
+    public DbSet<Post> Posts { get; set; } = null!;
+    public DbSet<Location> Locations { get; set; } = null!;
+    public DbSet<Tag> Tags { get; set; } = null!;
 
     /* REMOVE IN THE FUTURE WHEN SEPARATE AUTH SERVER */
     public DbSet<Token> Tokens { get; set; } = null!;
@@ -26,6 +32,15 @@ public class EfContext : DbContext
         
         var jwtTokenTempConfiguration = new JwtTokenTempConfigurations();
         builder.ApplyConfiguration(jwtTokenTempConfiguration);
+
+        var postDbContextConfiguration = new PostDbContextConfiguration();
+        builder.ApplyConfiguration(postDbContextConfiguration);
+        
+        var locationDbContextConfiguration = new LocationDbContextConfiguration();
+        builder.ApplyConfiguration(locationDbContextConfiguration);
+        
+        var tagDbContextConfiguration = new TagDbContextConfiguration();
+        builder.ApplyConfiguration(tagDbContextConfiguration);
         
         base.OnModelCreating(builder);
     }

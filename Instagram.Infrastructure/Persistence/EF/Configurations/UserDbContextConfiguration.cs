@@ -1,4 +1,5 @@
 ﻿using Instagram.Domain.Aggregates.UserAggregate;
+using Instagram.Domain.Aggregates.UserAggregate.ValueObjects;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -20,8 +21,11 @@ public class UserDbContextConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.Id)
             .HasColumnName("id")
-            .ValueGeneratedOnAdd()
-            .UseSerialColumn();
+            .ValueGeneratedNever()
+            .HasConversion(
+                id => id.Value,
+                value => UserId.Fill(value)
+            );
 
         builder.Property(u => u.Username)
             .HasColumnName("username")
@@ -51,8 +55,11 @@ public class UserDbContextConfiguration : IEntityTypeConfiguration<User>
             ps
                 .Property(p => p.Id)
                 .HasColumnName("id")
-                .ValueGeneratedOnAdd()
-                .UseSerialColumn();
+                .ValueGeneratedNever()
+                .HasConversion(
+                    id => id.Value,
+                    value => UserProfileId.Fill(value)
+                );
 
             ps
                 .Property(p => p.Bio)

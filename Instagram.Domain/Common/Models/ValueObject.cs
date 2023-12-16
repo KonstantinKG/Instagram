@@ -20,12 +20,12 @@ public abstract class ValueObject : IEquatable<ValueObject>
         return Equals((object?)other);
     }
 
-    public static bool operator ==(ValueObject left, ValueObject right)
+    public static bool operator ==(ValueObject? left, ValueObject? right)
     {
         return Equals(left, right);
     }
 
-    public static bool operator !=(ValueObject left, ValueObject right)
+    public static bool operator !=(ValueObject? left, ValueObject? right)
     {
         return !Equals(left, right);
     }

@@ -53,7 +53,7 @@ public class LoginQueryHandler
 
         var userSessionId = Guid.NewGuid().ToString();
         var tokenParameters = new TokenParameters(
-            user.Id.ToString(),
+            user.Id.Value.ToString(),
             userSessionId,
             user.Username,
             user.Email
@@ -63,7 +63,7 @@ public class LoginQueryHandler
         var refreshToken = _jwtTokenGenerator.GenerateRefreshToken(tokenParameters);
 
         var tokenHash = _jwtTokenHasher.HashToken(refreshToken);
-        await _jwtTokenRepository.InsertToken(user.Id, userSessionId, tokenHash);
+        await _jwtTokenRepository.InsertToken(user.Id.Value.ToString(), userSessionId, tokenHash);
         
         return new AuthenticationResult(
             accessToken,

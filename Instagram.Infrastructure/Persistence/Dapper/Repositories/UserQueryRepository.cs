@@ -15,7 +15,7 @@ public class UserQueryRepository : IUserQueryRepository
         _context = context;
     }
 
-    public async Task<User?> GetUserById(long id)
+    public async Task<User?> GetUserById(string id)
     {
         var connection = _context.CreateConnection();
         var parameters = new { Id = id };

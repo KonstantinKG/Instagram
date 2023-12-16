@@ -1,15 +1,19 @@
-﻿using Instagram.Domain.Common.Models;
+﻿using Instagram.Domain.Aggregates.UserAggregate.ValueObjects;
+using Instagram.Domain.Common.Models;
 
 namespace Instagram.Domain.Aggregates.UserAggregate.Entities;
 
-public class UserProfile : Entity<long>
+public class UserProfile : Entity<UserProfileId>
 {
     public string? Image { get; private set; }
     public string? Bio { get; private set; }
 
     private UserProfile(
+        UserProfileId id,
         string? image,
-        string? bio)
+        string? bio
+        )
+    : base(id)
     {
         Image = image;
         Bio = bio;
@@ -17,19 +21,26 @@ public class UserProfile : Entity<long>
     
     public static UserProfile Create(
         string? image,
-        string? bio)
+        string? bio
+        )
     {
         return new UserProfile(
+            UserProfileId.Create(),
             image,
             bio
-            );
+        );
     }
     
-    public static UserProfile Empty()
+    public static UserProfile Fill(
+        Guid id,
+        string? image,
+        string? bio
+        )
     {
         return new UserProfile(
-            null,
-            null
+            UserProfileId.Fill(id),
+            image,
+            bio
         );
     }
     

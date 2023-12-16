@@ -3,7 +3,7 @@
 namespace Instagram.Application.Services.UserService.Commands;
 
 public record EditUserCommand(
-    long UserId,
+    string UserId,
     string Username,
     string Fullname,
     string Email,
