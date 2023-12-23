@@ -1,15 +1,14 @@
-﻿using Instagram.Domain.Aggregates.LocationAggregate.ValueObjects;
-using Instagram.Domain.Common.Models;
+﻿using Instagram.Domain.Common.Models;
 
 namespace Instagram.Domain.Aggregates.LocationAggregate;
 
-public sealed class Location : AggregateRoot<LocationId>
+public sealed class Location : AggregateRoot<long>
 {
     public string Name { get; private set; }
 
 
     private Location(
-        LocationId id,
+        long id, 
         string name
         )
     : base(id)
@@ -22,18 +21,18 @@ public sealed class Location : AggregateRoot<LocationId>
         )
     {
         return new Location(
-            LocationId.Create(),
+            default,
             name
         );
     }
     
     public static Location Fill(
-        Guid id,
+        long id,
         string name
     )
     {
         return new Location(
-            LocationId.Fill(id),
+            id,
             name
         );
     }

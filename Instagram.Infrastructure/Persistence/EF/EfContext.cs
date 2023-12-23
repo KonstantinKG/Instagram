@@ -27,20 +27,13 @@ public class EfContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        var configuration = new UserDbContextConfiguration();
-        builder.ApplyConfiguration(configuration);
+        builder.ConfigureUser();
+        builder.ConfigurePost();
+        builder.ConfigureTag();
+        builder.ConfigureLocation();
         
-        var jwtTokenTempConfiguration = new JwtTokenTempConfigurations();
-        builder.ApplyConfiguration(jwtTokenTempConfiguration);
-
-        var postDbContextConfiguration = new PostDbContextConfiguration();
-        builder.ApplyConfiguration(postDbContextConfiguration);
-        
-        var locationDbContextConfiguration = new LocationDbContextConfiguration();
-        builder.ApplyConfiguration(locationDbContextConfiguration);
-        
-        var tagDbContextConfiguration = new TagDbContextConfiguration();
-        builder.ApplyConfiguration(tagDbContextConfiguration);
+        /* TEMPORARY */
+        builder.ConfigureJwt();
         
         base.OnModelCreating(builder);
     }

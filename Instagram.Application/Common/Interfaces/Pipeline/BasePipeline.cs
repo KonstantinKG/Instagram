@@ -36,10 +36,7 @@ public class BasePipeline<TRequest, TResponse>
         if (validationResult.IsValid)
             return null;
         
-        var errors = validationResult.Errors
-            .ConvertAll(e => Error.Validation(
-                e.PropertyName, 
-                e.ErrorMessage));
+        var errors = validationResult.Errors.ConvertAll(e => Error.Validation(e.PropertyName));
         return errors;
     }
 }

@@ -1,5 +1,4 @@
-﻿using Instagram.Domain.Aggregates.LocationAggregate.ValueObjects;
-using Instagram.Domain.Aggregates.TagAggregate.ValueObjects;
+﻿using Instagram.Domain.Aggregates.TagAggregate.ValueObjects;
 using Instagram.Domain.Common.Models;
 
 namespace Instagram.Domain.Aggregates.TagAggregate;

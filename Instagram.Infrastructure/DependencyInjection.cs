@@ -1,6 +1,7 @@
 ﻿using Instagram.Application.Common.Interfaces.Authentication;
-using Instagram.Application.Common.Interfaces.Persistence.CommandRepositories;
-using Instagram.Application.Common.Interfaces.Persistence.QueryRepositories;
+using Instagram.Application.Common.Interfaces.Persistence.DapperRepositories;
+using Instagram.Application.Common.Interfaces.Persistence.EfRepositories;
+using Instagram.Application.Common.Interfaces.Persistence.TemporaryRepositories;
 using Instagram.Application.Common.Interfaces.Services;
 using Instagram.Infrastructure.Authentication;
 using Instagram.Infrastructure.Persistence.Connections;
@@ -34,7 +35,7 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddPersistence(this IServiceCollection services, ConfigurationManager configuration)
+    private static IServiceCollection AddPersistence(this IServiceCollection services, ConfigurationManager configuration)
     {
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         
@@ -46,13 +47,14 @@ public static class DependencyInjection
         services.AddDbContext<EfContext>(options => options.UseNpgsql(dbConnections.Postgres));
 
         services.AddScoped<IJwtTokenRepository, JwtTokenRepository>();
-        services.AddScoped<IUserCommandRepository, UserCommandRepository>();
-        services.AddScoped<IUserQueryRepository, UserQueryRepository>();
+        services.AddScoped<IEfUserRepository, EfUserRepository>();
+        services.AddScoped<IEfPostRepository, EfPostRepository>();
+        services.AddScoped<IDapperUserRepository, DapperUserRepository>();
         
         return services;
     }
-    
-    public static IServiceCollection AddAuth(
+
+    private static IServiceCollection AddAuth(
         this IServiceCollection services,
         ConfigurationManager configuration)
     {
@@ -87,8 +89,7 @@ public static class DependencyInjection
         return services;
     }
 
-
-    public static IServiceCollection AddFileDownloader(
+    private static IServiceCollection AddFileDownloader(
         this IServiceCollection services,
         ConfigurationManager configuration)
     {

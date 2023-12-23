@@ -1,7 +1,6 @@
 ﻿using Instagram.Domain.Aggregates.TokenAggregate;
-using Instagram.Domain.Aggregates.UserAggregate.ValueObjects;
 
-namespace Instagram.Application.Common.Interfaces.Persistence.QueryRepositories;
+namespace Instagram.Application.Common.Interfaces.Persistence.TemporaryRepositories;
 
 public interface IJwtTokenRepository
 {

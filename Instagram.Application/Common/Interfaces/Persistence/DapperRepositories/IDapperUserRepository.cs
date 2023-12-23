@@ -1,8 +1,8 @@
 ﻿using Instagram.Domain.Aggregates.UserAggregate;
 
-namespace Instagram.Application.Common.Interfaces.Persistence.QueryRepositories;
+namespace Instagram.Application.Common.Interfaces.Persistence.DapperRepositories;
 
-public interface IUserQueryRepository
+public interface IDapperUserRepository
 {
     Task<User?> GetUserById(string id);
     Task<User?> GetUserByIdentity(string? username, string? email, string? phone);

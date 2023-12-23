@@ -1,6 +1,6 @@
 ﻿using Instagram.Application.Common.Interfaces.Services;
 
-namespace Instagram.Application.Services.UserService.Commands;
+namespace Instagram.Application.Services.UserService.Commands.EditUser;
 
 public record EditUserCommand(
     string UserId,

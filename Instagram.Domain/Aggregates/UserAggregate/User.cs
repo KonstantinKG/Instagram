@@ -53,7 +53,7 @@ public sealed class User : AggregateRoot<UserId>
     }
     
     public static User Fill(
-        Guid id,
+        UserId id,
         string username,
         string fullname,
         string email,
@@ -62,7 +62,7 @@ public sealed class User : AggregateRoot<UserId>
         UserProfile profile)
     {
         return new User(
-            UserId.Fill(id),
+            id,
             username,
             fullname,
             email,

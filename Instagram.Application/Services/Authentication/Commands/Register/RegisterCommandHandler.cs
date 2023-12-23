@@ -4,11 +4,13 @@ using System.Text;
 using ErrorOr;
 using Instagram.Application.Common.Interfaces.Authentication;
 using Instagram.Application.Common.Interfaces.Persistence;
-using Instagram.Application.Common.Interfaces.Persistence.CommandRepositories;
-using Instagram.Application.Common.Interfaces.Persistence.QueryRepositories;
+using Instagram.Application.Common.Interfaces.Persistence.DapperRepositories;
+using Instagram.Application.Common.Interfaces.Persistence.EfRepositories;
+using Instagram.Application.Common.Interfaces.Persistence.TemporaryRepositories;
 using Instagram.Application.Services.Authentication.Common;
 using Instagram.Domain.Aggregates.UserAggregate;
 using Instagram.Domain.Aggregates.UserAggregate.Entities;
+using Instagram.Domain.Aggregates.UserAggregate.ValueObjects;
 using Instagram.Domain.Common.Errors;
 
 using Microsoft.AspNetCore.Identity;
@@ -19,22 +21,22 @@ public class RegisterCommandHandler
 {
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IJwtTokenHasher _jwtTokenHasher;
-    private readonly IUserCommandRepository _userCommandRepository;
-    private readonly IUserQueryRepository _userQueryRepository;
+    private readonly IEfUserRepository _efUserRepository;
+    private readonly IDapperUserRepository _dapperUserRepository;
     private readonly IJwtTokenRepository _jwtTokenRepository;
     private readonly IPasswordHasher<object> _passwordHasher;
 
     public RegisterCommandHandler(
         IJwtTokenGenerator jwtTokenGenerator,
-        IUserQueryRepository userQueryRepository,
-        IUserCommandRepository userCommandRepository,
+        IDapperUserRepository dapperUserRepository,
+        IEfUserRepository efUserRepository,
         IJwtTokenRepository jwtTokenRepository, 
         IPasswordHasher<object> passwordHasher,
         IJwtTokenHasher jwtTokenHasher)
     {
         _jwtTokenGenerator = jwtTokenGenerator;
-        _userQueryRepository = userQueryRepository;
-        _userCommandRepository = userCommandRepository;
+        _dapperUserRepository = dapperUserRepository;
+        _efUserRepository = efUserRepository;
         _jwtTokenRepository = jwtTokenRepository;
         _passwordHasher = passwordHasher;
         _jwtTokenHasher = jwtTokenHasher;
@@ -43,7 +45,7 @@ public class RegisterCommandHandler
     public async Task<ErrorOr<AuthenticationResult>> Handle(RegisterCommand command, CancellationToken cancellationToken)
     {
         
-        if (await _userQueryRepository.GetUserByIdentity(
+        if (await _dapperUserRepository.GetUserByIdentity(
                 command.Username,
                 command.Email,
                 null)
@@ -60,16 +62,25 @@ public class RegisterCommandHandler
         }
 
         var passwordHash = _passwordHasher.HashPassword(new object(), command.Password);
-        var user = User.Create(
-            username: command.Username,
-            fullname: command.Fullname,
-            email: command.Email,
-            phone: null,
-            password: passwordHash,
-            UserProfile.Create(null, null)
+
+        var userId = UserId.Create();
+        var profile = UserProfile.Create(
+            userId,
+            null,
+            null,
+            null
+        );
+        var user = User.Fill(
+            userId,
+            command.Username,
+            command.Fullname,
+            command.Email,
+            null,
+            passwordHash,
+            profile
         );
         
-        await _userCommandRepository.AddUser(user);
+        await _efUserRepository.AddUser(user);
         
         var userSessionId = Guid.NewGuid().ToString();
         var tokenParameters = new TokenParameters(

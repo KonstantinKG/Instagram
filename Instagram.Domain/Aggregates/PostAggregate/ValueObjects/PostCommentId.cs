@@ -18,7 +18,7 @@ public sealed class PostCommentId : ValueObject
 
     public override IEnumerable<object?> GetEqualityComponents()
     {
-        throw new NotImplementedException();
+        yield return Value;
     }
     
 # pragma warning disable CS8618

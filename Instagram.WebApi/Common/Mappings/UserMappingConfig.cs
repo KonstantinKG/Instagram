@@ -1,4 +1,5 @@
 ﻿using Instagram.Application.Services.UserService.Commands;
+using Instagram.Application.Services.UserService.Commands.EditUser;
 using Instagram.Application.Services.UserService.Queries.GetAllUsers;
 using Instagram.Application.Services.UserService.Queries.GetUser;
 using Instagram.Contracts.User.EditUserContracts;

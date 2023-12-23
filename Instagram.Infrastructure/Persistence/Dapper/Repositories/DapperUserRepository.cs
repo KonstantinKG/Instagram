@@ -1,16 +1,16 @@
 ﻿using Dapper;
 
-using Instagram.Application.Common.Interfaces.Persistence.QueryRepositories;
+using Instagram.Application.Common.Interfaces.Persistence.DapperRepositories;
 using Instagram.Domain.Aggregates.UserAggregate;
 using Instagram.Domain.Aggregates.UserAggregate.Entities;
 
 namespace Instagram.Infrastructure.Persistence.Dapper.Repositories;
 
-public class UserQueryRepository : IUserQueryRepository
+public class DapperUserRepository : IDapperUserRepository
 {
     private readonly DapperContext _context;
 
-    public UserQueryRepository(DapperContext context)
+    public DapperUserRepository(DapperContext context)
     {
         _context = context;
     }

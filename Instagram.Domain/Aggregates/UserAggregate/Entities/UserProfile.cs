@@ -5,42 +5,58 @@ namespace Instagram.Domain.Aggregates.UserAggregate.Entities;
 
 public class UserProfile : Entity<UserProfileId>
 {
+    
+    public UserId UserId { get; private set; }
     public string? Image { get; private set; }
     public string? Bio { get; private set; }
+    
+    public Gender? Sex { get; private set; }
 
     private UserProfile(
         UserProfileId id,
+        UserId userId,
         string? image,
-        string? bio
+        string? bio,
+        Gender? sex
         )
     : base(id)
     {
+        UserId = userId;
         Image = image;
         Bio = bio;
+        Sex = sex;
     }
     
     public static UserProfile Create(
+        UserId userId,
         string? image,
-        string? bio
+        string? bio,
+        Gender? sex
         )
     {
         return new UserProfile(
             UserProfileId.Create(),
+            userId,
             image,
-            bio
+            bio,
+            sex
         );
     }
     
     public static UserProfile Fill(
-        Guid id,
+        UserProfileId id,
+        UserId userId,
         string? image,
-        string? bio
-        )
+        string? bio,
+        Gender? sex
+    )
     {
         return new UserProfile(
-            UserProfileId.Fill(id),
+            id,
+            userId,
             image,
-            bio
+            bio,
+            sex
         );
     }
     

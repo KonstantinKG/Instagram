@@ -4,7 +4,7 @@ namespace Instagram.Domain.Common.Errors;
 
 public static partial class Errors
 {
-    public static partial class User
+    public static class User
     {
         public static Error InvalidCredentials => Error.Validation(
             code: "errors.user.invalid_credentials"

@@ -1,7 +1,7 @@
 ﻿using ErrorOr;
 
 using Instagram.Application.Common.Interfaces.Authentication;
-using Instagram.Application.Common.Interfaces.Persistence.QueryRepositories;
+using Instagram.Application.Common.Interfaces.Persistence.TemporaryRepositories;
 
 namespace Instagram.Application.Services.Authentication.Commands.Logout;
 

@@ -1,6 +1,6 @@
 ﻿using ErrorOr;
 
-using Instagram.Application.Common.Interfaces.Persistence.QueryRepositories;
+using Instagram.Application.Common.Interfaces.Persistence.DapperRepositories;
 using Instagram.Application.Services.UserService.Queries.GetUser;
 using Instagram.Domain.Aggregates.UserAggregate;
 using Instagram.Domain.Common.Errors;
@@ -9,11 +9,11 @@ namespace Instagram.Application.Services.UserService.Queries.GetAllUsers;
 
 public class GetAllUsersQueryHandler
 {
-    private readonly IUserQueryRepository _userQueryRepository;
+    private readonly IDapperUserRepository _dapperUserRepository;
 
-    public GetAllUsersQueryHandler(IUserQueryRepository userQueryRepository)
+    public GetAllUsersQueryHandler(IDapperUserRepository dapperUserRepository)
     {
-        _userQueryRepository = userQueryRepository;
+        _dapperUserRepository = dapperUserRepository;
     }
     
     public async Task<ErrorOr<GetAllUsersResult>> Handle(GetAllUsersQuery query,  CancellationToken cancellationToken)
@@ -23,7 +23,7 @@ public class GetAllUsersQueryHandler
             const int limit = 15;
             var offset = (query.Page - 1) * limit;
             
-            var users = await _userQueryRepository.GetAllUsers(
+            var users = await _dapperUserRepository.GetAllUsers(
                 offset,
                 limit
                 );

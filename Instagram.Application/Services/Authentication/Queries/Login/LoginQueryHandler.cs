@@ -3,7 +3,8 @@ using System.Text;
 
 using ErrorOr;
 using Instagram.Application.Common.Interfaces.Authentication;
-using Instagram.Application.Common.Interfaces.Persistence.QueryRepositories;
+using Instagram.Application.Common.Interfaces.Persistence.DapperRepositories;
+using Instagram.Application.Common.Interfaces.Persistence.TemporaryRepositories;
 using Instagram.Application.Services.Authentication.Common;
 using Instagram.Domain.Aggregates.UserAggregate;
 using Instagram.Domain.Common.Errors;
@@ -15,20 +16,20 @@ namespace Instagram.Application.Services.Authentication.Queries.Login;
 public class LoginQueryHandler
 {
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
-    private readonly IUserQueryRepository _userQueryRepository;
+    private readonly IDapperUserRepository _dapperUserRepository;
     private readonly IJwtTokenRepository _jwtTokenRepository;
     private readonly IJwtTokenHasher _jwtTokenHasher;
     private readonly IPasswordHasher<object> _passwordHasher;
 
     public LoginQueryHandler(
         IJwtTokenGenerator jwtTokenGenerator,
-        IUserQueryRepository userQueryRepository,
+        IDapperUserRepository dapperUserRepository,
         IJwtTokenRepository jwtTokenRepository,
         IPasswordHasher<object> passwordHasher,
         IJwtTokenHasher jwtTokenHasher)
     {
         _jwtTokenGenerator = jwtTokenGenerator;
-        _userQueryRepository = userQueryRepository;
+        _dapperUserRepository = dapperUserRepository;
         _jwtTokenRepository = jwtTokenRepository;
         _passwordHasher = passwordHasher;
         _jwtTokenHasher = jwtTokenHasher;
@@ -36,7 +37,7 @@ public class LoginQueryHandler
     
     public async Task<ErrorOr<AuthenticationResult>> Handle(LoginQuery query, CancellationToken cancellationToken)
     {
-        if (await _userQueryRepository.GetUserByIdentity(
+        if (await _dapperUserRepository.GetUserByIdentity(
                 query.Identity,
                 query.Identity,
                 query.Identity)

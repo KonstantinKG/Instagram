@@ -8,7 +8,7 @@ namespace Instagram.Domain.Aggregates.PostAggregate.Entities;
 public class PostComment : Entity<PostCommentId>
 {
     private readonly List<PostComment> _comments = new();
-    private readonly List<UserId> _usersLikedIds = new();
+    private readonly List<PostCommentLike> _commentLikes = new();
     
     public PostCommentId? ParentId { get; private set; }
     public string Content { get; private set; }
@@ -19,7 +19,7 @@ public class PostComment : Entity<PostCommentId>
     public DateTime CreatedAt { get; private set; }
     
     public IReadOnlyList<PostComment> Comments => _comments.AsReadOnly();
-    public IReadOnlyList<UserId> UsersLikedIds => _usersLikedIds.AsReadOnly();
+    public IReadOnlyList<PostCommentLike> CommentLikes => _commentLikes.AsReadOnly();
 
     private PostComment(
         PostCommentId id,
