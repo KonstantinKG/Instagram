@@ -39,7 +39,7 @@ public class JwtTokenRepository : IJwtTokenRepository
                 INSERT INTO tokens (user_id, session_id, hash) VALUES (@userId, @sessionId, @tokenHash);
             """;
         
-        var token = await connection.ExecuteAsync(sql, parameters);
+        await connection.ExecuteAsync(sql, parameters);
     }
 
     public async Task DeleteToken(string tokenHash)

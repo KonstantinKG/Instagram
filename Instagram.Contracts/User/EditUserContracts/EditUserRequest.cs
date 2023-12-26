@@ -8,5 +8,6 @@ public record EditUserRequest(
     string Email,
     IFormFile? Image,
     string? Phone,
-    string? Bio
+    string? Bio,
+    string? Gender
 );

@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-using Instagram.Application.Common.Interfaces.Services;
+﻿using Instagram.Application.Common.Interfaces.Services;
 using Instagram.Domain.Common.Exceptions;
 
 using Microsoft.Extensions.Options;

@@ -2,8 +2,6 @@
 
 using Instagram.Domain.Aggregates.PostAggregate;
 using Instagram.Domain.Aggregates.PostAggregate.Entities;
-using Instagram.Domain.Aggregates.PostAggregate.ValueObjects;
-using Instagram.Domain.Aggregates.UserAggregate.ValueObjects;
 using Instagram.Domain.Aggregates.TagAggregate;
 using Instagram.Domain.Aggregates.TagAggregate.ValueObjects;
 using Instagram.Domain.Aggregates.UserAggregate;
@@ -32,27 +30,17 @@ public static class PostConfiguration
 
             builder.Property(x => x.Id)
                 .HasColumnName("id")
-                .ValueGeneratedNever()
-                .HasConversion(
-                    id => id.Value,
-                    value => PostId.Fill(value)
-                );
-
-
+                .ValueGeneratedNever();
+            
             builder.Property(x => x.UserId)
-                .HasColumnName("user_id")
-                .HasConversion(
-                    id => id.Value,
-                    value => UserId.Fill(value)
-                );
+                .HasColumnName("user_id");
 
             builder
                 .HasOne(x => x.User)
                 .WithMany()
                 .HasForeignKey(x => x.UserId)
                 .IsRequired();
-        
-        
+            
             builder.Property(x => x.Content)
                 .HasColumnName("content")
                 .HasMaxLength(2200);
@@ -65,8 +53,7 @@ public static class PostConfiguration
                 .WithMany()
                 .HasForeignKey(x => x.LocationId)
                 .IsRequired(false);
-
-
+            
             builder.Property(x => x.Views)
                 .HasColumnName("views");
 
@@ -107,20 +94,13 @@ public static class PostConfiguration
                     left => left.HasOne<Tag>().WithMany().HasForeignKey(p => p.TagId).OnDelete(DeleteBehavior.Cascade),
                     right => right.HasOne<Post>().WithMany().HasForeignKey(t => t.PostId).OnDelete(DeleteBehavior.Cascade),
                     eb =>
-                        {
-                            eb.Property(p => p.PostId).HasColumnName("post_id")
-                                .HasConversion(
-                                    id => id.Value,
-                                    value => PostId.Fill(value)
-                                )
-                                .ValueGeneratedNever();
+                    {
+                            eb.Property(p => p.PostId)
+                                .HasColumnName("post_id");
 
-                            eb.Property(p => p.TagId).HasColumnName("tag_id")
-                                .HasConversion(
-                                id => id.Value,
-                                value => TagId.Fill(value)
-                                ).ValueGeneratedNever();
-
+                            eb.Property(p => p.TagId)
+                                .HasColumnName("tag_id");
+                            
                             eb.HasKey(x => new {x.PostId, x.TagId});
                         }
                     );
@@ -149,11 +129,7 @@ public static class PostConfiguration
 
             builder.Property(x => x.Id)
                 .HasColumnName("id")
-                .ValueGeneratedNever()
-                .HasConversion(
-                    id => id.Value,
-                    value => PostGalleryId.Fill(value)
-                );
+                .ValueGeneratedNever();
 
             builder.Property(x => x.Description)
                 .HasColumnName("description");
@@ -174,22 +150,12 @@ public static class PostConfiguration
             builder.ToTable("posts_likes");
 
             builder.HasKey(x => new {x.PostId, x.UserId});
-            
+
             builder.Property(x => x.PostId)
-                .HasColumnName("post_id")
-                .ValueGeneratedNever()
-                .HasConversion(
-                    id => id.Value,
-                    value => PostId.Fill(value)
-                );
-            
+                .HasColumnName("post_id");
+
             builder.Property(x => x.UserId)
-                .HasColumnName("user_id")
-                .ValueGeneratedNever()
-                .HasConversion(
-                    id => id.Value,
-                    value => UserId.Fill(value)
-                );
+                .HasColumnName("user_id");
 
             builder.HasOne<Post>()
                 .WithMany(x => x.PostLikes)
@@ -211,28 +177,16 @@ public static class PostConfiguration
 
             builder.Property(x => x.Id)
                 .HasColumnName("id")
-                .ValueGeneratedNever()
-                .HasConversion(
-                    id => id.Value,
-                    value => PostCommentId.Fill(value)
-                );
+                .ValueGeneratedNever();
 
             builder.Property(x => x.Content)
                 .HasColumnName("content");
 
             builder.Property(x => x.ParentId)
-                .HasColumnName("parent_id")
-                .HasConversion(
-                    id => id == null ? (Guid?)null : id.Value,
-                    value => value == null ? null : PostCommentId.Fill((Guid)value)
-                );
+                .HasColumnName("parent_id");
             
             builder.Property(x => x.UserId)
-                .HasColumnName("user_id")
-                .HasConversion(
-                    id => id.Value,
-                    value => UserId.Fill(value)
-                );
+                .HasColumnName("user_id");
             
             builder.Property(x => x.CreatedAt)
                 .HasColumnName("created_at")
@@ -264,22 +218,12 @@ public static class PostConfiguration
             builder.ToTable("posts_comments_likes");
             
             builder.HasKey(x => new {x.CommentId, x.UserId});
-            
+
             builder.Property(x => x.CommentId)
-                .HasColumnName("comment_id")
-                .ValueGeneratedNever()
-                .HasConversion(
-                    id => id.Value,
-                    value => PostCommentId.Fill(value)
-                );
-            
+                .HasColumnName("comment_id");
+
             builder.Property(x => x.UserId)
-                .HasColumnName("user_id")
-                .ValueGeneratedNever()
-                .HasConversion(
-                    id => id.Value,
-                    value => UserId.Fill(value)
-                );
+                .HasColumnName("user_id");
 
             builder.HasOne<PostComment>()
                 .WithMany(x => x.CommentLikes)

@@ -1,30 +1,29 @@
-﻿using Instagram.Domain.Aggregates.UserAggregate.ValueObjects;
-using Instagram.Domain.Common.Models;
+﻿using Instagram.Domain.Common.Models;
 
 namespace Instagram.Domain.Aggregates.UserAggregate.Entities;
 
-public class Gender : Entity<long>
+public class UserGender : Entity<long>
 {
     public string Name { get; private set; }
 
-    private Gender(
+    private UserGender(
         string name
         )
     {
         Name = name;
     }
 
-    public static Gender Create(
+    public static UserGender Create(
         string name
         )
     {
-        return new Gender(
+        return new UserGender(
             name
         );
     }
     
 # pragma warning disable CS8618
-    private Gender()
+    private UserGender()
     {
     }
 # pragma warning disable CS8618

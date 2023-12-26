@@ -1,7 +1,4 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-
-using ErrorOr;
+﻿using ErrorOr;
 using Instagram.Application.Common.Interfaces.Authentication;
 using Instagram.Application.Common.Interfaces.Persistence.DapperRepositories;
 using Instagram.Application.Common.Interfaces.Persistence.TemporaryRepositories;
@@ -54,7 +51,7 @@ public class LoginQueryHandler
 
         var userSessionId = Guid.NewGuid().ToString();
         var tokenParameters = new TokenParameters(
-            user.Id.Value.ToString(),
+            user.Id.ToString(),
             userSessionId,
             user.Username,
             user.Email
@@ -64,7 +61,7 @@ public class LoginQueryHandler
         var refreshToken = _jwtTokenGenerator.GenerateRefreshToken(tokenParameters);
 
         var tokenHash = _jwtTokenHasher.HashToken(refreshToken);
-        await _jwtTokenRepository.InsertToken(user.Id.Value.ToString(), userSessionId, tokenHash);
+        await _jwtTokenRepository.InsertToken(user.Id.ToString(), userSessionId, tokenHash);
         
         return new AuthenticationResult(
             accessToken,

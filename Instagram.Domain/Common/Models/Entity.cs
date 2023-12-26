@@ -15,9 +15,21 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>
         Id = id;
     }
 
+    
+    
     public override bool Equals(object? obj)
     {
         return obj is Entity<TId> entity && Id.Equals(entity.Id);
+    }
+
+    protected virtual IEnumerable<object?> GetEqualityComponents()
+    {
+        yield return Id;
+    }
+    
+    public bool Different(Entity<TId> obj)
+    {
+        return !GetEqualityComponents().SequenceEqual(obj.GetEqualityComponents());
     }
 
     public bool Equals(Entity<TId>? other)
@@ -25,12 +37,12 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>
         return Equals((object?)other);
     }
 
-    public static bool operator ==(Entity<TId> left, Entity<TId> right)
+    public static bool operator ==(Entity<TId>? left, Entity<TId>? right)
     {
         return Equals(left, right);
     }
 
-    public static bool operator !=(Entity<TId> left, Entity<TId> right)
+    public static bool operator !=(Entity<TId>? left, Entity<TId>? right)
     {
         return !Equals(left, right);
     }

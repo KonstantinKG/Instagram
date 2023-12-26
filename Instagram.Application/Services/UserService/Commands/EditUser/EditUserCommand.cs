@@ -7,8 +7,8 @@ public record EditUserCommand(
     string Username,
     string Fullname,
     string Email,
-    string Password,
     string? Phone,
     IAppFileProxy? Image,
-    string? Bio
+    string? Bio,
+    string? Gender
     );

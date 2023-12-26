@@ -28,12 +28,12 @@ public sealed class Tag : AggregateRoot<TagId>
     }
 
     public static Tag Fill(
-        Guid id,
+        TagId id,
         string name
     )
     {
         return new Tag(
-            TagId.Fill(id), 
+            id, 
             name
         );
     }

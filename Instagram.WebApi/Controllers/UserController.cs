@@ -62,7 +62,7 @@ public class UserController : ApiController
     public async Task<IActionResult> Edit([FromForm] EditUserRequest request)
     {
         var userId = HttpContext.User.Claims.First(c => c.Type == "nameid").Value;
-        var editUserCommand = _mapper.Map<EditUserCommand>((long.Parse(userId), request));
+        var editUserCommand = _mapper.Map<EditUserCommand>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<EditUserCommandHandler>();
         ErrorOr<bool> serviceResult = await handler.Handle(editUserCommand, CancellationToken.None);
 

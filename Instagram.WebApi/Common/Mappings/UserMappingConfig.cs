@@ -6,6 +6,7 @@ using Instagram.Contracts.User.EditUserContracts;
 using Instagram.Contracts.User.GetAllUsersContracts;
 using Instagram.Contracts.User.GetUserContracts;
 using Instagram.Domain.Aggregates.UserAggregate;
+using Instagram.Domain.Aggregates.UserAggregate.Entities;
 using Instagram.Infrastructure.Services;
 
 using Mapster;
@@ -18,13 +19,14 @@ public class UserMappingConfig : IRegister
     {
         config.NewConfig<GetUserRequest, GetUserQuery>()
             .Map(dest => dest, src => src);
-        
+
         config.NewConfig<GetUserResult, GetUserResponse>()
             .Map(dest => dest.Profile, src => src.User.Profile)
+            .Map(dest => dest.Profile.Gender, src => src.User.Profile.Gender != null ? src.User.Profile.Gender.Name : null)
             .Map(dest => dest, src => src.User);
 
         
-        config.NewConfig<(long userId, EditUserRequest request), EditUserCommand>()
+        config.NewConfig<(string userId, EditUserRequest request), EditUserCommand>()
             .Map(dest => dest.Image , src => src.request.Image != null ? new AppFileProxy(src.request.Image) : null)
             .Map(dest => dest.UserId, src => src.userId)
             .Map(dest => dest, src => src.request);

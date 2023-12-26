@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Instagram.Domain.Aggregates.UserAggregate;
 using Instagram.Domain.Aggregates.UserAggregate.Entities;
-using Instagram.Domain.Aggregates.UserAggregate.ValueObjects;
 
 namespace Instagram.Infrastructure.Persistence.EF.Configurations;
 
@@ -10,7 +9,7 @@ public static class UserConfiguration
     public static void ConfigureUser(this ModelBuilder modelBuilder)
     {
         ConfigureUserTable(modelBuilder);
-        ConfigureSexTable(modelBuilder);
+        ConfigureGenderTable(modelBuilder);
         ConfigureProfileTable(modelBuilder);
     }
 
@@ -24,11 +23,7 @@ public static class UserConfiguration
 
             builder.Property(u => u.Id)
                 .HasColumnName("id")
-                .ValueGeneratedNever()
-                .HasConversion(
-                    id => id.Value,
-                    value => UserId.Fill(value)
-                );
+                .ValueGeneratedNever();
 
             builder.Property(u => u.Username)
                 .HasColumnName("username")
@@ -64,20 +59,10 @@ public static class UserConfiguration
 
             builder.Property(p => p.Id)
                 .HasColumnName("id")
-                .ValueGeneratedNever()
-                .HasConversion(
-                    id => id.Value,
-                    value => UserProfileId.Fill(value)
-                );
+                .ValueGeneratedNever();
 
             builder.Property(p => p.UserId)
-                .HasColumnName("user_id")
-                .ValueGeneratedNever()
-                .HasConversion(
-                    id => id.Value,
-                    value => UserId.Fill(value)
-                );
-
+                .HasColumnName("user_id");
             
             builder.Property(p => p.Bio)
                 .HasColumnName("bio")
@@ -85,17 +70,20 @@ public static class UserConfiguration
 
             builder.Property(p => p.Image)
                 .HasColumnName("image");
+            
+            builder.Property(p => p.GenderId)
+                .HasColumnName("gender_id");
 
-            builder.HasOne(x => x.Sex)
+            builder.HasOne(x => x.Gender)
                 .WithMany()
-                .HasForeignKey("sex_id")
+                .HasForeignKey(x => x.GenderId)
                 .IsRequired(false);
         });
     }
 
-    private static void ConfigureSexTable(ModelBuilder modelBuilder)
+    private static void ConfigureGenderTable(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Gender>(builder =>
+        modelBuilder.Entity<UserGender>(builder =>
         {
             builder.ToTable("users_genders");
 

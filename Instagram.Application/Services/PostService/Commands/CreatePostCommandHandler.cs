@@ -1,11 +1,9 @@
 ﻿using ErrorOr;
 
-using Instagram.Application.Common.Interfaces.Persistence.DapperRepositories;
 using Instagram.Application.Common.Interfaces.Persistence.EfRepositories;
 using Instagram.Application.Common.Interfaces.Services;
 using Instagram.Domain.Aggregates.PostAggregate;
 using Instagram.Domain.Aggregates.PostAggregate.Entities;
-using Instagram.Domain.Aggregates.UserAggregate.ValueObjects;
 using Instagram.Domain.Common.Errors;
 using Instagram.Domain.Common.Exceptions;
 
@@ -29,7 +27,7 @@ public class CreatePostCommandHandler
         try
         {
             var post = Post.Create(
-                UserId.Fill(Guid.Parse(command.UserId)),
+                Guid.Parse(command.UserId),
                 command.Content,
                 command.LocationId,
                 null,
@@ -52,7 +50,7 @@ public class CreatePostCommandHandler
             
             await _efPostRepository.AddPost(post, galleries);
             
-            return new CreatePostResult(post.Id.Value.ToString());
+            return new CreatePostResult(post.Id.ToString());
         }
         catch (FileDownloadException e)
         {

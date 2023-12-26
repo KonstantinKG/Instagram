@@ -1,19 +1,17 @@
-﻿using Instagram.Domain.Aggregates.PostAggregate.ValueObjects;
-using Instagram.Domain.Aggregates.TagAggregate.ValueObjects;
-using Instagram.Domain.Aggregates.UserAggregate.ValueObjects;
+﻿using Instagram.Domain.Aggregates.TagAggregate.ValueObjects;
 using Instagram.Domain.Common.Models;
 
 namespace Instagram.Domain.Aggregates.PostAggregate.Entities;
 
 public class PostToTag : ValueObject
 {
-    public PostId PostId { get; private set; }
+    public Guid PostId { get; private set; }
     public TagId TagId { get; private set; }
     
 
     private PostToTag(
         TagId tagId,
-        PostId postId
+        Guid postId
             )
     {
         TagId = tagId;
@@ -22,7 +20,7 @@ public class PostToTag : ValueObject
     
     public static PostToTag Create(
         TagId tagId,
-        PostId postId
+        Guid postId
         )
     {
         return new PostToTag(

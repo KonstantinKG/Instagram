@@ -1,7 +1,7 @@
 ﻿namespace Instagram.Contracts.User.GetUserContracts;
 
 public record GetUserResponse(
-    long Id,
+    Guid Id,
     string Username,
     string Fullname,
     string? Email,
@@ -11,5 +11,6 @@ public record GetUserResponse(
     
 public record GetUserUserProfileResponse(
     string? Image,
-    string? Bio
+    string? Bio,
+    string? Gender
     );

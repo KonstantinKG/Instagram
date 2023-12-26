@@ -5,7 +5,7 @@ public record GetAllUsersResponse(
 );
 
 public record GetAllUser(
-    long Id,
+    Guid Id,
     string Username,
     string Fullname,
     string? Image

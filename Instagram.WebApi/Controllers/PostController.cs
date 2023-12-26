@@ -1,4 +1,6 @@
-﻿using ErrorOr;
+﻿using System.ComponentModel.DataAnnotations;
+
+using ErrorOr;
 
 using Instagram.Application.Services.PostService.Commands;
 using Instagram.Contracts.Post.CreatePostContracts;
@@ -6,6 +8,7 @@ using Instagram.Contracts.Post.CreatePostContracts;
 using MapsterMapper;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Instagram.WebApi.Controllers;
 
@@ -19,11 +22,12 @@ public class PostController : ApiController
         _mapper = mapper;
     }
     
-    [HttpGet]
+    [HttpPost]
     [Route("create")]
-    public async Task<IActionResult> Create([FromForm] CreatePostRequest request)
+    public async Task<IActionResult> Create(CreatePostRequest request)
     {
-        var createPostCommand = _mapper.Map<CreatePostCommand>(request);
+        var userId = HttpContext.User.Claims.First(c => c.Type == "nameid").Value;
+        var createPostCommand = _mapper.Map<CreatePostCommand>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<CreatePostCommandHandler>();
         var pipeline = HttpContext.RequestServices.GetRequiredService<CreatePostCommandPipeline>();
         ErrorOr<CreatePostResult> serviceResult = await pipeline.Pipe(createPostCommand, handler.Handle, CancellationToken.None);
@@ -32,5 +36,13 @@ public class PostController : ApiController
             result => Ok(_mapper.Map<CreatePostResponse>(result)),
             errors => Problem(errors)
         );
+    }
+    
+    [HttpPost]
+    [Route("create2")]
+    public async Task<IActionResult> Create2([FromForm] List<CreatePostRequestImag2e> request)
+    {
+        await Task.CompletedTask;
+        return Ok();
     }
 }

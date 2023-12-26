@@ -1,16 +1,15 @@
-﻿using Instagram.Domain.Aggregates.PostAggregate.ValueObjects;
-using Instagram.Domain.Common.Models;
+﻿using Instagram.Domain.Common.Models;
 
 namespace Instagram.Domain.Aggregates.PostAggregate.Entities;
 
-public class PostGallery : Entity<PostGalleryId>
+public class PostGallery : Entity<Guid>
 {
     public string File { get; private set; }
     public string? Description { get; private set; }
     public string? Labels { get; private set; }
 
     private PostGallery(
-        PostGalleryId id,
+        Guid id,
         string file,
         string? description,
         string? labels
@@ -29,7 +28,7 @@ public class PostGallery : Entity<PostGalleryId>
         )
     {
         return new PostGallery(
-            PostGalleryId.Create(), 
+            Guid.NewGuid(), 
             file,
             description,
             labels
@@ -44,7 +43,7 @@ public class PostGallery : Entity<PostGalleryId>
         )
     {
         return new PostGallery(
-            PostGalleryId.Fill(id), 
+            id, 
             file,
             description,
             labels

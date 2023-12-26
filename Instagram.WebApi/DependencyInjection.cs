@@ -3,6 +3,8 @@ using Instagram.WebApi.Common.Mappings;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.OpenApi.Models;
 
+using Swashbuckle.AspNetCore.SwaggerGen;
+
 namespace Instagram.WebApi;
 
 public static class DependencyInjection

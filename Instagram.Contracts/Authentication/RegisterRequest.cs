@@ -4,5 +4,6 @@ public record RegisterRequest(
     string Username,
     string Fullname,
     string Email,
-    string Password
+    string Password,
+    string? Gender
 );

@@ -32,7 +32,7 @@ public class EditUserCommandHandler
                 command.Username,
                 command.Email,
                 command.Phone)
-            is User existingUser && existingUser.Id.Value.ToString() != command.UserId)
+            is User existingUser && existingUser.Id.ToString() != command.UserId)
         {
             List<Error> errors = new ();
             
@@ -59,37 +59,68 @@ public class EditUserCommandHandler
             return Errors.File.DownloadFailed;
         }
         
-        var user = await _dapperUserRepository.GetUserById(command.UserId);
+        var userId = Guid.Parse(command.UserId);
+        var user = await _dapperUserRepository.GetUserById(userId);
         if (user is null)
             return Errors.User.UserNotFound;
+        
+        UserGender? gender = null;
+        if (command.Gender != user.Profile.Gender?.Name)
+        {
+            if (command.Gender != null)
+            {
+                if (await _dapperUserRepository.GetUserGender(command.Gender) is UserGender userGender)
+                {
+                    gender = userGender;
+                }
+                else
+                {
+                    gender = UserGender.Create(command.Gender);
+                    await _efUserRepository.AddUserGender(gender);
+                }
+            }
+            
+        }
 
-        var updatedProfile = UserProfile.Fill(
+        UserProfile? updatedProfile = null;
+        var tempProfile = UserProfile.Fill(
             user.Profile.Id,
             user.Id,
             imagePath,
             command.Bio,
-            null
+            gender
         );
+        
+        if (user.Profile.Different(tempProfile))
+        {
+            updatedProfile = tempProfile;
+        }
 
-        var updatedUser = User.Fill(
+        User? updatedUser = null;
+        var tempUser = User.Fill( 
             user.Id,
             command.Username,
             command.Fullname,
-            command.Email,
+            command.Email, 
             command.Phone,
             user.Password,
-            updatedProfile
+            updatedProfile ?? user.Profile
         );
+
+        if (user.Different(tempUser))
+        {
+            updatedUser = tempUser;
+        }
         
         try
         {
-            await _efUserRepository.UpdateUser(updatedUser);
+            await _efUserRepository.UpdateUser(updatedUser, updatedProfile);
             return true;
         }
         catch (Exception)
         {
             return Errors.Common.Unexpected;
         }
-        
+
     }
 }

@@ -1,16 +1,11 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-
-using ErrorOr;
+﻿using ErrorOr;
 using Instagram.Application.Common.Interfaces.Authentication;
-using Instagram.Application.Common.Interfaces.Persistence;
 using Instagram.Application.Common.Interfaces.Persistence.DapperRepositories;
 using Instagram.Application.Common.Interfaces.Persistence.EfRepositories;
 using Instagram.Application.Common.Interfaces.Persistence.TemporaryRepositories;
 using Instagram.Application.Services.Authentication.Common;
 using Instagram.Domain.Aggregates.UserAggregate;
 using Instagram.Domain.Aggregates.UserAggregate.Entities;
-using Instagram.Domain.Aggregates.UserAggregate.ValueObjects;
 using Instagram.Domain.Common.Errors;
 
 using Microsoft.AspNetCore.Identity;
@@ -61,14 +56,21 @@ public class RegisterCommandHandler
             return errors;
         }
 
+        var userId = Guid.NewGuid();
         var passwordHash = _passwordHasher.HashPassword(new object(), command.Password);
 
-        var userId = UserId.Create();
+        UserGender? gender = null;
+        if (command.Gender != null)
+        {
+            gender = await _dapperUserRepository.GetUserGender(command.Gender);
+            gender ??= UserGender.Create(command.Gender);
+        }
+        
         var profile = UserProfile.Create(
             userId,
             null,
             null,
-            null
+            gender
         );
         var user = User.Fill(
             userId,
@@ -84,7 +86,7 @@ public class RegisterCommandHandler
         
         var userSessionId = Guid.NewGuid().ToString();
         var tokenParameters = new TokenParameters(
-            user.Id.Value.ToString(),
+            user.Id.ToString(),
             userSessionId,
             user.Username,
             user.Email
@@ -94,7 +96,7 @@ public class RegisterCommandHandler
         var refreshToken = _jwtTokenGenerator.GenerateRefreshToken(tokenParameters);
 
         var tokenHash = _jwtTokenHasher.HashToken(refreshToken);
-        await _jwtTokenRepository.InsertToken(user.Id.Value.ToString(), userSessionId, tokenHash);
+        await _jwtTokenRepository.InsertToken(user.Id.ToString(), userSessionId, tokenHash);
         
         return new AuthenticationResult(
             accessToken,

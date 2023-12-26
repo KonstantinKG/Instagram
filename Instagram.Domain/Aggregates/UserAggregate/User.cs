@@ -1,10 +1,9 @@
 ﻿using Instagram.Domain.Aggregates.UserAggregate.Entities;
-using Instagram.Domain.Aggregates.UserAggregate.ValueObjects;
 using Instagram.Domain.Common.Models;
 
 namespace Instagram.Domain.Aggregates.UserAggregate;
 
-public sealed class User : AggregateRoot<UserId>
+public sealed class User : AggregateRoot<Guid>
 {
     public string Username { get; private set; }
     public string Fullname { get; private set; }
@@ -12,11 +11,11 @@ public sealed class User : AggregateRoot<UserId>
     public string? Phone { get; private set; }
     public string Password { get; private set; }
     
-    public UserProfile Profile { get; private set;  }
+    public UserProfile Profile { get; set;  }
 
 
     private User(
-        UserId id,
+        Guid id,
         string username,
         string fullname,
         string email,
@@ -42,7 +41,7 @@ public sealed class User : AggregateRoot<UserId>
         UserProfile profile)
     {
         return new User(
-            UserId.Create(),
+            Guid.NewGuid(), 
             username,
             fullname,
             email,
@@ -53,7 +52,7 @@ public sealed class User : AggregateRoot<UserId>
     }
     
     public static User Fill(
-        UserId id,
+        Guid id,
         string username,
         string fullname,
         string email,
@@ -76,10 +75,21 @@ public sealed class User : AggregateRoot<UserId>
     {
         Profile = profile;
     }
+
+    protected override IEnumerable<object?> GetEqualityComponents()
+    {
+        yield return Username;
+        yield return Fullname;
+        yield return Email;
+        yield return Phone;
+        yield return Password;
+    }
     
     # pragma warning disable CS8618
     private User()
     {
+
     }
     # pragma warning disable CS8618
+
 }

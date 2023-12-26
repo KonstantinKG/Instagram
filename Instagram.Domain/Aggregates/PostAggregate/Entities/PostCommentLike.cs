@@ -1,19 +1,16 @@
-﻿using Instagram.Domain.Aggregates.PostAggregate.ValueObjects;
-using Instagram.Domain.Aggregates.UserAggregate;
-using Instagram.Domain.Aggregates.UserAggregate.ValueObjects;
-using Instagram.Domain.Common.Models;
+﻿using Instagram.Domain.Common.Models;
 
 namespace Instagram.Domain.Aggregates.PostAggregate.Entities;
 
 public class PostCommentLike : ValueObject
 {
-    public PostCommentId CommentId { get; private set; }
-    public UserId UserId { get; private set; }
+    public Guid CommentId { get; private set; }
+    public Guid UserId { get; private set; }
     
 
     private PostCommentLike(
-        UserId userId,
-        PostCommentId postCommentId
+        Guid userId,
+        Guid postCommentId
             )
     {
         UserId = userId;
@@ -21,8 +18,8 @@ public class PostCommentLike : ValueObject
     }
     
     public static PostCommentLike Create(
-        UserId userId,
-        PostCommentId postId
+        Guid userId,
+        Guid postId
         )
     {
         return new PostCommentLike(

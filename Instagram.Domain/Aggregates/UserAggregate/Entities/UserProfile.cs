@@ -1,54 +1,53 @@
-﻿using Instagram.Domain.Aggregates.UserAggregate.ValueObjects;
-using Instagram.Domain.Common.Models;
+﻿using Instagram.Domain.Common.Models;
 
 namespace Instagram.Domain.Aggregates.UserAggregate.Entities;
 
-public class UserProfile : Entity<UserProfileId>
+public class UserProfile : Entity<Guid>
 {
     
-    public UserId UserId { get; private set; }
+    public Guid UserId { get; private set; }
     public string? Image { get; private set; }
     public string? Bio { get; private set; }
-    
-    public Gender? Sex { get; private set; }
+    public long GenderId { get; set; }
+    public UserGender? Gender { get; set; }
 
     private UserProfile(
-        UserProfileId id,
-        UserId userId,
+        Guid id,
+        Guid userId,
         string? image,
         string? bio,
-        Gender? sex
+        UserGender? gender
         )
     : base(id)
     {
         UserId = userId;
         Image = image;
         Bio = bio;
-        Sex = sex;
+        Gender = gender;
     }
     
     public static UserProfile Create(
-        UserId userId,
+        Guid userId,
         string? image,
         string? bio,
-        Gender? sex
+        UserGender? gender
         )
     {
         return new UserProfile(
-            UserProfileId.Create(),
+            Guid.NewGuid(),
             userId,
             image,
             bio,
-            sex
+            gender
         );
     }
     
     public static UserProfile Fill(
-        UserProfileId id,
-        UserId userId,
+        Guid id,
+        Guid userId,
         string? image,
         string? bio,
-        Gender? sex
+        UserGender? sex
     )
     {
         return new UserProfile(
@@ -59,7 +58,16 @@ public class UserProfile : Entity<UserProfileId>
             sex
         );
     }
-    
+
+    protected override IEnumerable<object?> GetEqualityComponents()
+    {
+        yield return UserId;
+        yield return Image;
+        yield return Bio;
+        yield return GenderId;
+        yield return Gender;
+    }
+
 # pragma warning disable CS8618
     private UserProfile()
     {

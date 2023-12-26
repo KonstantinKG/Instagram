@@ -5,7 +5,7 @@ namespace Instagram.Application.Services.PostService.Commands;
 public record CreatePostCommand(
     string UserId,
     string Content,
-    long LocationId,
+    long? LocationId,
     bool HideStats,
     bool HideComments,
     List<CreatePostCommandImage> Images
@@ -13,6 +13,6 @@ public record CreatePostCommand(
     
 public record CreatePostCommandImage(
     IAppFileProxy Image,
-    string Description,
-    string Labels
+    string? Description,
+    string? Labels
 );

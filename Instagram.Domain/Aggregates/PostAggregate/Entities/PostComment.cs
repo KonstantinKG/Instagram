@@ -1,19 +1,17 @@
-﻿using Instagram.Domain.Aggregates.PostAggregate.ValueObjects;
-using Instagram.Domain.Aggregates.UserAggregate;
-using Instagram.Domain.Aggregates.UserAggregate.ValueObjects;
+﻿using Instagram.Domain.Aggregates.UserAggregate;
 using Instagram.Domain.Common.Models;
 
 namespace Instagram.Domain.Aggregates.PostAggregate.Entities;
 
-public class PostComment : Entity<PostCommentId>
+public class PostComment : Entity<Guid>
 {
     private readonly List<PostComment> _comments = new();
     private readonly List<PostCommentLike> _commentLikes = new();
     
-    public PostCommentId? ParentId { get; private set; }
+    public Guid? ParentId { get; private set; }
     public string Content { get; private set; }
     
-    public UserId UserId { get; private set; }
+    public Guid UserId { get; private set; }
     public User? User { get; private set; }
     
     public DateTime CreatedAt { get; private set; }
@@ -22,9 +20,9 @@ public class PostComment : Entity<PostCommentId>
     public IReadOnlyList<PostCommentLike> CommentLikes => _commentLikes.AsReadOnly();
 
     private PostComment(
-        PostCommentId id,
-        PostCommentId? parentId,
-        UserId userId,
+        Guid id,
+        Guid? parentId,
+        Guid userId,
         string content)
     : base(id)
     {
@@ -34,13 +32,13 @@ public class PostComment : Entity<PostCommentId>
     }
     
     public static PostComment Create(
-        PostCommentId? parentId,
-        UserId userId,
+        Guid? parentId,
+        Guid userId,
         string content
         )
     {
         return new PostComment(
-            PostCommentId.Create(),
+            Guid.NewGuid(),
             parentId,
             userId,
             content
@@ -49,13 +47,13 @@ public class PostComment : Entity<PostCommentId>
     
     public static PostComment Fill(
         Guid id,
-        PostCommentId? parentId,
-        UserId userId,
+        Guid? parentId,
+        Guid userId,
         string content
     )
     {
         return new PostComment(
-            PostCommentId.Fill(id),
+            id,
             parentId,
             userId,
             content

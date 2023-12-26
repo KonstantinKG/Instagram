@@ -5,13 +5,13 @@ namespace Instagram.Domain.Aggregates.TokenAggregate;
 
 public sealed class Token : AggregateRoot<long>
 {
-    public long UserId { get; private set; }
+    public string UserId { get; private set; }
     public string SessionId { get; private set; }
     public string Hash { get; private set; }
 
 
     private Token(
-        long userId,
+        string userId,
         string sessionId,
         string hash
         )
@@ -23,7 +23,7 @@ public sealed class Token : AggregateRoot<long>
     }
 
     public static Token Create(
-        long userId,
+        string userId,
         string sessionId,
         string hash
         )

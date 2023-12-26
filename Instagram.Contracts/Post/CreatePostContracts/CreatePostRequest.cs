@@ -4,7 +4,7 @@ namespace Instagram.Contracts.Post.CreatePostContracts;
 
 public record CreatePostRequest(
     string Content,
-    long LocationId,
+    long? LocationId,
     bool HideStats,
     bool HideComments,
     List<CreatePostRequestImage> Images
@@ -12,6 +12,12 @@ public record CreatePostRequest(
     
 public record CreatePostRequestImage(
     IFormFile Image,
-    string Description,
-    string Labels
+    string? Description,
+    string? Labels
     );
+    
+public record CreatePostRequestImag2e(
+    IFormFile Image,
+    string? Description,
+    string? Labels
+);  
