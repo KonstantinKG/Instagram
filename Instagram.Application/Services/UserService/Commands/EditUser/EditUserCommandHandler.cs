@@ -32,7 +32,7 @@ public class EditUserCommandHandler
                 command.Username,
                 command.Email,
                 command.Phone)
-            is User existingUser && existingUser.Id.ToString() != command.UserId)
+            is User existingUser && existingUser.Id != command.Id)
         {
             List<Error> errors = new ();
             
@@ -59,10 +59,9 @@ public class EditUserCommandHandler
             return Errors.File.DownloadFailed;
         }
         
-        var userId = Guid.Parse(command.UserId);
-        var user = await _dapperUserRepository.GetUserById(userId);
+        var user = await _dapperUserRepository.GetUserById(command.Id);
         if (user is null)
-            return Errors.User.UserNotFound;
+            return Errors.Common.NotFound;
         
         UserGender? gender = null;
         if (command.Gender != user.Profile.Gender?.Name)

@@ -59,7 +59,7 @@ public class UserProfile : Entity<Guid>
         );
     }
 
-    protected override IEnumerable<object?> GetEqualityComponents()
+    protected override IEnumerable<object?> GetDifferenceComponents()
     {
         yield return UserId;
         yield return Image;

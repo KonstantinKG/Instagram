@@ -1,6 +1,5 @@
 ﻿using ErrorOr;
 
-using Instagram.Application.Services.UserService.Commands;
 using Instagram.Application.Services.UserService.Commands.EditUser;
 using Instagram.Application.Services.UserService.Queries.GetAllUsers;
 using Instagram.Application.Services.UserService.Queries.GetUser;
@@ -25,11 +24,11 @@ public class UserController : ApiController
     }
 
     [HttpGet]
-    [Route("get/")]
+    [Route("get")]
     public async Task<IActionResult> Get([FromQuery] GetUserRequest request)
     {
-        var requestUserId = request.UserId;
-        var claimsUserId =  HttpContext.User.Claims.First(x => x.Type == "nameid").Value;
+        var requestUserId = request.Id;
+        var claimsUserId = Guid.Parse(GetUserClaim<string>(c => c.Type == "nameid"));
 
         var userId = requestUserId ?? claimsUserId;
         var getUserQuery = new GetUserQuery(userId);
@@ -61,7 +60,7 @@ public class UserController : ApiController
     [Route("edit")]
     public async Task<IActionResult> Edit([FromForm] EditUserRequest request)
     {
-        var userId = HttpContext.User.Claims.First(c => c.Type == "nameid").Value;
+        var userId = Guid.Parse(GetUserClaim<string>(c => c.Type == "nameid"));
         var editUserCommand = _mapper.Map<EditUserCommand>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<EditUserCommandHandler>();
         ErrorOr<bool> serviceResult = await handler.Handle(editUserCommand, CancellationToken.None);

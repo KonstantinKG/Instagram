@@ -50,6 +50,7 @@ public static class DependencyInjection
         services.AddScoped<IEfUserRepository, EfUserRepository>();
         services.AddScoped<IEfPostRepository, EfPostRepository>();
         services.AddScoped<IDapperUserRepository, DapperUserRepository>();
+        services.AddScoped<IDapperPostRepository, DapperPostRepository>();
         
         return services;
     }

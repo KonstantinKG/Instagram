@@ -21,9 +21,5 @@ public static partial class Errors
         public static Error UniquePhone => Error.Conflict(
             code: "errors.user.unique_phone"
         );
-        
-        public static Error UserNotFound => Error.NotFound(
-            code: "errors.user.not_found"
-        );
     }
 }

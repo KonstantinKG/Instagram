@@ -22,14 +22,14 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>
         return obj is Entity<TId> entity && Id.Equals(entity.Id);
     }
 
-    protected virtual IEnumerable<object?> GetEqualityComponents()
+    protected virtual IEnumerable<object?> GetDifferenceComponents()
     {
         yield return Id;
     }
     
     public bool Different(Entity<TId> obj)
     {
-        return !GetEqualityComponents().SequenceEqual(obj.GetEqualityComponents());
+        return !GetDifferenceComponents().SequenceEqual(obj.GetDifferenceComponents());
     }
 
     public bool Equals(Entity<TId>? other)

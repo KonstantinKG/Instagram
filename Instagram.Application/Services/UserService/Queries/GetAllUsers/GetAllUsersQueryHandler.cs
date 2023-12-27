@@ -1,8 +1,6 @@
 ﻿using ErrorOr;
 
 using Instagram.Application.Common.Interfaces.Persistence.DapperRepositories;
-using Instagram.Application.Services.UserService.Queries.GetUser;
-using Instagram.Domain.Aggregates.UserAggregate;
 using Instagram.Domain.Common.Errors;
 
 namespace Instagram.Application.Services.UserService.Queries.GetAllUsers;

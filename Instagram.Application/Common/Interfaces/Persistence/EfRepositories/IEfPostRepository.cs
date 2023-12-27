@@ -5,5 +5,9 @@ namespace Instagram.Application.Common.Interfaces.Persistence.EfRepositories;
 
 public interface IEfPostRepository
 {
-    Task AddPost(Post post, List<PostGallery> galleries);
+    Task AddPost(Post post);
+    Task UpdatePost(Post post);
+    Task DeletePost(Post post);
+    Task AddGallery(PostGallery gallery);
+    Task UpdateGallery(PostGallery gallery);
 }

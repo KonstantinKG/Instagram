@@ -1,4 +1,6 @@
-﻿using ErrorOr;
+﻿using System.Security.Claims;
+
+using ErrorOr;
 using Instagram.WebApi.Common.Http;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,5 +26,13 @@ public class ApiController : ControllerBase
         HttpContext.Items[HttpContextItemKeys.Errors] = errors;
         
         return Problem(statusCode: statusCode);
+    }
+
+    protected T GetUserClaim<T>(Func<Claim,bool> predicate)
+    {
+        var claim = HttpContext.User.Claims.First(predicate).Value;
+        if (claim is T tClaim)
+            return tClaim;
+        return (T)Convert.ChangeType(claim, typeof(T));
     }
 }

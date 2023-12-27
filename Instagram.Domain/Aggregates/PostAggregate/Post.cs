@@ -15,12 +15,13 @@ public sealed class Post : AggregateRoot<Guid>
     
     public Guid UserId { get; private set; }
     public User? User { get; private set;  }
-    public string Content { get; private set; }
+    public string? Content { get; private set; }
     public long? LocationId { get; private set; }
     public Location? Location { get; private set; }
     public int? Views { get; private set; }
     public bool HideStats { get; private set; }
     public bool HideComments { get; private set; }
+    public bool Active { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
     
@@ -34,11 +35,12 @@ public sealed class Post : AggregateRoot<Guid>
     private Post(
         Guid id,
         Guid userId,
-        string content,
+        string? content,
         long? locationId,
         int? views,
         bool hideStats,
-        bool hideComments
+        bool hideComments,
+        bool active
         )
     : base(id)
     {
@@ -48,36 +50,32 @@ public sealed class Post : AggregateRoot<Guid>
         Views = views;
         HideStats = hideStats;
         HideComments = hideComments;
+        Active = active;
     }
 
-    public static Post Create(
-        Guid userId,
-        string content,
-        long? locationId,
-        int? views,
-        bool hideStats,
-        bool hideComments
-        )
+    public static Post Create(Guid userId)
     {
         return new Post(
             Guid.NewGuid(), 
             userId,  
-            content, 
-            locationId,  
-            views,   
-            hideStats,   
-            hideComments
+            null, 
+            null,  
+            null,   
+            false,   
+            false,
+            false
         );
     }
     
     public static Post Fill(
         Guid id,
         Guid userId,
-        string content,
+        string? content,
         long? locationId,
         int ?views,
         bool hideStats,
-        bool hideComments
+        bool hideComments,
+        bool active
         )
     {
         return new Post(
@@ -87,11 +85,20 @@ public sealed class Post : AggregateRoot<Guid>
             locationId,  
             views,   
             hideStats,   
-            hideComments
+            hideComments,
+            active
         );
     }
-    
-    # pragma warning disable CS8618
+
+    protected override IEnumerable<object?> GetDifferenceComponents()
+    {
+        yield return Content;
+        yield return LocationId;
+        yield return HideStats;
+        yield return HideComments;
+    }
+
+# pragma warning disable CS8618
     private Post()
     {
     }

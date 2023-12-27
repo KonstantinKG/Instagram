@@ -18,10 +18,9 @@ public class GetUserQueryHandler
     
     public async Task<ErrorOr<GetUserResult>> Handle(GetUserQuery query, CancellationToken cancellationToken)
     {
-        var userId = Guid.Parse(query.UserId);
-        if (await _dapperUserRepository.GetUserById(userId) is not User user)
+        if (await _dapperUserRepository.GetUserById(query.Id) is not User user)
         {
-            return Errors.User.UserNotFound;
+            return Errors.Common.NotFound;
         }
 
         return new GetUserResult(user);

@@ -26,9 +26,9 @@ public class UserMappingConfig : IRegister
             .Map(dest => dest, src => src.User);
 
         
-        config.NewConfig<(string userId, EditUserRequest request), EditUserCommand>()
+        config.NewConfig<(Guid userId, EditUserRequest request), EditUserCommand>()
             .Map(dest => dest.Image , src => src.request.Image != null ? new AppFileProxy(src.request.Image) : null)
-            .Map(dest => dest.UserId, src => src.userId)
+            .Map(dest => dest.Id, src => src.userId)
             .Map(dest => dest, src => src.request);
         
 

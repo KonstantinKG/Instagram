@@ -3,7 +3,7 @@
 namespace Instagram.Application.Services.UserService.Commands.EditUser;
 
 public record EditUserCommand(
-    string UserId,
+    Guid Id,
     string Username,
     string Fullname,
     string Email,

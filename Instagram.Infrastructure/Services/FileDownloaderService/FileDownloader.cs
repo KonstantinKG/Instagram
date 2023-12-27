@@ -32,9 +32,9 @@ public class FileDownloader : IFileDownloader
             await file.CopyToAsync(stream);
             return filePath;
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            throw new FileDownloadException(file.FileName(), e);
+            throw new FileDownloadException();
         }
     }
 }

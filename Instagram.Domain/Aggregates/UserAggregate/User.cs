@@ -76,7 +76,7 @@ public sealed class User : AggregateRoot<Guid>
         Profile = profile;
     }
 
-    protected override IEnumerable<object?> GetEqualityComponents()
+    protected override IEnumerable<object?> GetDifferenceComponents()
     {
         yield return Username;
         yield return Fullname;

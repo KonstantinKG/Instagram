@@ -7,7 +7,7 @@ public static partial class Errors
     public static class File
     {
         public static Error DownloadFailed => Error.Failure(
-            code: "errors.file.download_failed"
+            code: "errors.file.download_failed:{0}"
         );
     }
 }

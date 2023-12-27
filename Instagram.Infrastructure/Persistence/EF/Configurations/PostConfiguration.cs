@@ -43,7 +43,8 @@ public static class PostConfiguration
             
             builder.Property(x => x.Content)
                 .HasColumnName("content")
-                .HasMaxLength(2200);
+                .HasMaxLength(2200)
+                .IsRequired(false);
 
             builder.Property(x => x.LocationId)
                 .HasColumnName("location_id");
@@ -63,15 +64,19 @@ public static class PostConfiguration
             builder.Property(x => x.HideComments)
                 .HasColumnName("hide_comments");
 
+            builder.Property(x => x.Active)
+                .HasColumnName("active");
+            
             builder.Property(x => x.CreatedAt)
                 .HasColumnName("created_at")
                 .ValueGeneratedOnAdd()
-                .HasDefaultValueSql("now()");
+                .HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
 
             builder.Property(x => x.UpdatedAt)
                 .HasColumnName("updated_at")
-                .ValueGeneratedOnUpdate()
-                .HasDefaultValueSql("now()");
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
+
 
             builder.HasMany(x => x.PostLikes)
                 .WithOne()
@@ -79,7 +84,7 @@ public static class PostConfiguration
             
             builder.HasMany(x => x.Galleries)
                 .WithOne()
-                .HasForeignKey("post_id")
+                .HasForeignKey(x => x.PostId)
                 .IsRequired();
             
             builder.HasMany(x => x.Comments)
@@ -130,6 +135,9 @@ public static class PostConfiguration
             builder.Property(x => x.Id)
                 .HasColumnName("id")
                 .ValueGeneratedNever();
+
+            builder.Property(x => x.PostId)
+                .HasColumnName("post_id");
 
             builder.Property(x => x.Description)
                 .HasColumnName("description");
@@ -190,7 +198,7 @@ public static class PostConfiguration
             
             builder.Property(x => x.CreatedAt)
                 .HasColumnName("created_at")
-                .HasDefaultValueSql("now()");
+                .HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
 
             builder.HasOne(x => x.User)
                 .WithMany()
