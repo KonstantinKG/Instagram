@@ -81,7 +81,19 @@ public class DapperUserRepository : IDapperUserRepository
         
         return users.ToList();
     }
-    
+
+    public async Task<long> GetTotalUsers()
+    {
+        var connection = _context.CreateConnection();
+        const string sql = 
+            """
+                SELECT count(*) FROM users;
+            """;
+
+        return await connection.QueryFirstAsync<long>(sql);
+        
+    }
+
     public async Task<UserGender?> GetUserGender(string name)
     {
         var connection = _context.CreateConnection();

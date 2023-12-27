@@ -40,6 +40,17 @@ public class DapperPostRepository : IDapperPostRepository
         return post;
     }
 
+    public async Task<long> GetTotalPosts()
+    {
+        var connection = _context.CreateConnection();
+        const string sql = 
+            """
+                SELECT count(*) FROM posts;
+            """;
+
+        return await connection.QueryFirstAsync<long>(sql);
+    }
+
     public async Task<List<Post>> GetPosts(int offset, int limit)
     {
         var connection = _context.CreateConnection();

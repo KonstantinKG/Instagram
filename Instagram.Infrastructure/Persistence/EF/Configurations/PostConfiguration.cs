@@ -80,16 +80,19 @@ public static class PostConfiguration
 
             builder.HasMany(x => x.PostLikes)
                 .WithOne()
-                .HasForeignKey(x => x.PostId);
+                .HasForeignKey(x => x.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
             
             builder.HasMany(x => x.Galleries)
                 .WithOne()
                 .HasForeignKey(x => x.PostId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
             
             builder.HasMany(x => x.Comments)
                 .WithOne()
                 .HasForeignKey("post_id")
+                .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
 
             builder.HasMany(x => x.Tags)
@@ -167,10 +170,12 @@ public static class PostConfiguration
 
             builder.HasOne<Post>()
                 .WithMany(x => x.PostLikes)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasForeignKey(x => x.PostId);
             
             builder.HasOne<User>()
                 .WithMany()
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasForeignKey(x => x.UserId);
         });
     }
@@ -202,10 +207,12 @@ public static class PostConfiguration
 
             builder.HasOne(x => x.User)
                 .WithMany()
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasForeignKey(x => x.UserId);
 
             builder.HasMany(x => x.Comments)
                 .WithOne()
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasForeignKey(x => x.ParentId);
 
             builder.HasMany(p => p.CommentLikes);
@@ -235,10 +242,12 @@ public static class PostConfiguration
 
             builder.HasOne<PostComment>()
                 .WithMany(x => x.CommentLikes)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasForeignKey(x => x.CommentId);
             
             builder.HasOne<User>()
                 .WithMany()
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasForeignKey(x => x.UserId);
         });
     }
