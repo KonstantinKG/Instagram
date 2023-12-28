@@ -90,6 +90,11 @@ public sealed class Post : AggregateRoot<Guid>
         );
     }
 
+    public void AddGallery(PostGallery gallery)
+    {
+        _galleries.Add(gallery);
+    }
+
     protected override IEnumerable<object?> GetDifferenceComponents()
     {
         yield return Content;

@@ -2,8 +2,6 @@
 using Instagram.Domain.Aggregates.PostAggregate;
 using Instagram.Domain.Aggregates.PostAggregate.Entities;
 
-using Microsoft.EntityFrameworkCore;
-
 namespace Instagram.Infrastructure.Persistence.EF.Repositories;
 
 public class EfPostRepository : IEfPostRepository
@@ -42,6 +40,12 @@ public class EfPostRepository : IEfPostRepository
     public async Task UpdateGallery(PostGallery gallery)
     {
         await _context.SingleUpdateAsync(gallery);
+        await _context.SaveChangesAsync();
+    }
+    
+    public async Task DeleteGallery(PostGallery gallery)
+    {
+        await _context.SingleDeleteAsync(gallery);
         await _context.SaveChangesAsync();
     }
 }

@@ -13,6 +13,7 @@ public record GetPostResponse(
 );
 
 public record GetPostGalleryResponse(
+    Guid Id,
     string File,
     string? Description,
     string? Labels

@@ -10,4 +10,5 @@ public interface IEfPostRepository
     Task DeletePost(Post post);
     Task AddGallery(PostGallery gallery);
     Task UpdateGallery(PostGallery gallery);
+    Task DeleteGallery(PostGallery gallery);
 }

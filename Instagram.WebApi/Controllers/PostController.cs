@@ -4,6 +4,7 @@ using Instagram.Application.Services.PostService.Commands.AddPostGallery;
 using Instagram.Application.Services.PostService.Commands.ConfirmPost;
 using Instagram.Application.Services.PostService.Commands.CreatePost;
 using Instagram.Application.Services.PostService.Commands.DeletePost;
+using Instagram.Application.Services.PostService.Commands.DeletePostGallery;
 using Instagram.Application.Services.PostService.Commands.EditPost;
 using Instagram.Application.Services.PostService.Commands.EditPostGallery;
 using Instagram.Application.Services.PostService.Queries.GetAllPosts;
@@ -12,6 +13,7 @@ using Instagram.Contracts.Post.AddPostGalleryContracts;
 using Instagram.Contracts.Post.ConfirmPostContracts;
 using Instagram.Contracts.Post.CreatePostContracts;
 using Instagram.Contracts.Post.DeletePostContracts;
+using Instagram.Contracts.Post.DeletePostGalleryContracts;
 using Instagram.Contracts.Post.EditPostContracts;
 using Instagram.Contracts.Post.EditPostGalleryContracts;
 using Instagram.Contracts.Post.GetAllPostsContracts;
@@ -146,6 +148,21 @@ public class PostController : ApiController
         var editPostGalleryCommand = _mapper.Map<EditPostGalleryCommand>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<EditPostGalleryCommandHandler>();
         ErrorOr<EditPostGalleryResult> serviceResult = await handler.Handle(editPostGalleryCommand, CancellationToken.None);
+
+        return serviceResult.Match(
+            _ => Ok(),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpPost]
+    [Route("gallery/delete")]
+    public async Task<IActionResult> GalleryDeelete(DeletePostGalleryRequest request)
+    {
+        var userId = Guid.Parse(GetUserClaim<string>(c => c.Type == "nameid"));
+        var deletePostGalleryCommand = _mapper.Map<DeletePostGalleryCommand>((userId, request));
+        var handler = HttpContext.RequestServices.GetRequiredService<DeletePostGalleryCommandHandler>();
+        ErrorOr<DeletePostGalleryResult> serviceResult = await handler.Handle(deletePostGalleryCommand, CancellationToken.None);
 
         return serviceResult.Match(
             _ => Ok(),
