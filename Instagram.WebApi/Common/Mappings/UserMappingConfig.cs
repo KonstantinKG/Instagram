@@ -41,8 +41,5 @@ public class UserMappingConfig : IRegister
         
         config.NewConfig<GetAllUsersResult, GetAllUsersResponse>()
             .Map(dest => dest.Users, src => src.Users);
-
-        
-
     }
 }

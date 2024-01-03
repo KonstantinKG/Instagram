@@ -91,7 +91,7 @@ public static class PostConfiguration
             
             builder.HasMany(x => x.Comments)
                 .WithOne()
-                .HasForeignKey("post_id")
+                .HasForeignKey(x => x.PostId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
 
@@ -200,6 +200,9 @@ public static class PostConfiguration
             
             builder.Property(x => x.UserId)
                 .HasColumnName("user_id");
+            
+            builder.Property(x => x.PostId)
+                .HasColumnName("post_id");
             
             builder.Property(x => x.CreatedAt)
                 .HasColumnName("created_at")

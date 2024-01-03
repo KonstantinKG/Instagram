@@ -8,6 +8,7 @@ public class PostComment : Entity<Guid>
     private readonly List<PostComment> _comments = new();
     private readonly List<PostCommentLike> _commentLikes = new();
     
+    public Guid PostId { get; private set; }
     public Guid? ParentId { get; private set; }
     public string Content { get; private set; }
     
@@ -21,17 +22,20 @@ public class PostComment : Entity<Guid>
 
     private PostComment(
         Guid id,
+        Guid postId,
         Guid? parentId,
         Guid userId,
         string content)
     : base(id)
     {
+        PostId = postId;
         UserId = userId;
         ParentId = parentId;
         Content = content;
     }
     
     public static PostComment Create(
+        Guid postId,
         Guid? parentId,
         Guid userId,
         string content
@@ -39,6 +43,7 @@ public class PostComment : Entity<Guid>
     {
         return new PostComment(
             Guid.NewGuid(),
+            postId,
             parentId,
             userId,
             content
@@ -47,6 +52,7 @@ public class PostComment : Entity<Guid>
     
     public static PostComment Fill(
         Guid id,
+        Guid postId,
         Guid? parentId,
         Guid userId,
         string content
@@ -54,10 +60,16 @@ public class PostComment : Entity<Guid>
     {
         return new PostComment(
             id,
+            postId,
             parentId,
             userId,
             content
         );
+    }
+
+    public void AddChild(PostComment comment)
+    {
+        _comments.Add(comment);
     }
     
 # pragma warning disable CS8618

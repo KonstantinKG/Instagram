@@ -1,17 +1,30 @@
 ﻿using System.Reflection;
 using FluentValidation;
 using Instagram.Application.Common.Markers;
+
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Instagram.Application;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services)
+    public static IServiceCollection AddApplication(
+        this IServiceCollection services, 
+        ConfigurationManager configuration
+        )
     {
+        services.AddApplicationSettings(configuration);
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddPipeline();
         
+        return services;
+    }
+    
+    private static IServiceCollection AddApplicationSettings(this IServiceCollection services, ConfigurationManager configuration)
+    {
+        services.Configure<ApplicationSettings>(configuration.GetSection(ApplicationSettings.SectionName));
+        services.AddSingleton<ApplicationSettings>();
         return services;
     }
 

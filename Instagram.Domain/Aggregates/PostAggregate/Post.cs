@@ -30,6 +30,8 @@ public sealed class Post : AggregateRoot<Guid>
     public IReadOnlyList<PostGallery> Galleries => _galleries.AsReadOnly();
     public IReadOnlyList<PostComment> Comments => _comments.AsReadOnly();
     
+    public long CommentsCount { get; set; }
+    public long LikesCount { get; set; }
     
 
     private Post(
@@ -93,6 +95,16 @@ public sealed class Post : AggregateRoot<Guid>
     public void AddGallery(PostGallery gallery)
     {
         _galleries.Add(gallery);
+    }
+    
+    public void AddComment(PostComment comment)
+    {
+        _comments.Add(comment);
+    }
+    
+    public void AddLike(PostLike like)
+    {
+        _postLikes.Add(like);
     }
 
     protected override IEnumerable<object?> GetDifferenceComponents()

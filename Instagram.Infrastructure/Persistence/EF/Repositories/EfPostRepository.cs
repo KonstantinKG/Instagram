@@ -48,4 +48,22 @@ public class EfPostRepository : IEfPostRepository
         await _context.SingleDeleteAsync(gallery);
         await _context.SaveChangesAsync();
     }
+
+    public async Task AddComment(PostComment comment)
+    {
+        await _context.AddAsync(comment);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateComment(PostComment comment)
+    {
+        await _context.SingleUpdateAsync(comment);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteComment(PostComment comment)
+    {
+        await _context.SingleDeleteAsync(comment);
+        await _context.SaveChangesAsync();
+    }
 }

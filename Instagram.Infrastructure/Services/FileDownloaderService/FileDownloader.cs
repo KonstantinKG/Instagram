@@ -34,7 +34,7 @@ public class FileDownloader : IFileDownloader
         }
         catch (Exception)
         {
-            throw new FileDownloadException();
+            throw new FileSaveException();
         }
     }
 }

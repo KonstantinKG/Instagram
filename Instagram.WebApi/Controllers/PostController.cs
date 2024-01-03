@@ -1,23 +1,43 @@
 ﻿using ErrorOr;
 
+using Instagram.Application.Services.PostService.Commands.AddPost;
+using Instagram.Application.Services.PostService.Commands.AddPostComment;
 using Instagram.Application.Services.PostService.Commands.AddPostGallery;
 using Instagram.Application.Services.PostService.Commands.ConfirmPost;
-using Instagram.Application.Services.PostService.Commands.CreatePost;
 using Instagram.Application.Services.PostService.Commands.DeletePost;
+using Instagram.Application.Services.PostService.Commands.DeletePostComment;
 using Instagram.Application.Services.PostService.Commands.DeletePostGallery;
-using Instagram.Application.Services.PostService.Commands.EditPost;
-using Instagram.Application.Services.PostService.Commands.EditPostGallery;
-using Instagram.Application.Services.PostService.Queries.GetAllPosts;
+using Instagram.Application.Services.PostService.Commands.UpdatePost;
+using Instagram.Application.Services.PostService.Commands.UpdatePostComment;
+using Instagram.Application.Services.PostService.Commands.UpdatePostGallery;
+using Instagram.Application.Services.PostService.Commands.UpdatePostStatus;
+using Instagram.Application.Services.PostService.Queries.AllHomePosts;
+using Instagram.Application.Services.PostService.Queries.AllPosts;
+using Instagram.Application.Services.PostService.Queries.AllUserPosts;
+using Instagram.Application.Services.PostService.Queries.GetHomeNewPostsStatus;
+using Instagram.Application.Services.PostService.Queries.GetHomePostsSlider;
 using Instagram.Application.Services.PostService.Queries.GetPost;
-using Instagram.Contracts.Post.AddPostGalleryContracts;
-using Instagram.Contracts.Post.ConfirmPostContracts;
-using Instagram.Contracts.Post.CreatePostContracts;
-using Instagram.Contracts.Post.DeletePostContracts;
-using Instagram.Contracts.Post.DeletePostGalleryContracts;
-using Instagram.Contracts.Post.EditPostContracts;
-using Instagram.Contracts.Post.EditPostGalleryContracts;
-using Instagram.Contracts.Post.GetAllPostsContracts;
-using Instagram.Contracts.Post.GetPostContracts;
+using Instagram.Application.Services.PostService.Queries.GetUserNewPostsStatus;
+using Instagram.Application.Services.PostService.Queries.GetUserPostsSlider;
+using Instagram.Contracts.Post.AddPost;
+using Instagram.Contracts.Post.AddPostComment;
+using Instagram.Contracts.Post.AddPostGallery;
+using Instagram.Contracts.Post.AllHomePosts;
+using Instagram.Contracts.Post.AllPosts;
+using Instagram.Contracts.Post.AllUserPosts;
+using Instagram.Contracts.Post.Common;
+using Instagram.Contracts.Post.DeletePost;
+using Instagram.Contracts.Post.DeletePostComment;
+using Instagram.Contracts.Post.DeletePostGallery;
+using Instagram.Contracts.Post.GetHomeNewPostsStatus;
+using Instagram.Contracts.Post.GetHomePostsSlider;
+using Instagram.Contracts.Post.GetPost;
+using Instagram.Contracts.Post.GetUserNewPostsStatus;
+using Instagram.Contracts.Post.GetUserPostsSlider;
+using Instagram.Contracts.Post.UpdatePost;
+using Instagram.Contracts.Post.UpdatePostComment;
+using Instagram.Contracts.Post.UpdatePostGallery;
+using Instagram.Contracts.Post.UpdatePostStatus;
 
 using MapsterMapper;
 
@@ -36,25 +56,25 @@ public class PostController : ApiController
     }
     
     [HttpPost]
-    [Route("create")]
-    public async Task<IActionResult> Create()
+    [Route("add")]
+    public async Task<IActionResult> Add()
     {
-        var userId = Guid.Parse(GetUserClaim<string>(c => c.Type == "nameid"));
-        var createPostCommand = new CreatePostCommand(userId);
-        var handler = HttpContext.RequestServices.GetRequiredService<CreatePostCommandHandler>();
-        ErrorOr<CreatePostResult> serviceResult = await handler.Handle(createPostCommand, CancellationToken.None);
+        var userId = GetUserId();
+        var createPostCommand = new AddPostCommand(userId);
+        var handler = HttpContext.RequestServices.GetRequiredService<AddPostCommandHandler>();
+        ErrorOr<AddPostResult> serviceResult = await handler.Handle(createPostCommand, CancellationToken.None);
 
         return serviceResult.Match(
-            result => Ok(_mapper.Map<CreatePostResponse>(result)),
+            result => Ok(_mapper.Map<AddPostResponse>(result)),
             errors => Problem(errors)
         );
     }
     
     [HttpPost]
-    [Route("edit")]
-    public async Task<IActionResult> Edit(EditPostRequest request)
+    [Route("update")]
+    public async Task<IActionResult> Update(UpdatePostRequest request)
     {
-        var userId = Guid.Parse(GetUserClaim<string>(c => c.Type == "nameid"));
+        var userId = GetUserId();
         var editPostCommand = _mapper.Map<EditPostCommand>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<EditPostCommandHandler>();
         var pipeline = HttpContext.RequestServices.GetRequiredService<EditPostCommandPipeline>();
@@ -66,55 +86,11 @@ public class PostController : ApiController
         );
     }
     
-    [HttpGet]
-    [Route("get")]
-    public async Task<IActionResult> Get([FromQuery] GetPostRequest request)
-    {
-        var getPostQuery = _mapper.Map<GetPostQuery>(request);
-        var handler = HttpContext.RequestServices.GetRequiredService<GetPostQueryHandler>();
-        ErrorOr<GetPostResult> serviceResult = await handler.Handle(getPostQuery, CancellationToken.None);
-
-        return serviceResult.Match(
-            result => Ok(_mapper.Map<GetPostResponse>(result)),
-            errors => Problem(errors)
-        );
-    }
-    
-    [HttpGet]
-    [Route("all")]
-    public async Task<IActionResult> All([FromQuery] GetAllPostsRequest request)
-    {
-        var getAllPostsQuery = _mapper.Map<GetAllPostsQuery>(request);
-        var handler = HttpContext.RequestServices.GetRequiredService<GetAllPostsQueryHandler>();
-        var pipeline = HttpContext.RequestServices.GetRequiredService<GetAllPostsQueryPipeline>();
-        ErrorOr<GetAllPostsResult> serviceResult = await pipeline.Pipe(getAllPostsQuery, handler.Handle, CancellationToken.None);
-
-        return serviceResult.Match(
-            result => Ok(_mapper.Map<GetAllPostsResponse>(result)),
-            errors => Problem(errors)
-        );
-    }
-    
-    [HttpPost]
-    [Route("confirm")]
-    public async Task<IActionResult> Confirm(ConfirmPostRequest request)
-    {
-        var userId = Guid.Parse(GetUserClaim<string>(c => c.Type == "nameid"));
-        var confirmPostCommand = _mapper.Map<ConfirmPostCommand>(request);
-        var handler = HttpContext.RequestServices.GetRequiredService<ConfirmPostCommandHandler>();
-        ErrorOr<ConfirmPostResult> serviceResult = await handler.Handle(confirmPostCommand, CancellationToken.None);
-
-        return serviceResult.Match(
-            result => Ok(),
-            errors => Problem(errors)
-        );
-    }
-    
     [HttpPost]
     [Route("delete")]
     public async Task<IActionResult> Delete(DeletePostRequest request)
     {
-        var userId = Guid.Parse(GetUserClaim<string>(c => c.Type == "nameid"));
+        var userId = GetUserId();
         var deletePostCommand = _mapper.Map<DeletePostCommand>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<DeletePostCommandHandler>();
         ErrorOr<DeletePostResult> serviceResult = await handler.Handle(deletePostCommand, CancellationToken.None);
@@ -126,10 +102,146 @@ public class PostController : ApiController
     }
     
     [HttpPost]
+    [Route("publish")]
+    public async Task<IActionResult> Publish(UpdatePostStatusRequest request)
+    {
+        var userId = GetUserId();
+        var confirmPostCommand = _mapper.Map<UpdatePostStatusCommand>((userId, request));
+        var handler = HttpContext.RequestServices.GetRequiredService<UpdatePostStatusCommandHandler>();
+        ErrorOr<UpdatePostStatusResult> serviceResult = await handler.Handle(confirmPostCommand, CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpGet]
+    [Route("get")]
+    public async Task<IActionResult> Get([FromQuery] GetPostRequest request)
+    {
+        var getPostQuery = new GetPostQuery(request.Id);
+        var handler = HttpContext.RequestServices.GetRequiredService<GetPostQueryHandler>();
+        ErrorOr<GetPostResult> serviceResult = await handler.Handle(getPostQuery, CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(_mapper.Map<PostResponse>(result)),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpGet]
+    [Route("all")]
+    public async Task<IActionResult> All([FromQuery] AllPostsRequest request)
+    {
+        var allPostsQuery = _mapper.Map<AllPostsQuery>(request);
+        var handler = HttpContext.RequestServices.GetRequiredService<AllPostsQueryHandler>();
+        var pipeline = HttpContext.RequestServices.GetRequiredService<AllPostsQueryPipeline>();
+        ErrorOr<AllPostsResult> serviceResult = await pipeline.Pipe(allPostsQuery, handler.Handle, CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(_mapper.Map<AllPostsResponse>(result)),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpGet]
+    [Route("user/all")]
+    public async Task<IActionResult> GetAllUserPosts([FromQuery] AllUserPostsRequest request)
+    {
+        
+        var userId = request.UserId ?? GetUserId();
+        var allPostsOfUserQuery = _mapper.Map<AllUserPostsQuery>((userId, request));
+        var handler = HttpContext.RequestServices.GetRequiredService<AllUserPostsQueryHandler>();
+        var pipeline = HttpContext.RequestServices.GetRequiredService<AllUserPostsQueryPipeline>();
+        ErrorOr<AllUserPostsResult> serviceResult = await pipeline.Pipe(allPostsOfUserQuery, handler.Handle, CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(_mapper.Map<AllUserPostsResponse>(result)),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpGet]
+    [Route("user/slider")]
+    public async Task<IActionResult> GetUserPostsSlider([FromQuery] GetUserPostsSliderRequest request)
+    {
+        var userId = request.UserId ?? GetUserId();
+        var getPostsOfUserSliderQuery =_mapper.Map<GetUserPostsSliderQuery>((userId, request));
+        var handler = HttpContext.RequestServices.GetRequiredService<GetUserPostsSliderQueryHandler>();
+        var pipeline = HttpContext.RequestServices.GetRequiredService<GetUserPostsSliderQueryPipeline>();
+        ErrorOr<GetUserPostsSliderResult> serviceResult = await pipeline.Pipe(getPostsOfUserSliderQuery, handler.Handle, CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(_mapper.Map<GetUserPostsSliderResponse>(result)),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpGet]
+    [Route("user/new")]
+    public async Task<IActionResult> GetUserNewPostsStatus([FromQuery] GetUserNewPostsStatusRequest request)
+    {
+        var userId = GetUserId();
+        var getPostsOfUserNewStatusQuery =_mapper.Map<GetUserNewPostsStatusQuery>((userId, request));
+        var handler = HttpContext.RequestServices.GetRequiredService<GetUserNewPostsStatusQueryHandler>();
+        ErrorOr<GetUserNewPostsStatusResult> serviceResult = await handler.Handle(getPostsOfUserNewStatusQuery, CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(_mapper.Map<GetUserNewPostsStatusResponse>(result)),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpGet]
+    [Route("home/all")]
+    public async Task<IActionResult> GetAllHomePosts([FromQuery] AllHomePostsRequest request)
+    {
+        var query = _mapper.Map<AllHomePostsQuery>(request);
+        var handler = HttpContext.RequestServices.GetRequiredService<AllHomePostsQueryHandler>();
+        var pipeline = HttpContext.RequestServices.GetRequiredService<AllHomePostsQueryPipeline>();
+        ErrorOr<AllHomePostsResult> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(_mapper.Map<AllHomePostsResponse>(result)),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpGet]
+    [Route("home/slider")]
+    public async Task<IActionResult> GetHomePostsSlider([FromQuery] GetHomePostsSliderRequest request)
+    {
+        var query =_mapper.Map<GetHomePostsSliderQuery>(request);
+        var handler = HttpContext.RequestServices.GetRequiredService<GetHomePostsSliderQueryHandler>();
+        var pipeline = HttpContext.RequestServices.GetRequiredService<GetHomePostsSliderQueryPipeline>();
+        ErrorOr<GetHomePostsSliderResult> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(_mapper.Map<GetHomePostsSliderResponse>(result)),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpGet]
+    [Route("home/new")]
+    public async Task<IActionResult> GetHomeNewPostsStatus([FromQuery] GetHomeNewPostsStatusRequest request)
+    {
+        var query = _mapper.Map<GetHomeNewPostsStatusQuery>(request);
+        var handler = HttpContext.RequestServices.GetRequiredService<GetHomeNewPostsStatusQueryHandler>();
+        ErrorOr<GetHomeNewPostsStatusResult> serviceResult = await handler.Handle(query, CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(_mapper.Map<GetHomeNewPostsStatusResponse>(result)),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpPost]
     [Route("gallery/add")]
     public async Task<IActionResult> GalleryAdd([FromForm] AddPostGalleryRequest request)
     {
-        var userId = Guid.Parse(GetUserClaim<string>(c => c.Type == "nameid"));
+        var userId = GetUserId();
         var addPostGalleryCommand = _mapper.Map<AddPostGalleryCommand>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<AddPostGalleryCommandHandler>();
         ErrorOr<AddPostGalleryResult> serviceResult = await handler.Handle(addPostGalleryCommand, CancellationToken.None);
@@ -141,13 +253,13 @@ public class PostController : ApiController
     }
     
     [HttpPost]
-    [Route("gallery/edit")]
-    public async Task<IActionResult> GalleryEdit([FromForm] EditPostGalleryRequest request)
+    [Route("gallery/update")]
+    public async Task<IActionResult> GalleryUpdate([FromForm] UpdatePostGalleryRequest request)
     {
-        var userId = Guid.Parse(GetUserClaim<string>(c => c.Type == "nameid"));
-        var editPostGalleryCommand = _mapper.Map<EditPostGalleryCommand>((userId, request));
-        var handler = HttpContext.RequestServices.GetRequiredService<EditPostGalleryCommandHandler>();
-        ErrorOr<EditPostGalleryResult> serviceResult = await handler.Handle(editPostGalleryCommand, CancellationToken.None);
+        var userId = GetUserId();
+        var editPostGalleryCommand = _mapper.Map<UpdatePostGalleryCommand>((userId, request));
+        var handler = HttpContext.RequestServices.GetRequiredService<UpdatePostGalleryCommandHandler>();
+        ErrorOr<UpdatePostGalleryResult> serviceResult = await handler.Handle(editPostGalleryCommand, CancellationToken.None);
 
         return serviceResult.Match(
             _ => Ok(),
@@ -159,10 +271,55 @@ public class PostController : ApiController
     [Route("gallery/delete")]
     public async Task<IActionResult> GalleryDeelete(DeletePostGalleryRequest request)
     {
-        var userId = Guid.Parse(GetUserClaim<string>(c => c.Type == "nameid"));
+        var userId = GetUserId();
         var deletePostGalleryCommand = _mapper.Map<DeletePostGalleryCommand>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<DeletePostGalleryCommandHandler>();
         ErrorOr<DeletePostGalleryResult> serviceResult = await handler.Handle(deletePostGalleryCommand, CancellationToken.None);
+
+        return serviceResult.Match(
+            _ => Ok(),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpPost]
+    [Route("comment/add")]
+    public async Task<IActionResult> CommentAdd([FromForm] AddPostCommentRequest request)
+    {
+        var userId = GetUserId();
+        var addPostCommentCommand = _mapper.Map<AddPostCommentCommand>((userId, request));
+        var handler = HttpContext.RequestServices.GetRequiredService<AddPostCommentCommandHandler>();
+        ErrorOr<AddPostCommentResult> serviceResult = await handler.Handle(addPostCommentCommand, CancellationToken.None);
+
+        return serviceResult.Match(
+            _ => Ok(),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpPost]
+    [Route("comment/update")]
+    public async Task<IActionResult> CommentUpdate([FromForm] UpdatePostCommentRequest request)
+    {
+        var userId = GetUserId();
+        var editPostCommentCommand = _mapper.Map<UpdatePostCommentCommand>((userId, request));
+        var handler = HttpContext.RequestServices.GetRequiredService<UpdatePostCommentCommandHandler>();
+        ErrorOr<UpdatePostCommentResult> serviceResult = await handler.Handle(editPostCommentCommand, CancellationToken.None);
+
+        return serviceResult.Match(
+            _ => Ok(),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpPost]
+    [Route("comment/delete")]
+    public async Task<IActionResult> CommentDeelete(DeletePostCommentRequest request)
+    {
+        var userId = GetUserId();
+        var deletePostCommentCommand = _mapper.Map<DeletePostCommentCommand>((userId, request));
+        var handler = HttpContext.RequestServices.GetRequiredService<DeletePostCommentCommandHandler>();
+        ErrorOr<DeletePostCommentResult> serviceResult = await handler.Handle(deletePostCommentCommand, CancellationToken.None);
 
         return serviceResult.Match(
             _ => Ok(),

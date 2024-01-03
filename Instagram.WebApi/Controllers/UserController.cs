@@ -27,10 +27,7 @@ public class UserController : ApiController
     [Route("get")]
     public async Task<IActionResult> Get([FromQuery] GetUserRequest request)
     {
-        var requestUserId = request.Id;
-        var claimsUserId = Guid.Parse(GetUserClaim<string>(c => c.Type == "nameid"));
-
-        var userId = requestUserId ?? claimsUserId;
+        var userId = request.Id ?? GetUserId();
         var getUserQuery = new GetUserQuery(userId);
         var handler = HttpContext.RequestServices.GetRequiredService<GetUserQueryHandler>();
         ErrorOr<GetUserResult> serviceResult = await handler.Handle(getUserQuery, CancellationToken.None);
@@ -60,7 +57,7 @@ public class UserController : ApiController
     [Route("edit")]
     public async Task<IActionResult> Edit([FromForm] EditUserRequest request)
     {
-        var userId = Guid.Parse(GetUserClaim<string>(c => c.Type == "nameid"));
+        var userId = GetUserId();
         var editUserCommand = _mapper.Map<EditUserCommand>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<EditUserCommandHandler>();
         ErrorOr<bool> serviceResult = await handler.Handle(editUserCommand, CancellationToken.None);

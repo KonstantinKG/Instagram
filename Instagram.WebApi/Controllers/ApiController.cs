@@ -35,4 +35,10 @@ public class ApiController : ControllerBase
             return tClaim;
         return (T)Convert.ChangeType(claim, typeof(T));
     }
+    
+    protected Guid GetUserId()
+    {
+        var text = GetUserClaim<string>(c => c.Type == "nameid");
+        return Guid.Parse(text);
+    }
 }

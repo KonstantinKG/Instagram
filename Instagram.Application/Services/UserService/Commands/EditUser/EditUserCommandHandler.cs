@@ -54,7 +54,7 @@ public class EditUserCommandHandler
             if (command.Image is not null)
                 imagePath = await _fileDownloader.Download(command.Image, "profiles");
         }
-        catch (FileDownloadException)
+        catch (FileSaveException)
         {
             return Errors.File.DownloadFailed;
         }

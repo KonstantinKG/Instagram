@@ -4,20 +4,24 @@ using Instagram.Application.Common.Interfaces.Persistence.DapperRepositories;
 using Instagram.Application.Common.Interfaces.Persistence.EfRepositories;
 using Instagram.Domain.Common.Errors;
 
+using Microsoft.Extensions.Logging;
+
 namespace Instagram.Application.Services.PostService.Commands.DeletePostGallery;
 
 public class DeletePostGalleryCommandHandler
 {
     private readonly IEfPostRepository _efPostRepository;
     private readonly IDapperPostRepository _dapperPostRepository;
+    private readonly ILogger<DeletePostGalleryCommandHandler> _logger;
 
     public DeletePostGalleryCommandHandler(
         IEfPostRepository efPostRepository,
-        IDapperPostRepository dapperPostRepository
-        )
+        IDapperPostRepository dapperPostRepository, 
+        ILogger<DeletePostGalleryCommandHandler> logger)
     {
         _efPostRepository = efPostRepository;
         _dapperPostRepository = dapperPostRepository;
+        _logger = logger;
     }
     
     public async Task<ErrorOr<DeletePostGalleryResult>> Handle(DeletePostGalleryCommand command,  CancellationToken cancellationToken)
@@ -42,8 +46,9 @@ public class DeletePostGalleryCommandHandler
 
             return new DeletePostGalleryResult();
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            _logger.LogError(e, "Error occurred in {Name}", GetType().Name);
             return Errors.Common.Unexpected;
         }
 
