@@ -31,7 +31,7 @@ public class AllHomePostsQueryHandler
         {
             var limit = _applicationSettings.PaginationLimit;
             var offset = (query.Page - 1) *  limit;
-            var total = await _dapperPostRepository.GetTotalPosts();
+            var total = await _dapperPostRepository.GetTotalHomePosts(query.Date);
             var pages = total /  limit + (total %  limit > 0 ? 1 : 0);
 
             var posts = new List<Post>();

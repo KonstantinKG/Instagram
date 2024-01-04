@@ -8,15 +8,15 @@ using Instagram.Domain.Aggregates.UserAggregate.Entities;
 using Instagram.Domain.Common.Errors;
 using Instagram.Domain.Common.Exceptions;
 
-namespace Instagram.Application.Services.UserService.Commands.EditUser;
+namespace Instagram.Application.Services.UserService.Commands.UpdateUser;
 
-public class EditUserCommandHandler
+public class UpdateUserCommandHandler
 {
     private readonly IDapperUserRepository _dapperUserRepository;
     private readonly IEfUserRepository _efUserRepository;
     private readonly IFileDownloader _fileDownloader;
     
-    public EditUserCommandHandler(
+    public UpdateUserCommandHandler(
         IDapperUserRepository dapperUserRepository,
         IEfUserRepository efUserRepository,
         IFileDownloader fileDownloader)
@@ -26,7 +26,7 @@ public class EditUserCommandHandler
         _fileDownloader = fileDownloader;
     }
 
-    public async Task<ErrorOr<bool>> Handle(EditUserCommand command, CancellationToken cancellationToken)
+    public async Task<ErrorOr<bool>> Handle(UpdateUserCommand command, CancellationToken cancellationToken)
     {
         if (await _dapperUserRepository.GetUserByIdentity(
                 command.Username,

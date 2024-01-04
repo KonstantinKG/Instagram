@@ -42,4 +42,9 @@ public class AppFileProxy : IAppFileProxy
     {
         return _formFile.CopyToAsync(target, cancellationToken);
     }
+
+    public Stream OpenReadStream()
+    {
+        return _formFile.OpenReadStream();
+    }
 }

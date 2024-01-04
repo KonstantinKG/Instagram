@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace Instagram.Contracts.User.EditUserContracts;
+namespace Instagram.Contracts.User.UpdateUserContracts;
 
-public record EditUserRequest(
+public record UpdateUserRequest(
     string Username,
     string Fullname,
     string Email,

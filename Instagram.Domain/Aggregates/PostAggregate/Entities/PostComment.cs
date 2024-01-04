@@ -13,7 +13,7 @@ public class PostComment : Entity<Guid>
     public string Content { get; private set; }
     
     public Guid UserId { get; private set; }
-    public User? User { get; private set; }
+    public User? User { get; set; }
     
     public DateTime CreatedAt { get; private set; }
     

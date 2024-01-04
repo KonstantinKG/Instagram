@@ -9,6 +9,9 @@ using Instagram.Application.Services.PostService.Commands.UpdatePostComment;
 using Instagram.Application.Services.PostService.Commands.UpdatePostGallery;
 using Instagram.Application.Services.PostService.Commands.UpdatePostStatus;
 using Instagram.Application.Services.PostService.Queries.AllHomePosts;
+using Instagram.Application.Services.PostService.Queries.AllPostCommentChildren;
+using Instagram.Application.Services.PostService.Queries.AllPostComments;
+using Instagram.Application.Services.PostService.Queries.AllPostParentComments;
 using Instagram.Application.Services.PostService.Queries.AllPosts;
 using Instagram.Application.Services.PostService.Queries.AllUserPosts;
 using Instagram.Application.Services.PostService.Queries.GetHomeNewPostsStatus;
@@ -20,6 +23,9 @@ using Instagram.Contracts.Post.AddPost;
 using Instagram.Contracts.Post.AddPostComment;
 using Instagram.Contracts.Post.AddPostGallery;
 using Instagram.Contracts.Post.AllHomePosts;
+using Instagram.Contracts.Post.AllPostCommentChildren;
+using Instagram.Contracts.Post.AllPostComments;
+using Instagram.Contracts.Post.AllPostParentComments;
 using Instagram.Contracts.Post.AllPosts;
 using Instagram.Contracts.Post.AllUserPosts;
 using Instagram.Contracts.Post.Common;
@@ -34,6 +40,7 @@ using Instagram.Contracts.Post.UpdatePost;
 using Instagram.Contracts.Post.UpdatePostComment;
 using Instagram.Contracts.Post.UpdatePostGallery;
 using Instagram.Contracts.Post.UpdatePostStatus;
+using Instagram.Domain.Aggregates.PostAggregate.Entities;
 using Instagram.Infrastructure.Services;
 
 using Mapster;
@@ -97,6 +104,32 @@ public class PostMappingConfig : IRegister
     
     private void RegisterPostCommentMappings(TypeAdapterConfig config)
     {
+        config.NewConfig<PostComment, PostCommentResponse>()
+            .Map(dest => dest.User, src => src.User)
+            .Map(dest => dest, src => src);
+        
+        config.NewConfig<AllPostCommentsRequest, AllPostCommentsQuery>()
+            .Map(dest => dest, src => src);
+        
+        config.NewConfig<AllPostCommentsResult, AllPostCommentsResponse>()
+            .Map(dest => dest, src => src);
+        
+        config.NewConfig<PostComment, AllPostCommentsComment>()
+            .Map(dest => dest.User, src => src.User)
+            .Map(dest => dest, src => src);
+        
+        config.NewConfig<AllPostParentCommentsRequest, AllPostParentCommentsQuery>()
+            .Map(dest => dest, src => src);
+        
+        config.NewConfig<AllPostParentCommentsResult, AllPostParentCommentsResponse>()
+            .Map(dest => dest, src => src);
+        
+        config.NewConfig<AllPostCommentChildrenRequest, AllPostCommentChildrenQuery>()
+            .Map(dest => dest, src => src);
+        
+        config.NewConfig<AllPostCommentChildrenResult, AllPostCommentChildrenResponse>()
+            .Map(dest => dest, src => src);
+        
         config.NewConfig<(Guid userId, AddPostCommentRequest request), AddPostCommentCommand>()
             .Map(dest => dest.UserId, src => src.userId)
             .Map(dest => dest, src => src.request);

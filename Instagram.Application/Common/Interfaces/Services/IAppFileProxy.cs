@@ -10,4 +10,6 @@ public interface IAppFileProxy
     public void CopyTo(Stream target);
 
     public Task CopyToAsync(Stream target, CancellationToken cancellationToken = default);
+
+    public Stream OpenReadStream();
 }

@@ -12,6 +12,9 @@ using Instagram.Application.Services.PostService.Commands.UpdatePostComment;
 using Instagram.Application.Services.PostService.Commands.UpdatePostGallery;
 using Instagram.Application.Services.PostService.Commands.UpdatePostStatus;
 using Instagram.Application.Services.PostService.Queries.AllHomePosts;
+using Instagram.Application.Services.PostService.Queries.AllPostCommentChildren;
+using Instagram.Application.Services.PostService.Queries.AllPostComments;
+using Instagram.Application.Services.PostService.Queries.AllPostParentComments;
 using Instagram.Application.Services.PostService.Queries.AllPosts;
 using Instagram.Application.Services.PostService.Queries.AllUserPosts;
 using Instagram.Application.Services.PostService.Queries.GetHomeNewPostsStatus;
@@ -23,6 +26,9 @@ using Instagram.Contracts.Post.AddPost;
 using Instagram.Contracts.Post.AddPostComment;
 using Instagram.Contracts.Post.AddPostGallery;
 using Instagram.Contracts.Post.AllHomePosts;
+using Instagram.Contracts.Post.AllPostCommentChildren;
+using Instagram.Contracts.Post.AllPostComments;
+using Instagram.Contracts.Post.AllPostParentComments;
 using Instagram.Contracts.Post.AllPosts;
 using Instagram.Contracts.Post.AllUserPosts;
 using Instagram.Contracts.Post.Common;
@@ -53,67 +59,6 @@ public class PostController : ApiController
     public PostController(IMapper mapper)
     {
         _mapper = mapper;
-    }
-    
-    [HttpPost]
-    [Route("add")]
-    public async Task<IActionResult> Add()
-    {
-        var userId = GetUserId();
-        var createPostCommand = new AddPostCommand(userId);
-        var handler = HttpContext.RequestServices.GetRequiredService<AddPostCommandHandler>();
-        ErrorOr<AddPostResult> serviceResult = await handler.Handle(createPostCommand, CancellationToken.None);
-
-        return serviceResult.Match(
-            result => Ok(_mapper.Map<AddPostResponse>(result)),
-            errors => Problem(errors)
-        );
-    }
-    
-    [HttpPost]
-    [Route("update")]
-    public async Task<IActionResult> Update(UpdatePostRequest request)
-    {
-        var userId = GetUserId();
-        var editPostCommand = _mapper.Map<EditPostCommand>((userId, request));
-        var handler = HttpContext.RequestServices.GetRequiredService<EditPostCommandHandler>();
-        var pipeline = HttpContext.RequestServices.GetRequiredService<EditPostCommandPipeline>();
-        ErrorOr<EditPostResult> serviceResult = await pipeline.Pipe(editPostCommand, handler.Handle, CancellationToken.None);
-
-        return serviceResult.Match(
-            _ => Ok(),
-            errors => Problem(errors)
-        );
-    }
-    
-    [HttpPost]
-    [Route("delete")]
-    public async Task<IActionResult> Delete(DeletePostRequest request)
-    {
-        var userId = GetUserId();
-        var deletePostCommand = _mapper.Map<DeletePostCommand>((userId, request));
-        var handler = HttpContext.RequestServices.GetRequiredService<DeletePostCommandHandler>();
-        ErrorOr<DeletePostResult> serviceResult = await handler.Handle(deletePostCommand, CancellationToken.None);
-
-        return serviceResult.Match(
-            result => Ok(),
-            errors => Problem(errors)
-        );
-    }
-    
-    [HttpPost]
-    [Route("publish")]
-    public async Task<IActionResult> Publish(UpdatePostStatusRequest request)
-    {
-        var userId = GetUserId();
-        var confirmPostCommand = _mapper.Map<UpdatePostStatusCommand>((userId, request));
-        var handler = HttpContext.RequestServices.GetRequiredService<UpdatePostStatusCommandHandler>();
-        ErrorOr<UpdatePostStatusResult> serviceResult = await handler.Handle(confirmPostCommand, CancellationToken.None);
-
-        return serviceResult.Match(
-            result => Ok(),
-            errors => Problem(errors)
-        );
     }
     
     [HttpGet]
@@ -238,6 +183,67 @@ public class PostController : ApiController
     }
     
     [HttpPost]
+    [Route("add")]
+    public async Task<IActionResult> Add()
+    {
+        var userId = GetUserId();
+        var createPostCommand = new AddPostCommand(userId);
+        var handler = HttpContext.RequestServices.GetRequiredService<AddPostCommandHandler>();
+        ErrorOr<AddPostResult> serviceResult = await handler.Handle(createPostCommand, CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(_mapper.Map<AddPostResponse>(result)),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpPut]
+    [Route("update")]
+    public async Task<IActionResult> Update(UpdatePostRequest request)
+    {
+        var userId = GetUserId();
+        var editPostCommand = _mapper.Map<EditPostCommand>((userId, request));
+        var handler = HttpContext.RequestServices.GetRequiredService<EditPostCommandHandler>();
+        var pipeline = HttpContext.RequestServices.GetRequiredService<EditPostCommandPipeline>();
+        ErrorOr<EditPostResult> serviceResult = await pipeline.Pipe(editPostCommand, handler.Handle, CancellationToken.None);
+
+        return serviceResult.Match(
+            _ => Ok(),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpPut]
+    [Route("publish")]
+    public async Task<IActionResult> Publish(UpdatePostStatusRequest request)
+    {
+        var userId = GetUserId();
+        var confirmPostCommand = _mapper.Map<UpdatePostStatusCommand>((userId, request));
+        var handler = HttpContext.RequestServices.GetRequiredService<UpdatePostStatusCommandHandler>();
+        ErrorOr<UpdatePostStatusResult> serviceResult = await handler.Handle(confirmPostCommand, CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpDelete]
+    [Route("delete")]
+    public async Task<IActionResult> Delete(DeletePostRequest request)
+    {
+        var userId = GetUserId();
+        var deletePostCommand = _mapper.Map<DeletePostCommand>((userId, request));
+        var handler = HttpContext.RequestServices.GetRequiredService<DeletePostCommandHandler>();
+        ErrorOr<DeletePostResult> serviceResult = await handler.Handle(deletePostCommand, CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpPost]
     [Route("gallery/add")]
     public async Task<IActionResult> GalleryAdd([FromForm] AddPostGalleryRequest request)
     {
@@ -252,7 +258,7 @@ public class PostController : ApiController
         );
     }
     
-    [HttpPost]
+    [HttpPut]
     [Route("gallery/update")]
     public async Task<IActionResult> GalleryUpdate([FromForm] UpdatePostGalleryRequest request)
     {
@@ -267,9 +273,9 @@ public class PostController : ApiController
         );
     }
     
-    [HttpPost]
+    [HttpDelete]
     [Route("gallery/delete")]
-    public async Task<IActionResult> GalleryDeelete(DeletePostGalleryRequest request)
+    public async Task<IActionResult> GalleryDelete(DeletePostGalleryRequest request)
     {
         var userId = GetUserId();
         var deletePostGalleryCommand = _mapper.Map<DeletePostGalleryCommand>((userId, request));
@@ -278,6 +284,53 @@ public class PostController : ApiController
 
         return serviceResult.Match(
             _ => Ok(),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpGet]
+    [Route("comment/all")]
+    public async Task<IActionResult> CommentAll([FromQuery] AllPostCommentsRequest request)
+    {
+        var query = _mapper.Map<AllPostCommentsQuery>(request);
+        var handler = HttpContext.RequestServices.GetRequiredService<AllPostCommentsQueryHandler>();
+        var pipeline = HttpContext.RequestServices.GetRequiredService<AllPostCommentsQueryPipeline>();
+        ErrorOr<AllPostCommentsResult> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(_mapper.Map<AllPostCommentsResponse>(result)),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpGet]
+    [Route("comment/all/parents")]
+    public async Task<IActionResult> CommentAllParents([FromQuery] AllPostParentCommentsRequest request)
+    {
+        var userId = GetUserId();
+        var query = _mapper.Map<AllPostParentCommentsQuery>(request);
+        var handler = HttpContext.RequestServices.GetRequiredService<AllPostParentCommentsQueryHandler>();
+        var pipeline = HttpContext.RequestServices.GetRequiredService<AllPostParentCommentsQueryPipeline>();
+        ErrorOr<AllPostParentCommentsResult> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(_mapper.Map<AllPostParentCommentsResponse>(result)),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpGet]
+    [Route("comment/all/children")]
+    public async Task<IActionResult> CommentAllChildren([FromQuery] AllPostCommentChildrenRequest request)
+    {
+        var userId = GetUserId();
+        var query = _mapper.Map<AllPostCommentChildrenQuery>(request);
+        var handler = HttpContext.RequestServices.GetRequiredService<AllPostCommentChildrenQueryHandler>();
+        var pipeline = HttpContext.RequestServices.GetRequiredService<AllPostCommentChildrenQueryPipeline>();
+        ErrorOr<AllPostCommentChildrenResult> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(_mapper.Map<AllPostCommentChildrenResponse>(result)),
             errors => Problem(errors)
         );
     }
@@ -297,7 +350,7 @@ public class PostController : ApiController
         );
     }
     
-    [HttpPost]
+    [HttpPut]
     [Route("comment/update")]
     public async Task<IActionResult> CommentUpdate([FromForm] UpdatePostCommentRequest request)
     {
@@ -312,7 +365,7 @@ public class PostController : ApiController
         );
     }
     
-    [HttpPost]
+    [HttpDelete]
     [Route("comment/delete")]
     public async Task<IActionResult> CommentDeelete(DeletePostCommentRequest request)
     {

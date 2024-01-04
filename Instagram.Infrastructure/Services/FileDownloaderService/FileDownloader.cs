@@ -1,4 +1,6 @@
-﻿using Instagram.Application.Common.Interfaces.Services;
+﻿using System.Security.Cryptography;
+
+using Instagram.Application.Common.Interfaces.Services;
 using Instagram.Domain.Common.Exceptions;
 
 using Microsoft.Extensions.Options;
@@ -22,8 +24,9 @@ public class FileDownloader : IFileDownloader
             if (!Directory.Exists(dirFolder))
                 Directory.CreateDirectory(dirFolder);
 
-            var uniqueIdentifier =
-                $"{Guid.NewGuid()}{file.FileName().Substring(file.FileName().LastIndexOf(".", StringComparison.Ordinal))}";
+            var fileHash = HashFileContent(file);
+            var fileExtension = file.FileName().Substring(file.FileName().LastIndexOf(".", StringComparison.Ordinal));
+            var uniqueIdentifier = $"{fileHash}{fileExtension}";
             var filePath = Path.Combine(dirFolder, uniqueIdentifier);
             if (Path.Exists(filePath))
                 return filePath;
@@ -36,5 +39,13 @@ public class FileDownloader : IFileDownloader
         {
             throw new FileSaveException();
         }
+    }
+    
+    public static string HashFileContent(IAppFileProxy file)
+    {
+        using var stream = file.OpenReadStream();
+        using var sha256 = SHA256.Create();
+        byte[] hashBytes = sha256.ComputeHash(stream);
+        return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
     }
 }

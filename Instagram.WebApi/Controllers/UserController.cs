@@ -1,11 +1,11 @@
 ﻿using ErrorOr;
 
-using Instagram.Application.Services.UserService.Commands.EditUser;
+using Instagram.Application.Services.UserService.Commands.UpdateUser;
 using Instagram.Application.Services.UserService.Queries.GetAllUsers;
 using Instagram.Application.Services.UserService.Queries.GetUser;
-using Instagram.Contracts.User.EditUserContracts;
 using Instagram.Contracts.User.GetAllUsersContracts;
 using Instagram.Contracts.User.GetUserContracts;
+using Instagram.Contracts.User.UpdateUserContracts;
 
 using MapsterMapper;
 
@@ -53,13 +53,13 @@ public class UserController : ApiController
         );
     }
 
-    [HttpPost]
-    [Route("edit")]
-    public async Task<IActionResult> Edit([FromForm] EditUserRequest request)
+    [HttpPut]
+    [Route("update")]
+    public async Task<IActionResult> Edit([FromForm] UpdateUserRequest request)
     {
         var userId = GetUserId();
-        var editUserCommand = _mapper.Map<EditUserCommand>((userId, request));
-        var handler = HttpContext.RequestServices.GetRequiredService<EditUserCommandHandler>();
+        var editUserCommand = _mapper.Map<UpdateUserCommand>((userId, request));
+        var handler = HttpContext.RequestServices.GetRequiredService<UpdateUserCommandHandler>();
         ErrorOr<bool> serviceResult = await handler.Handle(editUserCommand, CancellationToken.None);
 
         return serviceResult.Match(
