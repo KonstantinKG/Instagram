@@ -10,4 +10,6 @@ public interface IEfUserRepository
     Task UpdateUser(User? user, UserProfile? profile);
 
     Task AddUserGender(UserGender gender);
+    Task AddUserSubscription(UserSubscription subscription);
+    Task DeleteUserSubscription(UserSubscription subscription);
 }

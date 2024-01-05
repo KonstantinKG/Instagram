@@ -42,12 +42,13 @@ public class AddPostGalleryCommandHandler
                 return Errors.Common.AccessDenied;
 
             var path = await _fileDownloader.Download(command.File, "post_galleries");
-            var gallery = PostGallery.Create(
-                command.PostId,
-                path,
-                command.Description,
-                command.Labels
-            );
+            var gallery = new PostGallery {
+                Id = Guid.NewGuid(),
+                PostId = command.PostId,
+                File = path,
+                Description = command.Description,
+                Labels = command.Labels
+            };
             await _efPostRepository.AddGallery(gallery);
 
             return new AddPostGalleryResult();

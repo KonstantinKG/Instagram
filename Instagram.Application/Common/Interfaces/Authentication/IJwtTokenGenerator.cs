@@ -14,5 +14,5 @@ public record TokenParameters
     string Id,
     string SessionId,
     string Username,
-    string Email
+    string? Email
 );

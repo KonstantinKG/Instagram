@@ -1,10 +1,17 @@
 ﻿using ErrorOr;
 
+using Instagram.Application.Services.UserService.Commands.SubscribeUser;
+using Instagram.Application.Services.UserService.Commands.UnsubscribeUser;
 using Instagram.Application.Services.UserService.Commands.UpdateUser;
+using Instagram.Application.Services.UserService.Queries.AllUserSubscriptions;
 using Instagram.Application.Services.UserService.Queries.GetAllUsers;
 using Instagram.Application.Services.UserService.Queries.GetUser;
+using Instagram.Contracts.User._Common;
+using Instagram.Contracts.User.AllUserSubscriptions;
 using Instagram.Contracts.User.GetAllUsersContracts;
 using Instagram.Contracts.User.GetUserContracts;
+using Instagram.Contracts.User.SubscribeUserContracts;
+using Instagram.Contracts.User.UnsubscribeUserContracts;
 using Instagram.Contracts.User.UpdateUserContracts;
 
 using MapsterMapper;
@@ -28,12 +35,12 @@ public class UserController : ApiController
     public async Task<IActionResult> Get([FromQuery] GetUserRequest request)
     {
         var userId = request.Id ?? GetUserId();
-        var getUserQuery = new GetUserQuery(userId);
+        var query = new GetUserQuery(userId);
         var handler = HttpContext.RequestServices.GetRequiredService<GetUserQueryHandler>();
-        ErrorOr<GetUserResult> serviceResult = await handler.Handle(getUserQuery, CancellationToken.None);
+        ErrorOr<GetUserResult> serviceResult = await handler.Handle(query, CancellationToken.None);
 
         return serviceResult.Match(
-            result => Ok(_mapper.Map<GetUserResponse>(result)),
+            result => Ok(_mapper.Map<UserResponse>(result)),
             errors => Problem(errors)
         );
     }
@@ -42,10 +49,10 @@ public class UserController : ApiController
     [Route("all")]
     public async Task<IActionResult> All([FromQuery] GetAllUsersRequest request)
     {
-        var getAllUsersQuery = _mapper.Map<GetAllUsersQuery>(request);
+        var query = _mapper.Map<GetAllUsersQuery>(request);
         var handler = HttpContext.RequestServices.GetRequiredService<GetAllUsersQueryHandler>();
         var pipeline = HttpContext.RequestServices.GetRequiredService<GetAllUsersQueryPipeline>();
-        ErrorOr<GetAllUsersResult> serviceResult = await pipeline.Pipe(getAllUsersQuery, handler.Handle, CancellationToken.None);
+        ErrorOr<GetAllUsersResult> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
 
         return serviceResult.Match(
             result => Ok(_mapper.Map<GetAllUsersResponse>(result)),
@@ -58,12 +65,57 @@ public class UserController : ApiController
     public async Task<IActionResult> Edit([FromForm] UpdateUserRequest request)
     {
         var userId = GetUserId();
-        var editUserCommand = _mapper.Map<UpdateUserCommand>((userId, request));
+        var command = _mapper.Map<UpdateUserCommand>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<UpdateUserCommandHandler>();
-        ErrorOr<bool> serviceResult = await handler.Handle(editUserCommand, CancellationToken.None);
+        ErrorOr<bool> serviceResult = await handler.Handle(command, CancellationToken.None);
 
         return serviceResult.Match(
             _ => Ok(),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpPost]
+    [Route("subscribe")]
+    public async Task<IActionResult> Subscribe(SubscribeUserRequest request)
+    {
+        var userId = GetUserId();
+        var command = _mapper.Map<SubscribeUserCommand>((userId, request));
+        var handler = HttpContext.RequestServices.GetRequiredService<SubscribeUserCommandHandler>();
+        ErrorOr<SubscribeUserResult> serviceResult = await handler.Handle(command, CancellationToken.None);
+
+        return serviceResult.Match(
+            _ => Ok(),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpPost]
+    [Route("unsubscribe")]
+    public async Task<IActionResult> Unsubscribe(UnsubscribeUserRequest request)
+    {
+        var userId = GetUserId();
+        var command = _mapper.Map<UnsubscribeUserCommand>((userId, request));
+        var handler = HttpContext.RequestServices.GetRequiredService<UnsubscribeUserCommandHandler>();
+        ErrorOr<UnsubscribeUserResult> serviceResult = await handler.Handle(command, CancellationToken.None);
+
+        return serviceResult.Match(
+            _ => Ok(),
+            errors => Problem(errors)
+        );
+    }
+    
+    [HttpGet]
+    [Route("subscriptions/all")]
+    public async Task<IActionResult> AllSubscriptions([FromQuery] AllUserSubscriptionsRequest request)
+    {
+        var userId = GetUserId();
+        var query = _mapper.Map<AllUserSubscriptionsQuery>((userId, request));
+        var handler = HttpContext.RequestServices.GetRequiredService<AllUserSubscriptionsQueryHandler>();
+        ErrorOr<AllUserSubscriptionsResult> serviceResult = await handler.Handle(query, CancellationToken.None);
+
+        return serviceResult.Match(
+            result => Ok(_mapper.Map<AllUserSubscriptionsResponse>(result)),
             errors => Problem(errors)
         );
     }

@@ -25,7 +25,7 @@ public class GetPostQueryHandler
     {
         try
         {
-            if (await _dapperPostRepository.GetPostWithGallery(query.Id) is not Post post)
+            if (await _dapperPostRepository.GetFullPost(query.Id) is not Post post)
             {
                 return Errors.Common.NotFound;
             }

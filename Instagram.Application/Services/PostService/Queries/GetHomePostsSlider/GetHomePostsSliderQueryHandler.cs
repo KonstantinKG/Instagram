@@ -34,7 +34,7 @@ public class GetHomePostsSliderQueryHandler
             int? previousOffset = query.Page == 1 ? null : offset - limit;
             var nextOffset = offset + limit;
 
-            var posts =  await _dapperPostRepository.AllHomePosts(offset,  limit, query.Date);
+            var posts =  await _dapperPostRepository.AllHomePosts(query.UserId, offset,  limit, query.Date);
 
             Guid? previousPostId = null;
             Guid? nextPostId = null;
@@ -48,13 +48,13 @@ public class GetHomePostsSliderQueryHandler
                 
                 if (i == 0)
                 {
-                    var previousPosts = previousOffset != null ? await _dapperPostRepository.AllHomePosts((int)previousOffset, limit, query.Date) : null;
+                    var previousPosts = previousOffset != null ? await _dapperPostRepository.AllHomePosts(query.UserId, (int)previousOffset, limit, query.Date) : null;
                     previousPostId = previousPosts?.Last().Id;    
                     nextPostId = posts.Count > 1 ? posts[1].Id : null;
                 }
                 else if (i == posts.Count)
                 {
-                    var nextPosts = await _dapperPostRepository.AllHomePosts(nextOffset, limit, query.Date);
+                    var nextPosts = await _dapperPostRepository.AllHomePosts(query.UserId, nextOffset, limit, query.Date);
                     nextPostId = nextPosts.FirstOrDefault()?.Id;
                     previousPostId = posts[i - 1].Id;
                 }

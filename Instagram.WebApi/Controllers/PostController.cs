@@ -3,7 +3,6 @@
 using Instagram.Application.Services.PostService.Commands.AddPost;
 using Instagram.Application.Services.PostService.Commands.AddPostComment;
 using Instagram.Application.Services.PostService.Commands.AddPostGallery;
-using Instagram.Application.Services.PostService.Commands.ConfirmPost;
 using Instagram.Application.Services.PostService.Commands.DeletePost;
 using Instagram.Application.Services.PostService.Commands.DeletePostComment;
 using Instagram.Application.Services.PostService.Commands.DeletePostGallery;
@@ -22,6 +21,7 @@ using Instagram.Application.Services.PostService.Queries.GetHomePostsSlider;
 using Instagram.Application.Services.PostService.Queries.GetPost;
 using Instagram.Application.Services.PostService.Queries.GetUserNewPostsStatus;
 using Instagram.Application.Services.PostService.Queries.GetUserPostsSlider;
+using Instagram.Contracts.Post._Common;
 using Instagram.Contracts.Post.AddPost;
 using Instagram.Contracts.Post.AddPostComment;
 using Instagram.Contracts.Post.AddPostGallery;
@@ -31,7 +31,6 @@ using Instagram.Contracts.Post.AllPostComments;
 using Instagram.Contracts.Post.AllPostParentComments;
 using Instagram.Contracts.Post.AllPosts;
 using Instagram.Contracts.Post.AllUserPosts;
-using Instagram.Contracts.Post.Common;
 using Instagram.Contracts.Post.DeletePost;
 using Instagram.Contracts.Post.DeletePostComment;
 using Instagram.Contracts.Post.DeletePostGallery;
@@ -142,7 +141,8 @@ public class PostController : ApiController
     [Route("home/all")]
     public async Task<IActionResult> GetAllHomePosts([FromQuery] AllHomePostsRequest request)
     {
-        var query = _mapper.Map<AllHomePostsQuery>(request);
+        var userId = GetUserId();
+        var query = _mapper.Map<AllHomePostsQuery>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<AllHomePostsQueryHandler>();
         var pipeline = HttpContext.RequestServices.GetRequiredService<AllHomePostsQueryPipeline>();
         ErrorOr<AllHomePostsResult> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
@@ -157,7 +157,8 @@ public class PostController : ApiController
     [Route("home/slider")]
     public async Task<IActionResult> GetHomePostsSlider([FromQuery] GetHomePostsSliderRequest request)
     {
-        var query =_mapper.Map<GetHomePostsSliderQuery>(request);
+        var userId = GetUserId();
+        var query =_mapper.Map<GetHomePostsSliderQuery>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<GetHomePostsSliderQueryHandler>();
         var pipeline = HttpContext.RequestServices.GetRequiredService<GetHomePostsSliderQueryPipeline>();
         ErrorOr<GetHomePostsSliderResult> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);

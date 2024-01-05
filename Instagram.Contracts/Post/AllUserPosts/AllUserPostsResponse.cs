@@ -1,9 +1,9 @@
-﻿using Instagram.Contracts.Post.Common;
+﻿using Instagram.Contracts.Post._Common;
 
 namespace Instagram.Contracts.Post.AllUserPosts;
 
 public record AllUserPostsResponse(
     long Current,
     long Total,
-    List<PostResponse> Posts
+    List<PostShortResponse> Posts
 );

@@ -19,6 +19,7 @@ using Instagram.Application.Services.PostService.Queries.GetHomePostsSlider;
 using Instagram.Application.Services.PostService.Queries.GetPost;
 using Instagram.Application.Services.PostService.Queries.GetUserNewPostsStatus;
 using Instagram.Application.Services.PostService.Queries.GetUserPostsSlider;
+using Instagram.Contracts.Post._Common;
 using Instagram.Contracts.Post.AddPost;
 using Instagram.Contracts.Post.AddPostComment;
 using Instagram.Contracts.Post.AddPostGallery;
@@ -28,7 +29,6 @@ using Instagram.Contracts.Post.AllPostComments;
 using Instagram.Contracts.Post.AllPostParentComments;
 using Instagram.Contracts.Post.AllPosts;
 using Instagram.Contracts.Post.AllUserPosts;
-using Instagram.Contracts.Post.Common;
 using Instagram.Contracts.Post.DeletePost;
 using Instagram.Contracts.Post.DeletePostComment;
 using Instagram.Contracts.Post.DeletePostGallery;
@@ -40,7 +40,9 @@ using Instagram.Contracts.Post.UpdatePost;
 using Instagram.Contracts.Post.UpdatePostComment;
 using Instagram.Contracts.Post.UpdatePostGallery;
 using Instagram.Contracts.Post.UpdatePostStatus;
+using Instagram.Domain.Aggregates.PostAggregate;
 using Instagram.Domain.Aggregates.PostAggregate.Entities;
+using Instagram.Domain.Aggregates.TagAggregate;
 using Instagram.Infrastructure.Services;
 
 using Mapster;
@@ -60,15 +62,24 @@ public class PostMappingConfig : IRegister
 
     private void RegisterPostMappings(TypeAdapterConfig config)
     {
+        config.NewConfig<Post, PostResponse>()
+            .Map(dest => dest, src => src);
+        
+        config.NewConfig<Post, PostShortResponse>()
+            .Map(dest => dest, src => src);
+        
+        config.NewConfig<PostGallery, PostGalleryResponse>()
+            .Map(dest => dest, src => src);
+        
+        config.NewConfig<Tag, PostTagResponse>()
+            .Map(dest => dest, src => src);
+        
         config.NewConfig<AddPostResult, AddPostResponse>()
             .Map(dest => dest, src => src);
         
         config.NewConfig<(Guid userId, UpdatePostRequest request), EditPostCommand>()
             .Map(dest => dest.UserId, src => src.userId)
             .Map(dest => dest, src => src.request);
-        
-        config.NewConfig<GetPostResult, PostResponse>()
-            .Map(dest => dest, src => src.Post);
         
         config.NewConfig<AllPostsRequest, AllPostsQuery>()
             .Map(dest => dest, src => src);
@@ -105,7 +116,7 @@ public class PostMappingConfig : IRegister
     private void RegisterPostCommentMappings(TypeAdapterConfig config)
     {
         config.NewConfig<PostComment, PostCommentResponse>()
-            .Map(dest => dest.User, src => src.User)
+            .Map(dest => dest.UserResponse, src => src.User)
             .Map(dest => dest, src => src);
         
         config.NewConfig<AllPostCommentsRequest, AllPostCommentsQuery>()
@@ -115,7 +126,7 @@ public class PostMappingConfig : IRegister
             .Map(dest => dest, src => src);
         
         config.NewConfig<PostComment, AllPostCommentsComment>()
-            .Map(dest => dest.User, src => src.User)
+            .Map(dest => dest.UserResponse, src => src.User)
             .Map(dest => dest, src => src);
         
         config.NewConfig<AllPostParentCommentsRequest, AllPostParentCommentsQuery>()
@@ -169,14 +180,16 @@ public class PostMappingConfig : IRegister
     
     private void RegisterHomePostMappings(TypeAdapterConfig config)
     {
-        config.NewConfig<AllHomePostsRequest, AllHomePostsQuery>()
-            .Map(dest => dest, src => src);
+        config.NewConfig<(Guid userId, AllHomePostsRequest request), AllHomePostsQuery>()
+            .Map(dest => dest.UserId, src => src.userId)
+            .Map(dest => dest, src => src.request);
 
         config.NewConfig<AllHomePostsResult, AllHomePostsResponse>()
             .Map(dest => dest, src => src);
         
-        config.NewConfig<GetHomePostsSliderRequest, GetHomePostsSliderQuery>()
-            .Map(dest => dest, src => src);
+        config.NewConfig<(Guid userId, GetHomePostsSliderRequest request), GetHomePostsSliderQuery>()
+            .Map(dest => dest.UserId, src => src.userId)
+            .Map(dest => dest, src => src.request);
 
         config.NewConfig<GetHomePostsSliderResult, GetHomePostsSliderResponse>()
             .Map(dest => dest, src => src);

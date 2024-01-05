@@ -1,6 +1,9 @@
 ﻿using Instagram.Application.Common.Interfaces.Persistence.EfRepositories;
 using Instagram.Domain.Aggregates.PostAggregate;
 using Instagram.Domain.Aggregates.PostAggregate.Entities;
+using Instagram.Domain.Aggregates.TagAggregate;
+
+using Microsoft.EntityFrameworkCore;
 
 namespace Instagram.Infrastructure.Persistence.EF.Repositories;
 
@@ -28,6 +31,24 @@ public class EfPostRepository : IEfPostRepository
     public async Task DeletePost(Post post)
     {
         await _context.SingleDeleteAsync(post);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task AddTags(List<Tag> tags)
+    {
+        await _context.BulkInsertAsync(tags);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task AddPostTags(List<PostToTag> tags)
+    {
+        await _context.AddRangeAsync(tags);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeletePostTags(List<PostToTag> tags)
+    {
+        await _context.BulkDeleteAsync(tags);
         await _context.SaveChangesAsync();
     }
 

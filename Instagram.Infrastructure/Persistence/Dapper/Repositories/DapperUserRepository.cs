@@ -55,6 +55,23 @@ public class DapperUserRepository : IDapperUserRepository
         return await connection.QuerySingleOrDefaultAsync<User>(sql, parameters);
     }
 
+    public async Task<UserSubscription?> GetUserSubscription(Guid subscriberId, Guid userId)
+    {
+        var connection = _context.CreateConnection();
+        var parameters = new { SubscriberId = subscriberId, UserId = userId};
+        const string sql = 
+            """
+                SELECT
+                    us.subscriber_id as SubscriberId,
+                    us.user_id as UserId,
+                    us.created_at as CreatedAt
+                FROM users_subscriptions us
+                WHERE us.subscriber_id = @subscriberId AND us.user_id = @userId;
+            """;
+
+        return await connection.QuerySingleOrDefaultAsync<UserSubscription>(sql, parameters);
+    }
+
     public async Task<List<User>> GetAllUsers(int offset, int limit)
     {
         var connection = _context.CreateConnection();
@@ -72,7 +89,7 @@ public class DapperUserRepository : IDapperUserRepository
             sql,
             (user, profile) =>
             {
-                user.SetProfile(profile);
+                user.Profile = profile;
                 return user;
             }, 
             parameters,
@@ -82,16 +99,39 @@ public class DapperUserRepository : IDapperUserRepository
         return users.ToList();
     }
 
-    public async Task<long> GetTotalUsers()
+    public async Task<List<User>> GetAllUserSubscriptions(Guid subscriberId, int offset, int limit)
     {
         var connection = _context.CreateConnection();
+        var parameters = new { SubscriberId = subscriberId, Offset = offset, Limit = limit };
         const string sql = 
             """
-                SELECT count(*) FROM users;
+                SELECT
+                    u.id,
+                    u.username,
+                    u.fullname,
+                    0 as profile_split,
+                    p.image
+                FROM users_subscriptions us
+                INNER JOIN users u ON u.id = us.user_id 
+                INNER JOIN users_profiles p ON p.user_id = u.id
+                WHERE us.subscriber_id = @subscriberId
+                ORDER BY us.created_at DESC 
+                LIMIT @limit
+                OFFSET @offset;
             """;
 
-        return await connection.QueryFirstAsync<long>(sql);
+        var subscriptions = await connection.QueryAsync<User, UserProfile, User>(
+            sql,
+            (user, profile) =>
+            {
+                user.Profile = profile;
+                return user;
+            }, 
+            parameters,
+            splitOn: "profile_split"
+        );
         
+        return subscriptions.ToList();
     }
 
     public async Task<UserGender?> GetUserGender(string name)
@@ -104,11 +144,22 @@ public class DapperUserRepository : IDapperUserRepository
                 WHERE lower(name) = @Name;
             ";
         
-        var gender = await connection.QueryFirstOrDefaultAsync<UserGender>(
-            sql,
-            parameters
-        );
-        
+        var gender = await connection.QueryFirstOrDefaultAsync<UserGender>(sql,parameters);
         return gender;
+    }
+    
+    public async Task<long> GetTotalUsers()
+    {
+        var connection = _context.CreateConnection();
+        const string sql = "SELECT count(*) FROM users;";
+        return await connection.QueryFirstAsync<long>(sql);
+    }
+
+    public async Task<long> GetTotalUserSubscriptions(Guid subscriberId)
+    {
+        var connection = _context.CreateConnection();
+        var parameters = new { SubscriberId = subscriberId };
+        const string sql = "SELECT count(*) FROM users_subscriptions us WHERE us.subscriber_id = @subscriberId;";
+        return await connection.QueryFirstAsync<long>(sql, parameters);
     }
 }

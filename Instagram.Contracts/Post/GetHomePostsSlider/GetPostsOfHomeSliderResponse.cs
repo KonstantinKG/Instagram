@@ -1,9 +1,9 @@
-﻿using Instagram.Contracts.Post.Common;
+﻿using Instagram.Contracts.Post._Common;
 
 namespace Instagram.Contracts.Post.GetHomePostsSlider;
 
 public record GetHomePostsSliderResponse(
     Guid? Previous,
     Guid? Next,
-    PostWithCountersResponse Post
+    PostShortResponse Post
     );

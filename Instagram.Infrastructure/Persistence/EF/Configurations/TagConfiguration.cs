@@ -1,5 +1,4 @@
 ﻿using Instagram.Domain.Aggregates.TagAggregate;
-using Instagram.Domain.Aggregates.TagAggregate.ValueObjects;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -17,14 +16,12 @@ public static class TagConfiguration
 
             builder.Property(x => x.Id)
                 .HasColumnName("id")
-                .ValueGeneratedNever()
-                .HasConversion(
-                    id => id.Value,
-                    value => TagId.Fill(value)
-                );
+                .ValueGeneratedNever();
 
             builder.Property(x => x.Name)
                 .HasColumnName("name");
+
+            builder.HasIndex(x => x.Name).IsUnique();
         });
     }
 }

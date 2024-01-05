@@ -13,17 +13,17 @@ public sealed class Post : AggregateRoot<Guid>
     private readonly List<PostGallery> _galleries = new();
     private readonly List<PostComment> _comments = new();
     
-    public Guid UserId { get; private set; }
-    public User? User { get; private set;  }
-    public string? Content { get; private set; }
-    public long? LocationId { get; private set; }
-    public Location? Location { get; private set; }
-    public int? Views { get; private set; }
-    public bool HideStats { get; private set; }
-    public bool HideComments { get; private set; }
-    public bool Active { get; private set; }
-    public DateTime CreatedAt { get; private set; }
-    public DateTime UpdatedAt { get; private set; }
+    public Guid UserId { get; init; }
+    public User? User { get; set; }
+    public string? Content { get; init; }
+    public long? LocationId { get; init; }
+    public Location? Location { get; init; }
+    public int? Views { get; init; }
+    public bool HideStats { get; init; }
+    public bool HideComments { get; init; }
+    public bool Active { get; init; }
+    public DateTime CreatedAt { get; init; }
+    public DateTime UpdatedAt { get; init; }
     
     public IReadOnlyList<PostLike> PostLikes => _postLikes.AsReadOnly();
     public IReadOnlyList<Tag> Tags => _tags.AsReadOnly();
@@ -32,64 +32,19 @@ public sealed class Post : AggregateRoot<Guid>
     
     public long CommentsCount { get; set; }
     public long LikesCount { get; set; }
-    
-
-    private Post(
-        Guid id,
-        Guid userId,
-        string? content,
-        long? locationId,
-        int? views,
-        bool hideStats,
-        bool hideComments,
-        bool active
-        )
-    : base(id)
-    {
-        UserId = userId;
-        Content = content;
-        LocationId = locationId;
-        Views = views;
-        HideStats = hideStats;
-        HideComments = hideComments;
-        Active = active;
-    }
 
     public static Post Create(Guid userId)
     {
-        return new Post(
-            Guid.NewGuid(), 
-            userId,  
-            null, 
-            null,  
-            null,   
-            false,   
-            false,
-            false
-        );
-    }
-    
-    public static Post Fill(
-        Guid id,
-        Guid userId,
-        string? content,
-        long? locationId,
-        int ?views,
-        bool hideStats,
-        bool hideComments,
-        bool active
-        )
-    {
-        return new Post(
-            id, 
-            userId,  
-            content, 
-            locationId,  
-            views,   
-            hideStats,   
-            hideComments,
-            active
-        );
+        return new Post() {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            Content = null,
+            LocationId = null,
+            Views = 0,
+            HideStats = false,
+            HideComments = false,
+            Active = false
+        };
     }
 
     public void AddGallery(PostGallery gallery)
@@ -105,6 +60,11 @@ public sealed class Post : AggregateRoot<Guid>
     public void AddLike(PostLike like)
     {
         _postLikes.Add(like);
+    } 
+    
+    public void AddTag(Tag tag)
+    {
+        _tags.Add(tag);
     }
 
     protected override IEnumerable<object?> GetDifferenceComponents()
@@ -114,10 +74,4 @@ public sealed class Post : AggregateRoot<Guid>
         yield return HideStats;
         yield return HideComments;
     }
-
-# pragma warning disable CS8618
-    private Post()
-    {
-    }
-    # pragma warning disable CS8618
 }

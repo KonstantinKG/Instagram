@@ -3,7 +3,6 @@
 using Instagram.Domain.Aggregates.PostAggregate;
 using Instagram.Domain.Aggregates.PostAggregate.Entities;
 using Instagram.Domain.Aggregates.TagAggregate;
-using Instagram.Domain.Aggregates.TagAggregate.ValueObjects;
 using Instagram.Domain.Aggregates.UserAggregate;
 
 
@@ -18,6 +17,7 @@ public static class PostConfiguration
         ConfigurePostGalleryTable(modelBuilder);
         ConfigurePostCommentTable(modelBuilder);
         ConfigurePostCommentLikeTable(modelBuilder);
+        ConfigurePostToTagsTable(modelBuilder);
     }
     
     private static void ConfigurePostTable(ModelBuilder modelBuilder)
@@ -77,6 +77,8 @@ public static class PostConfiguration
                 .ValueGeneratedOnAddOrUpdate()
                 .HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
 
+            builder.Ignore(x => x.CommentsCount);
+            builder.Ignore(x => x.LikesCount);
 
             builder.HasMany(x => x.PostLikes)
                 .WithOne()
@@ -97,21 +99,7 @@ public static class PostConfiguration
 
             builder.HasMany(x => x.Tags)
                 .WithMany()
-                .UsingEntity<PostToTag>(
-                    "posts_to_tags",
-                    left => left.HasOne<Tag>().WithMany().HasForeignKey(p => p.TagId).OnDelete(DeleteBehavior.Cascade),
-                    right => right.HasOne<Post>().WithMany().HasForeignKey(t => t.PostId).OnDelete(DeleteBehavior.Cascade),
-                    eb =>
-                    {
-                            eb.Property(p => p.PostId)
-                                .HasColumnName("post_id");
-
-                            eb.Property(p => p.TagId)
-                                .HasColumnName("tag_id");
-                            
-                            eb.HasKey(x => new {x.PostId, x.TagId});
-                        }
-                    );
+                .UsingEntity<PostToTag>();
             
             builder.Metadata.FindNavigation(nameof(Post.Galleries))!
                 .SetPropertyAccessMode(PropertyAccessMode.Field);
@@ -124,6 +112,32 @@ public static class PostConfiguration
             
             builder.Metadata.FindNavigation(nameof(Post.Tags))?
                 .SetPropertyAccessMode(PropertyAccessMode.Field);
+        });
+    }
+    
+    private static void ConfigurePostToTagsTable(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<PostToTag>(builder =>
+        {
+            builder.ToTable("posts_to_tags");
+            
+            builder.HasKey(x => new {x.PostId, x.TagId});
+
+            builder.Property(p => p.PostId)
+                .HasColumnName("post_id");
+                        
+            builder.Property(p => p.TagId)
+                .HasColumnName("tag_id");
+
+            builder.HasOne<Tag>()
+                .WithMany()
+                .HasForeignKey(p => p.TagId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne<Post>()
+                .WithMany()
+                .HasForeignKey(t => t.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
     

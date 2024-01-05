@@ -2,13 +2,12 @@
 
 using Instagram.Application.Common.Interfaces.Persistence.DapperRepositories;
 using Instagram.Application.Common.Interfaces.Persistence.EfRepositories;
-using Instagram.Application.Services.PostService.Commands.UpdatePostStatus;
 using Instagram.Domain.Aggregates.PostAggregate;
 using Instagram.Domain.Common.Errors;
 
 using Microsoft.Extensions.Logging;
 
-namespace Instagram.Application.Services.PostService.Commands.ConfirmPost;
+namespace Instagram.Application.Services.PostService.Commands.UpdatePostStatus;
 
 public class UpdatePostStatusCommandHandler
 {
@@ -37,16 +36,16 @@ public class UpdatePostStatusCommandHandler
             if (post.UserId != statusCommand.UserId)
                 return Errors.Common.AccessDenied;
 
-            var confirmedPost = Post.Fill(
-                post.Id,
-                post.UserId,
-                post.Content,
-                post.LocationId,
-                post.Views,
-                post.HideStats,
-                post.HideComments,
-                true
-            );
+            var confirmedPost = new Post {
+                Id = post.Id,
+                UserId = post.UserId,
+                Content = post.Content,
+                LocationId = post.LocationId,
+                Views = post.Views,
+                HideStats = post.HideStats,
+                HideComments = post.HideComments,
+                Active = true
+            };
 
             await _efPostRepository.UpdatePost(confirmedPost);
             

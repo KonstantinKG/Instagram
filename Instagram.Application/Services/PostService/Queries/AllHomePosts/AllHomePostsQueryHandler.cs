@@ -36,7 +36,7 @@ public class AllHomePostsQueryHandler
 
             var posts = new List<Post>();
             if (query.Page <= total)
-                posts = await _dapperPostRepository.AllHomePosts(offset,  limit, query.Date);
+                posts = await _dapperPostRepository.AllHomePosts(query.UserId, offset,  limit, query.Date);
             
             return new AllHomePostsResult(
                 query.Page,

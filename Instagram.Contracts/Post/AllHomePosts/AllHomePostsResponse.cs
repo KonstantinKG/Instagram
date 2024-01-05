@@ -1,4 +1,4 @@
-﻿using Instagram.Contracts.Post.Common;
+﻿using Instagram.Contracts.Post._Common;
 
 namespace Instagram.Contracts.Post.AllHomePosts;
 

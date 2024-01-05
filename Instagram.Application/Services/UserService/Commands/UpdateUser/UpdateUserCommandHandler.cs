@@ -74,7 +74,7 @@ public class UpdateUserCommandHandler
                 }
                 else
                 {
-                    gender = UserGender.Create(command.Gender);
+                    gender = new UserGender { Name = command.Gender };
                     await _efUserRepository.AddUserGender(gender);
                 }
             }
@@ -82,13 +82,13 @@ public class UpdateUserCommandHandler
         }
 
         UserProfile? updatedProfile = null;
-        var tempProfile = UserProfile.Fill(
-            user.Profile.Id,
-            user.Id,
-            imagePath,
-            command.Bio,
-            gender
-        );
+        var tempProfile = new UserProfile {
+            Id = user.Profile.Id,
+            UserId = user.Id,
+            Image = imagePath,
+            Bio = command.Bio,
+            Gender = gender
+        };
         
         if (user.Profile.Different(tempProfile))
         {
@@ -96,15 +96,15 @@ public class UpdateUserCommandHandler
         }
 
         User? updatedUser = null;
-        var tempUser = User.Fill( 
-            user.Id,
-            command.Username,
-            command.Fullname,
-            command.Email, 
-            command.Phone,
-            user.Password,
-            updatedProfile ?? user.Profile
-        );
+        var tempUser = new User { 
+            Id = user.Id,
+            Username = command.Username,
+            Fullname = command.Fullname,
+            Email = command.Email, 
+            Phone = command.Phone,
+            Password = user.Password,
+            Profile = updatedProfile ?? user.Profile
+        };
 
         if (user.Different(tempUser))
         {

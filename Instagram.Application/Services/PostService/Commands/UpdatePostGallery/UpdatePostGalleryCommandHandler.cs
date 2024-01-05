@@ -46,12 +46,13 @@ public class UpdatePostGalleryCommandHandler
                 return Errors.Common.NotFound;
             
             var path = await _fileDownloader.Download(command.File, "post_galleries");
-            var updatedGallery = PostGallery.Create(
-                command.PostId,
-                path,
-                command.Description,
-                command.Labels
-            );
+            var updatedGallery = new PostGallery {
+                Id = command.Id,
+                PostId = command.PostId,
+                File = path,
+                Description = command.Description,
+                Labels = command.Labels
+            };
             
             if (updatedGallery.Different(gallery))
                 await _efPostRepository.UpdateGallery(gallery);

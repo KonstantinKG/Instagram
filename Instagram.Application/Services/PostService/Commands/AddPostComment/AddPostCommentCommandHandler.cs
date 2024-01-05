@@ -33,12 +33,13 @@ public class AddPostCommentCommandHandler
     {
         try
         {
-            var comment = PostComment.Create(
-                command.PostId,
-                command.ParentId,
-                command.UserId,
-                command.Content
-                );
+            var comment = new PostComment {
+                Id = Guid.NewGuid(),
+                PostId = command.PostId,
+                ParentId = command.ParentId,
+                UserId = command.UserId,
+                Content = command.Content
+            };
             
             await _efPostRepository.AddComment(comment);
 

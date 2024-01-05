@@ -62,25 +62,34 @@ public class RegisterCommandHandler
         UserGender? gender = null;
         if (command.Gender != null)
         {
-            gender = await _dapperUserRepository.GetUserGender(command.Gender);
-            gender ??= UserGender.Create(command.Gender);
+            if (await _dapperUserRepository.GetUserGender(command.Gender) is UserGender userGender)
+            {
+                gender = userGender;
+            }
+            else
+            {
+                gender = new UserGender { Name = command.Gender };
+                await _efUserRepository.AddUserGender(gender);
+            }
         }
         
-        var profile = UserProfile.Create(
-            userId,
-            null,
-            null,
-            gender
-        );
-        var user = User.Fill(
-            userId,
-            command.Username,
-            command.Fullname,
-            command.Email,
-            null,
-            passwordHash,
-            profile
-        );
+        var profile = new UserProfile {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            Bio = null,
+            Image = null,
+            Gender = gender
+        };
+        
+        var user = new User {
+            Id = userId,
+            Username = command.Username,
+            Fullname = command.Fullname,
+            Email = command.Email,
+            Phone = null,
+            Password = passwordHash,
+            Profile = profile
+        };
         
         await _efUserRepository.AddUser(user);
         

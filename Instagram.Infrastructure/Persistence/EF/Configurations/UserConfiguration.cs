@@ -11,6 +11,7 @@ public static class UserConfiguration
         ConfigureUserTable(modelBuilder);
         ConfigureGenderTable(modelBuilder);
         ConfigureProfileTable(modelBuilder);
+        ConfigureSubscriptionsTable(modelBuilder);
     }
 
     private static void ConfigureUserTable(ModelBuilder modelBuilder)
@@ -98,6 +99,38 @@ public static class UserConfiguration
                 .HasColumnName("name");
             
             builder.HasIndex(x => x.Name).IsUnique();
+        });
+    }
+    
+    private static void ConfigureSubscriptionsTable(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<UserSubscription>(builder =>
+        {
+            builder.ToTable("users_subscriptions");
+            
+            builder.HasKey(x => new {x.SubscriberId, x.UserId});
+
+            builder.Property(x => x.SubscriberId)
+                .HasColumnName("subscriber_id")
+                .ValueGeneratedNever();
+            
+            builder.Property(x => x.UserId)
+                .HasColumnName("user_id")
+                .ValueGeneratedNever();
+                        
+            builder.Property(x => x.CreatedAt)
+                .HasColumnName("created_at")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
+
+            builder.HasOne<User>()
+                .WithMany()
+                .HasForeignKey(p => p.SubscriberId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(x => x.User)
+                .WithMany()
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

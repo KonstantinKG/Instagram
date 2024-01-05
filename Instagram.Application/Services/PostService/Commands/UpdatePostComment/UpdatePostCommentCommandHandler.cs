@@ -40,13 +40,13 @@ public class UpdatePostCommentCommandHandler
             if (comment.UserId != command.UserId)
                 return Errors.Common.AccessDenied;
             
-            var updatedComment = PostComment.Fill(
-                comment.Id,
-                comment.PostId,
-                comment.ParentId,
-                comment.UserId,
-                command.Content
-            );
+            var updatedComment = new PostComment {
+                Id = comment.Id,
+                PostId = comment.PostId,
+                ParentId = comment.ParentId,
+                UserId = comment.UserId,
+                Content = command.Content
+            };
             
             if (updatedComment.Different(comment))
                 await _efPostRepository.UpdateComment(updatedComment);

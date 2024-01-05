@@ -1,16 +1,20 @@
 ﻿using Instagram.Domain.Aggregates.PostAggregate;
 using Instagram.Domain.Aggregates.PostAggregate.Entities;
+using Instagram.Domain.Aggregates.TagAggregate;
 
 namespace Instagram.Application.Common.Interfaces.Persistence.DapperRepositories;
 
 public interface IDapperPostRepository
 {
     Task<Post?> GetPost(Guid id);
-    Task<Post?> GetPostWithGallery(Guid id);
+    Task<Post?> GetFullPost(Guid id);
+    
+    Task<Tag?> GetTag(string name);
+    Task<List<Tag>> GetPostTags(Guid id);
     
     Task<List<Post>> AllPosts(int offset, int limit, DateTime date);
     Task<List<Post>> AllUserPosts(Guid userId, int offset, int limit, DateTime date);
-    Task<List<Post>> AllHomePosts(int offset, int limit, DateTime date);
+    Task<List<Post>> AllHomePosts(Guid subscriberId, int offset, int limit, DateTime date);
 
     Task<PostGallery?> GetGallery(Guid id);
     Task<List<PostGallery>> AllGalleries(Guid postId);

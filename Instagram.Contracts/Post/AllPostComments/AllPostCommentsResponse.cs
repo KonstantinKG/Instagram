@@ -1,4 +1,4 @@
-﻿using Instagram.Contracts.Post.Common;
+﻿using Instagram.Contracts.Post._Common;
 
 namespace Instagram.Contracts.Post.AllPostComments;
 
@@ -11,6 +11,6 @@ public record AllPostCommentsResponse(
 public record AllPostCommentsComment(
     Guid Id,
     string Content,
-    PostCommentUser User,
+    PostCommentUserResponse UserResponse,
     List<AllPostCommentsComment> Comments
 );

@@ -5,5 +5,6 @@ public record UpdatePostRequest(
     string? Content,
     long? LocationId,
     bool HideStats,
-    bool HideComments
+    bool HideComments,
+    List<string> Tags
     );

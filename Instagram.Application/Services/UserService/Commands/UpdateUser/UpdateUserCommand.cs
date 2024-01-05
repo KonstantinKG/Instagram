@@ -10,5 +10,4 @@ public record UpdateUserCommand(
     string? Phone,
     IAppFileProxy? Image,
     string? Bio,
-    string? Gender
-    );
+    string? Gender);
