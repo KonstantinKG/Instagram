@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 
-using Instagram.Application.Services.Authentication.Queries.Login;
 using Instagram.Domain.Common.Errors;
 
 namespace Instagram.Application.Services.UserService.Queries.GetAllUsers;

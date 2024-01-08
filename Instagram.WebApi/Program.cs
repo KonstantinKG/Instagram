@@ -1,4 +1,3 @@
-
 using Instagram.Application;
 using Instagram.Infrastructure;
 using Instagram.WebApi;

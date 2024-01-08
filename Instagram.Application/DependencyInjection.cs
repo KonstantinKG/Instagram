@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using FluentValidation;
-using Instagram.Application.Common.Markers;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

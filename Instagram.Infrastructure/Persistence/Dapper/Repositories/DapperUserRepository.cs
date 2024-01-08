@@ -55,6 +55,15 @@ public class DapperUserRepository : IDapperUserRepository
         return await connection.QuerySingleOrDefaultAsync<User>(sql, parameters);
     }
 
+    public async Task<UserProfile?> GetUserProfile(Guid userId)
+    {
+        var connection = _context.CreateConnection();
+        var parameters = new { UserId = userId };
+        const string sql = "SELECT * FROM users_profiles p WHERE p.user_id = @userId;";
+        var profile = await connection.QuerySingleOrDefaultAsync<UserProfile>(sql,parameters);
+        return profile;
+    }
+
     public async Task<UserSubscription?> GetUserSubscription(Guid subscriberId, Guid userId)
     {
         var connection = _context.CreateConnection();
@@ -108,7 +117,7 @@ public class DapperUserRepository : IDapperUserRepository
                 SELECT
                     u.id,
                     u.username,
-                    u.fullname,
+                    p.fullname,
                     0 as profile_split,
                     p.image
                 FROM users_subscriptions us

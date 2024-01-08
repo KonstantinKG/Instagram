@@ -4,50 +4,13 @@ using Instagram.Domain.Aggregates.UserAggregate.Entities;
 
 namespace Instagram.Infrastructure.Persistence.EF.Configurations;
 
-public static class UserConfiguration
+public static class UserProfileConfiguration
 {
-    public static void ConfigureUser(this ModelBuilder modelBuilder)
+    public static void ConfigureUserProfile(this ModelBuilder modelBuilder)
     {
-        ConfigureUserTable(modelBuilder);
-        ConfigureGenderTable(modelBuilder);
         ConfigureProfileTable(modelBuilder);
+        ConfigureGenderTable(modelBuilder);
         ConfigureSubscriptionsTable(modelBuilder);
-    }
-
-    private static void ConfigureUserTable(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<User>(builder =>
-        {
-            builder.ToTable("users");
-
-            builder.HasKey(u => u.Id);
-
-            builder.Property(u => u.Id)
-                .HasColumnName("id")
-                .ValueGeneratedNever();
-
-            builder.Property(u => u.Username)
-                .HasColumnName("username")
-                .HasMaxLength(32);
-            
-            builder.Property(u => u.Fullname)
-                .HasColumnName("fullname");
-            
-            builder.Property(u => u.Phone)
-                .HasColumnName("phone")
-                .HasMaxLength(15);
-            
-            builder.Property(u => u.Email)
-                .HasColumnName("email");
-            
-            builder.Property(u => u.Password)
-                .HasColumnName("password");
-            
-            builder.HasOne(x => x.Profile)
-                .WithOne()
-                .HasForeignKey<UserProfile>(x => x.UserId)
-                .IsRequired();
-        });
     }
     
     private static void ConfigureProfileTable(ModelBuilder modelBuilder)
@@ -64,6 +27,9 @@ public static class UserConfiguration
 
             builder.Property(p => p.UserId)
                 .HasColumnName("user_id");
+            
+            builder.Property(u => u.Fullname)
+                .HasColumnName("fullname");
             
             builder.Property(p => p.Bio)
                 .HasColumnName("bio")

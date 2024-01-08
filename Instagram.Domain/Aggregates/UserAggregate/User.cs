@@ -6,7 +6,6 @@ namespace Instagram.Domain.Aggregates.UserAggregate;
 public sealed class User : AggregateRoot<Guid>
 {
     public required string Username { get; set; }
-    public required string Fullname { get; set; }
     public string? Email { get; set; }
     public string? Phone { get; set; }
     public required string Password { get; set; }
@@ -16,7 +15,6 @@ public sealed class User : AggregateRoot<Guid>
     protected override IEnumerable<object?> GetDifferenceComponents()
     {
         yield return Username;
-        yield return Fullname;
         yield return Email;
         yield return Phone;
         yield return Password;

@@ -2,7 +2,7 @@
 
 using Instagram.Application.Services.UserService.Commands.SubscribeUser;
 using Instagram.Application.Services.UserService.Commands.UnsubscribeUser;
-using Instagram.Application.Services.UserService.Commands.UpdateUser;
+using Instagram.Application.Services.UserService.Commands.UpdateUserProfile;
 using Instagram.Application.Services.UserService.Queries.AllUserSubscriptions;
 using Instagram.Application.Services.UserService.Queries.GetAllUsers;
 using Instagram.Application.Services.UserService.Queries.GetUser;
@@ -12,7 +12,7 @@ using Instagram.Contracts.User.GetAllUsersContracts;
 using Instagram.Contracts.User.GetUserContracts;
 using Instagram.Contracts.User.SubscribeUserContracts;
 using Instagram.Contracts.User.UnsubscribeUserContracts;
-using Instagram.Contracts.User.UpdateUserContracts;
+using Instagram.Contracts.User.UpdateUserProfileContracts;
 
 using MapsterMapper;
 
@@ -60,21 +60,7 @@ public class UserController : ApiController
         );
     }
 
-    [HttpPut]
-    [Route("update")]
-    public async Task<IActionResult> Edit([FromForm] UpdateUserRequest request)
-    {
-        var userId = GetUserId();
-        var command = _mapper.Map<UpdateUserCommand>((userId, request));
-        var handler = HttpContext.RequestServices.GetRequiredService<UpdateUserCommandHandler>();
-        ErrorOr<bool> serviceResult = await handler.Handle(command, CancellationToken.None);
-
-        return serviceResult.Match(
-            _ => Ok(),
-            errors => Problem(errors)
-        );
-    }
-    
+        
     [HttpPost]
     [Route("subscribe")]
     public async Task<IActionResult> Subscribe(SubscribeUserRequest request)
@@ -104,6 +90,22 @@ public class UserController : ApiController
             errors => Problem(errors)
         );
     }
+    
+    [HttpPut]
+    [Route("profile/update")]
+    public async Task<IActionResult> Edit([FromForm] UpdateUserProfileRequest profileRequest)
+    {
+        var userId = GetUserId();
+        var command = _mapper.Map<UpdateUserProfileCommand>((userId, profileRequest));
+        var handler = HttpContext.RequestServices.GetRequiredService<UpdateUserProfileCommandHandler>();
+        ErrorOr<bool> serviceResult = await handler.Handle(command, CancellationToken.None);
+
+        return serviceResult.Match(
+            _ => Ok(),
+            errors => Problem(errors)
+        );
+    }
+
     
     [HttpGet]
     [Route("subscriptions/all")]

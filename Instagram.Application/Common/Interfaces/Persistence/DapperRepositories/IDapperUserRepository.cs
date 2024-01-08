@@ -7,6 +7,7 @@ public interface IDapperUserRepository
 {
     Task<User?> GetUserById(Guid id);
     Task<User?> GetUserByIdentity(string? username, string? email, string? phone);
+    Task<UserProfile?> GetUserProfile(Guid userId);
     Task<UserSubscription?> GetUserSubscription(Guid subscriberId, Guid userId);
     Task<List<User>> GetAllUsers(int offset, int limit);
     Task<List<User>> GetAllUserSubscriptions(Guid subscriberId, int offset, int limit);

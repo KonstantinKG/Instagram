@@ -10,8 +10,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Instagram.Domain", "Instagr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Instagram.Infrastructure", "Instagram.Infrastructure\Instagram.Infrastructure.csproj", "{0E4BD71F-9AB5-408E-B058-D7D8B3E509CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Instagram.Tests", "Instagram.Tests\Instagram.Tests.csproj", "{92BD9219-A2F5-4808-A08E-6F18CBD4AA1C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,9 +36,5 @@ Global
 		{0E4BD71F-9AB5-408E-B058-D7D8B3E509CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E4BD71F-9AB5-408E-B058-D7D8B3E509CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E4BD71F-9AB5-408E-B058-D7D8B3E509CB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{92BD9219-A2F5-4808-A08E-6F18CBD4AA1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{92BD9219-A2F5-4808-A08E-6F18CBD4AA1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{92BD9219-A2F5-4808-A08E-6F18CBD4AA1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{92BD9219-A2F5-4808-A08E-6F18CBD4AA1C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

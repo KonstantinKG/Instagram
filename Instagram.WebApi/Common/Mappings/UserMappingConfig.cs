@@ -1,6 +1,6 @@
 ﻿using Instagram.Application.Services.UserService.Commands.SubscribeUser;
 using Instagram.Application.Services.UserService.Commands.UnsubscribeUser;
-using Instagram.Application.Services.UserService.Commands.UpdateUser;
+using Instagram.Application.Services.UserService.Commands.UpdateUserProfile;
 using Instagram.Application.Services.UserService.Queries.AllUserSubscriptions;
 using Instagram.Application.Services.UserService.Queries.GetAllUsers;
 using Instagram.Application.Services.UserService.Queries.GetUser;
@@ -10,7 +10,7 @@ using Instagram.Contracts.User.GetAllUsersContracts;
 using Instagram.Contracts.User.GetUserContracts;
 using Instagram.Contracts.User.SubscribeUserContracts;
 using Instagram.Contracts.User.UnsubscribeUserContracts;
-using Instagram.Contracts.User.UpdateUserContracts;
+using Instagram.Contracts.User.UpdateUserProfileContracts;
 using Instagram.Domain.Aggregates.UserAggregate;
 using Instagram.Infrastructure.Services;
 
@@ -31,9 +31,9 @@ public class UserMappingConfig : IRegister
             .Map(dest => dest, src => src.User);
 
         
-        config.NewConfig<(Guid userId, UpdateUserRequest request), UpdateUserCommand>()
+        config.NewConfig<(Guid userId, UpdateUserProfileRequest request), UpdateUserProfileCommand>()
             .Map(dest => dest.Image , src => src.request.Image != null ? new AppFileProxy(src.request.Image) : null)
-            .Map(dest => dest.Id, src => src.userId)
+            .Map(dest => dest.UserId, src => src.userId)
             .Map(dest => dest, src => src.request);
         
         config.NewConfig<GetAllUsersRequest, GetAllUsersQuery>()
