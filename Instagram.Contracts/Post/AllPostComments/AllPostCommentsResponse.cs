@@ -11,6 +11,6 @@ public record AllPostCommentsResponse(
 public record AllPostCommentsComment(
     Guid Id,
     string Content,
-    PostCommentUserResponse UserResponse,
+    PostCommentUserResponse User,
     List<AllPostCommentsComment> Comments
 );

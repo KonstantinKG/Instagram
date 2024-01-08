@@ -43,61 +43,152 @@ public class DapperPostRepository : IDapperPostRepository
         var post = await connection.QueryFirstOrDefaultAsync<Post>(sql, parameters);
         return post;
     }
-    public async Task<Post?> GetFullPost(Guid id)
+    
+    public async Task<Post?> GetPostWithGalleries(Guid id)
     {
         var connection = _context.CreateConnection();
         var parameters = new { Id = id };
         const string sql = 
             @"
             SELECT 
-                p.id,
-                p.user_id as UserId,
-                p.content as Content,
-                l.id as LocationId,
-                p.views as Views,
-                p.hide_stats as HideStats,
-                p.hide_comments as HideComments,
-                p.created_at as CreatedAt,
+                p.id, 
+                p.user_id as UserId, 
+                p.content, 
+                l.id as LocationId, 
+                p.views, 
+                p.hide_stats as HideStats, 
+                p.hide_comments as HideComments, 
+                p.active as Active,
+                p.created_at as CreatedAt, 
                 p.updated_at as UpdatedAt,
                 pg.id as Id,
-                pg.file as File,
                 pg.description as Description,
-                pg.labels as Labels,
-                t.id as Id,
-                t.name as Name,
-                pc.id as Id,
-                pl.post_id as PostId
+                pg.file as File,
+                pg.labels as Labels
             FROM posts p
-            INNER JOIN posts_gallery pg ON p.id = pg.post_id
             LEFT JOIN locations l ON p.location_id = l.id
-            LEFT JOIN public.posts_to_tags ptt on p.id = ptt.post_id
-            LEFT JOIN public.tags t on t.id = ptt.tag_id
-            LEFT JOIN public.posts_comments pc on p.id = pc.post_id
-            LEFT JOIN public.posts_likes pl on p.id = pl.post_id
-            WHERE p.id = @id and p.active = true
+            LEFT JOIN public.posts_gallery pg on p.id = pg.post_id
+            WHERE p.id = @id
             ";
 
-        var posts = await connection.QueryAsync<Post, PostGallery, Tag, PostComment, PostLike, Post>(
+        Post? postEntry = null;
+        var gallerySet = new HashSet<Guid>();
+        var post = await connection.QueryAsync<Post, PostGallery, Post>(
             sql,
-            (post, gallery, tag, comment, like) =>
+            (post, gallery) =>
             {
-                post.AddGallery(gallery);
-                if (tag?.Name != null)
-                    post.AddTag(tag);
+                if (postEntry == null)
+                    postEntry = post;
 
-                if (comment != null && comment.Id != Guid.Empty)
-                    post.CommentsCount += 1;
-                
-                if (like != null && like.PostId != Guid.Empty)
-                    post.LikesCount += 1;
-                
-                return post;
+                if (gallery == null || gallery.Id == Guid.Empty)
+                    return postEntry;
+
+                if (!gallerySet.Contains(gallery.Id))
+                {
+                    post.AddGallery(gallery);
+                    gallerySet.Add(gallery.Id);
+                }
+
+                return postEntry;
             },
             parameters,
-            splitOn: "Id,Id,Id,PostId"
+            splitOn: "Id");
+        
+        return post.DistinctBy(x => x.Id).FirstOrDefault();
+    }
+    
+    public async Task<Post?> GetFullPost(Guid id)
+    {
+        var connection = _context.CreateConnection();
+        var parameters = new { Id = id };
+        const string sql = 
+            """
+                SELECT DISTINCT 
+                    p.id,
+                    p.user_id as UserId,
+                    p.content as Content,
+                    l.id as LocationId,
+                    p.views as Views,
+                    p.hide_stats as HideStats,
+                    p.hide_comments as HideComments,
+                    p.created_at as CreatedAt,
+                    p.updated_at as UpdatedAt,
+                    pg.id as Id,
+                    pg.file as File,
+                    pg.description as Description,
+                    pg.labels as Labels,
+                    u.id as Id,
+                    u.username as Username,
+                    u.fullname as Fullname,
+                    up.id as Id,
+                    up.Image as Image,
+                    t.id as Id,
+                    t.name as Name,
+                    pc.id as Id,
+                    pl.post_id as PostId,
+                    pl.user_id as UserId
+                FROM posts p
+                INNER JOIN posts_gallery pg ON p.id = pg.post_id
+                INNER JOIN public.users u on u.id = p.user_id
+                INNER JOIN public.users_profiles up on u.id = up.user_id
+                LEFT JOIN locations l ON p.location_id = l.id
+                LEFT JOIN public.posts_to_tags ptt on p.id = ptt.post_id
+                LEFT JOIN public.tags t on t.id = ptt.tag_id
+                LEFT JOIN public.posts_comments pc on p.id = pc.post_id
+                LEFT JOIN public.posts_likes pl on p.id = pl.post_id
+                WHERE p.id = @id and p.active = true;
+            """;
+
+        var postDictionary = new Dictionary<Guid, Post>();
+        var postGalleries = new HashSet<Guid>();
+        var postTags = new HashSet<Guid>();
+        var postComments = new HashSet<Guid>();
+        var postLikes = new HashSet<string>();
+        
+        var posts = await connection.QueryAsync<Post, PostGallery, User, UserProfile, Tag, PostComment, PostLike, Post>(
+            sql,
+            (post, gallery, user, profile, tag, comment, like) =>
+            {
+                if (!postDictionary.TryGetValue(post.Id, out Post? postEntry))
+                {
+                    postEntry = post;
+                    postDictionary.Add(postEntry.Id, postEntry);
+                }
+                
+                postEntry.User = user;
+                user.Profile = profile;
+
+                if (!postGalleries.Contains(gallery.Id))
+                {
+                    postEntry.AddGallery(gallery);
+                    postGalleries.Add(gallery.Id);
+                }
+
+                if (tag?.Name != null && !postTags.Contains(tag.Id))
+                {
+                    postEntry.AddTag(tag);
+                    postTags.Add(tag.Id);
+                }
+
+                if (comment != null && comment.Id != Guid.Empty && !postComments.Contains(comment.Id))
+                {
+                    postEntry.CommentsCount += 1;
+                    postComments.Add(comment.Id);
+                }
+
+                if (like != null && like.PostId != Guid.Empty && like.UserId != Guid.Empty && !postLikes.Contains($"{like.UserId}{like.PostId}"))
+                {
+                    postEntry.LikesCount += 1;
+                    postLikes.Add($"{like.UserId}{like.PostId}");
+                }                    
+                
+                return postEntry;
+            },
+            parameters,
+            splitOn: "Id,Id,Id,Id,Id,PostId"
         );
         
-        return posts.FirstOrDefault();
+        return posts.DistinctBy(x => x.Id).FirstOrDefault();
     }
 
     public async Task<Tag?> GetTag(string name)
@@ -152,7 +243,8 @@ public class DapperPostRepository : IDapperPostRepository
                     t.id as Id,
                     t.name as Name,
                     pc.id as Id,
-                    pl.post_id as PostId
+                    pl.post_id as PostId,
+                    pl.user_id as UserId
                 FROM posts p
                 INNER JOIN posts_gallery pg ON p.id = pg.post_id
                 INNER JOIN public.users u on u.id = p.user_id
@@ -167,30 +259,56 @@ public class DapperPostRepository : IDapperPostRepository
                 OFFSET @offset
             """;
 
+        var postDictionary = new Dictionary<Guid, Post>();
+        var postGalleries = new HashSet<Guid>();
+        var postTags = new HashSet<Guid>();
+        var postComments = new HashSet<Guid>();
+        var postLikes = new HashSet<string>();
+        
         var posts = await connection.QueryAsync<Post, PostGallery, User, UserProfile, Tag, PostComment, PostLike, Post>(
             sql,
             (post, gallery, user, profile, tag, comment, like) =>
             {
-                post.AddGallery(gallery);
+                if (!postDictionary.TryGetValue(post.Id, out Post? postEntry))
+                {
+                    postEntry = post;
+                    postDictionary.Add(postEntry.Id, postEntry);
+                }
+                
+                postEntry.User = user;
                 user.Profile = profile;
-                post.User = user;
+
+                if (!postGalleries.Contains(gallery.Id))
+                {
+                    postEntry.AddGallery(gallery);
+                    postGalleries.Add(gallery.Id);
+                }
+
+                if (tag?.Name != null && !postTags.Contains(tag.Id))
+                {
+                    postEntry.AddTag(tag);
+                    postTags.Add(tag.Id);
+                }
+
+                if (comment != null && comment.Id != Guid.Empty && !postComments.Contains(comment.Id))
+                {
+                    postEntry.CommentsCount += 1;
+                    postComments.Add(comment.Id);
+                }
+
+                if (like != null && like.PostId != Guid.Empty && like.UserId != Guid.Empty && !postLikes.Contains($"{like.UserId}{like.PostId}"))
+                {
+                    postEntry.LikesCount += 1;
+                    postLikes.Add($"{like.UserId}{like.PostId}");
+                }                    
                 
-                if (tag?.Name != null)
-                    post.AddTag(tag);
-                
-                if (comment != null && comment.Id != Guid.Empty)
-                    post.CommentsCount += 1;
-                
-                if (like != null && like.PostId != Guid.Empty)
-                    post.LikesCount += 1;
-                
-                return post;
+                return postEntry;
             },
             parameters,
             splitOn: "Id,Id,Id,Id,Id,PostId"
         );
         
-        return posts.ToList();
+        return posts.DistinctBy(x => x.Id).ToList();
     }
     public async Task<List<Post>> AllUserPosts(Guid userId, int offset, int limit, DateTime date)
     {
@@ -214,7 +332,8 @@ public class DapperPostRepository : IDapperPostRepository
                             pg.description as Description,
                             pg.labels as Labels,
                             pc.id as Id,
-                            pl.post_id as PostId
+                            pl.post_id as PostId,
+                            pl.user_id as UserId
                         FROM posts p
                         INNER JOIN posts_gallery pg ON p.id = pg.post_id
                         LEFT JOIN locations l ON p.location_id = l.id
@@ -230,25 +349,46 @@ public class DapperPostRepository : IDapperPostRepository
                         
             """;
 
+        var postDictionary = new Dictionary<Guid, Post>();
+        var postGalleries = new HashSet<Guid>();
+        var postComments = new HashSet<Guid>();
+        var postLikes = new HashSet<string>();
+        
         var posts = await connection.QueryAsync<Post, PostGallery, PostComment, PostLike, Post>(
             sql,
             (post, gallery, comment, like) =>
             {
-                post.AddGallery(gallery);
+                if (!postDictionary.TryGetValue(post.Id, out Post? postEntry))
+                {
+                    postEntry = post;
+                    postDictionary.Add(postEntry.Id, postEntry);
+                }
+
+                if (!postGalleries.Contains(gallery.Id))
+                {
+                    postEntry.AddGallery(gallery);
+                    postGalleries.Add(gallery.Id);
+                }
+
+                if (comment != null && comment.Id != Guid.Empty && !postComments.Contains(comment.Id))
+                {
+                    postEntry.CommentsCount += 1;
+                    postComments.Add(comment.Id);
+                }
+
+                if (like != null && like.PostId != Guid.Empty && like.UserId != Guid.Empty && !postLikes.Contains($"{like.UserId}{like.PostId}"))
+                {
+                    postEntry.LikesCount += 1;
+                    postLikes.Add($"{like.UserId}{like.PostId}");
+                }                    
                 
-                if (comment != null && comment.Id != Guid.Empty)
-                    post.CommentsCount += 1;
-                
-                if (like != null && like.PostId != Guid.Empty)
-                    post.LikesCount += 1;
-                
-                return post;
+                return postEntry;
             },
             parameters,
             splitOn: "Id,Id,PostId"
         );
         
-        return posts.ToList();
+        return posts.DistinctBy(x => x.Id).ToList();
     }
     public async Task<List<Post>> AllHomePosts(Guid subscriberId, int offset, int limit, DateTime date)
     {
@@ -279,7 +419,8 @@ public class DapperPostRepository : IDapperPostRepository
                             t.id as Id,
                             t.name as Name,
                             pc.id as Id,
-                            pl.post_id as PostId
+                            pl.post_id as PostId,
+                            pl.user_id as UserId
                         FROM users_subscriptions us
                         INNER JOIN public.posts p on us.user_id = p.user_id
                         INNER JOIN posts_gallery pg ON p.id = pg.post_id
@@ -300,30 +441,56 @@ public class DapperPostRepository : IDapperPostRepository
                         
             """;
 
+        var postDictionary = new Dictionary<Guid, Post>();
+        var postGalleries = new HashSet<Guid>();
+        var postTags = new HashSet<Guid>();
+        var postComments = new HashSet<Guid>();
+        var postLikes = new HashSet<string>();
+        
         var posts = await connection.QueryAsync<Post, PostGallery, User, UserProfile, Tag, PostComment, PostLike, Post>(
             sql,
             (post, gallery, user, profile, tag, comment, like) =>
             {
-                post.AddGallery(gallery);
+                if (!postDictionary.TryGetValue(post.Id, out Post? postEntry))
+                {
+                    postEntry = post;
+                    postDictionary.Add(postEntry.Id, postEntry);
+                }
+                
+                postEntry.User = user;
                 user.Profile = profile;
-                post.User = user;
+
+                if (!postGalleries.Contains(gallery.Id))
+                {
+                    postEntry.AddGallery(gallery);
+                    postGalleries.Add(gallery.Id);
+                }
+
+                if (tag?.Name != null && !postTags.Contains(tag.Id))
+                {
+                    postEntry.AddTag(tag);
+                    postTags.Add(tag.Id);
+                }
+
+                if (comment != null && comment.Id != Guid.Empty && !postComments.Contains(comment.Id))
+                {
+                    postEntry.CommentsCount += 1;
+                    postComments.Add(comment.Id);
+                }
+
+                if (like != null && like.PostId != Guid.Empty && like.UserId != Guid.Empty && !postLikes.Contains($"{like.UserId}{like.PostId}"))
+                {
+                    postEntry.LikesCount += 1;
+                    postLikes.Add($"{like.UserId}{like.PostId}");
+                }                    
                 
-                if (tag?.Name != null)
-                    post.AddTag(tag);
-                
-                if (comment != null && comment.Id != Guid.Empty)
-                    post.CommentsCount += 1;
-                
-                if (like != null && like.PostId != Guid.Empty)
-                    post.LikesCount += 1;
-                
-                return post;
+                return postEntry;
             },
             parameters,
             splitOn: "Id,Id,Id,Id,Id,PostId"
         );
         
-        return posts.ToList();
+        return posts.DistinctBy(x => x.Id).ToList();
     }
 
     public async Task<PostGallery?> GetGallery(Guid id)
@@ -399,24 +566,44 @@ public class DapperPostRepository : IDapperPostRepository
                     pc.user_id,
                     u.username  
                 FROM parents p
-                INNER JOIN posts_comments pc ON pc.parent_id = p.id
-                INNER JOIN public.users u ON u.id = pc.user_id;
+                LEFT JOIN posts_comments pc ON pc.parent_id = p.id
+                LEFT JOIN public.users u ON u.id = pc.user_id;
 
             ";
 
+        var commentsDictionary = new Dictionary<Guid, PostComment>();
+        var commentChildDictionary = new Dictionary<Guid, HashSet<Guid>>();
         var comments = await connection.QueryAsync<PostComment, User, PostComment, User, PostComment>(
             sql,
             (comment, user, child, childUser) =>
             {
-                comment.User = user;
-                child.User = childUser;
-                comment.AddChild(child);
+                if (!commentsDictionary.TryGetValue(comment.Id, out PostComment? commentEntry))
+                {
+                    commentEntry = comment;
+                    commentsDictionary.Add(commentEntry.Id, commentEntry);
+                    commentChildDictionary.Add(commentEntry.Id, new HashSet<Guid>());
+                }
+                
+                if (commentEntry.User == null)
+                    commentEntry.User = user;
+                
+                if (child == null || child.Id == Guid.Empty)
+                    return commentEntry;
+
+                var childSet = commentChildDictionary[commentEntry.Id];
+                if (!childSet.Contains(child.Id))
+                {
+                    child.User = childUser;
+                    comment.AddChild(child);
+                    childSet.Add(child.Id);
+                }
                 return comment;
             },
             parameters,
             splitOn: "user_split,child_split,child_user_split"
             );
-        return comments.ToList();
+        
+        return comments.DistinctBy(x => x.Id).ToList();
     }
     public async Task<List<PostComment>> AllPostParentComments(Guid postId, int offset, int limit)
     {

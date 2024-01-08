@@ -74,6 +74,10 @@ public class PostMappingConfig : IRegister
         config.NewConfig<Tag, PostTagResponse>()
             .Map(dest => dest, src => src);
         
+        config.NewConfig<GetPostResult, PostResponse>()
+            .Map(dest => dest, src => src.Post)
+            .Map(dest => dest, src => src);
+        
         config.NewConfig<AddPostResult, AddPostResponse>()
             .Map(dest => dest, src => src);
         
@@ -126,7 +130,7 @@ public class PostMappingConfig : IRegister
             .Map(dest => dest, src => src);
         
         config.NewConfig<PostComment, AllPostCommentsComment>()
-            .Map(dest => dest.UserResponse, src => src.User)
+            .Map(dest => dest.User, src => src.User)
             .Map(dest => dest, src => src);
         
         config.NewConfig<AllPostParentCommentsRequest, AllPostParentCommentsQuery>()
@@ -170,9 +174,8 @@ public class PostMappingConfig : IRegister
         config.NewConfig<GetUserPostsSliderResult, GetUserPostsSliderResponse>()
             .Map(dest => dest, src => src);
         
-        config.NewConfig< (Guid userId, GetUserNewPostsStatusRequest request), GetUserNewPostsStatusQuery>()
-            .Map(dest => dest.UserId, src => src.userId)
-            .Map(dest => dest, src => src.request);
+        config.NewConfig<GetUserNewPostsStatusRequest, GetUserNewPostsStatusQuery>()
+            .Map(dest => dest, src => src);
 
         config.NewConfig<GetUserNewPostsStatusResult, GetUserNewPostsStatusResponse>()
             .Map(dest => dest, src => src);

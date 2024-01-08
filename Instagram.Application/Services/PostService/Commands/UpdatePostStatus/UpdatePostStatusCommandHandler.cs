@@ -29,13 +29,16 @@ public class UpdatePostStatusCommandHandler
     {
         try
         {
-            var post = await _dapperPostRepository.GetPost(statusCommand.Id);
+            var post = await _dapperPostRepository.GetPostWithGalleries(statusCommand.Id);
             if (post == null)
                 return Errors.Common.NotFound;
 
             if (post.UserId != statusCommand.UserId)
                 return Errors.Common.AccessDenied;
 
+            if (post.Galleries.Count == 0)
+                return Errors.Post.GalleriesNotFound;
+            
             var confirmedPost = new Post {
                 Id = post.Id,
                 UserId = post.UserId,
@@ -44,6 +47,7 @@ public class UpdatePostStatusCommandHandler
                 Views = post.Views,
                 HideStats = post.HideStats,
                 HideComments = post.HideComments,
+                CreatedAt = post.CreatedAt,
                 Active = true
             };
 

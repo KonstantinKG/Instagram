@@ -126,8 +126,7 @@ public class PostController : ApiController
     [Route("user/new")]
     public async Task<IActionResult> GetUserNewPostsStatus([FromQuery] GetUserNewPostsStatusRequest request)
     {
-        var userId = GetUserId();
-        var getPostsOfUserNewStatusQuery =_mapper.Map<GetUserNewPostsStatusQuery>((userId, request));
+        var getPostsOfUserNewStatusQuery =_mapper.Map<GetUserNewPostsStatusQuery>(request);
         var handler = HttpContext.RequestServices.GetRequiredService<GetUserNewPostsStatusQueryHandler>();
         ErrorOr<GetUserNewPostsStatusResult> serviceResult = await handler.Handle(getPostsOfUserNewStatusQuery, CancellationToken.None);
 

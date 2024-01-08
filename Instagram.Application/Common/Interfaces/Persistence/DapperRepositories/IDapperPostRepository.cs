@@ -7,6 +7,7 @@ namespace Instagram.Application.Common.Interfaces.Persistence.DapperRepositories
 public interface IDapperPostRepository
 {
     Task<Post?> GetPost(Guid id);
+    Task<Post?> GetPostWithGalleries(Guid id);
     Task<Post?> GetFullPost(Guid id);
     
     Task<Tag?> GetTag(string name);
