@@ -3,7 +3,6 @@
 using Instagram.Domain.Aggregates.PostAggregate;
 using Instagram.Domain.Aggregates.PostAggregate.Entities;
 using Instagram.Domain.Aggregates.TagAggregate;
-using Instagram.Domain.Aggregates.UserAggregate;
 
 
 namespace Instagram.Infrastructure.Persistence.EF.Configurations;
@@ -34,12 +33,6 @@ public static class PostConfiguration
             
             builder.Property(x => x.UserId)
                 .HasColumnName("user_id");
-
-            builder
-                .HasOne(x => x.User)
-                .WithMany()
-                .HasForeignKey(x => x.UserId)
-                .IsRequired();
             
             builder.Property(x => x.Content)
                 .HasColumnName("content")
@@ -186,11 +179,6 @@ public static class PostConfiguration
                 .WithMany(x => x.PostLikes)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasForeignKey(x => x.PostId);
-            
-            builder.HasOne<User>()
-                .WithMany()
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasForeignKey(x => x.UserId);
         });
     }
     
@@ -221,11 +209,6 @@ public static class PostConfiguration
             builder.Property(x => x.CreatedAt)
                 .HasColumnName("created_at")
                 .HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
-
-            builder.HasOne(x => x.User)
-                .WithMany()
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasForeignKey(x => x.UserId);
 
             builder.HasMany(x => x.Comments)
                 .WithOne()
@@ -261,11 +244,6 @@ public static class PostConfiguration
                 .WithMany(x => x.CommentLikes)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasForeignKey(x => x.CommentId);
-            
-            builder.HasOne<User>()
-                .WithMany()
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasForeignKey(x => x.UserId);
         });
     }
 }

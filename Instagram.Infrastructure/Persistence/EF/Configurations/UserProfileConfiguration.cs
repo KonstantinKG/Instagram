@@ -8,6 +8,7 @@ public static class UserProfileConfiguration
 {
     public static void ConfigureUserProfile(this ModelBuilder modelBuilder)
     {
+        modelBuilder.Ignore<User>();
         ConfigureProfileTable(modelBuilder);
         ConfigureGenderTable(modelBuilder);
         ConfigureSubscriptionsTable(modelBuilder);
@@ -87,16 +88,6 @@ public static class UserProfileConfiguration
             builder.Property(x => x.CreatedAt)
                 .HasColumnName("created_at")
                 .HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
-
-            builder.HasOne<User>()
-                .WithMany()
-                .HasForeignKey(p => p.SubscriberId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasOne(x => x.User)
-                .WithMany()
-                .HasForeignKey(t => t.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

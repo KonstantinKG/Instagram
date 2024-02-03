@@ -10,8 +10,6 @@ namespace Instagram.Infrastructure.Persistence.EF;
 
 public class EfContext : DbContext
 {
-
-    public DbSet<User> Users { get; set; } = null!;
     public DbSet<Post> Posts { get; set; } = null!;
     public DbSet<Location> Locations { get; set; } = null!;
     public DbSet<Tag> Tags { get; set; } = null!;
