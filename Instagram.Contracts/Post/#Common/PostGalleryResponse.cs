@@ -2,8 +2,8 @@
 
 
 public record PostGalleryResponse(
-    Guid Id,
-    string File,
-    string? Description,
-    string? Labels
+    Guid id,
+    string file,
+    string? description,
+    string? labels
 );

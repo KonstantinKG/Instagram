@@ -3,9 +3,9 @@
 namespace Instagram.Contracts.Post.UpdatePostGallery;
 
 public record UpdatePostGalleryRequest(
-    Guid Id,
-    Guid PostId,
-    IFormFile File,
-    string? Description,
-    string? Labels
+    Guid id,
+    Guid post_id,
+    IFormFile file,
+    string? description,
+    string? labels
     );

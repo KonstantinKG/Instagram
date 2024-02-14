@@ -11,23 +11,23 @@ using Microsoft.Extensions.Logging;
 
 namespace Instagram.Application.Services.PostService.Commands.UpdatePost;
 
-public class EditPostCommandHandler
+public class UpdatePostCommandHandler
 {
     private readonly IEfPostRepository _efPostRepository;
     private readonly IDapperPostRepository _dapperPostRepository;
-    private readonly ILogger<EditPostCommandHandler> _logger;
+    private readonly ILogger<UpdatePostCommandHandler> _logger;
 
-    public EditPostCommandHandler(
+    public UpdatePostCommandHandler(
         IEfPostRepository efPostRepository, 
         IDapperPostRepository dapperPostRepository, 
-        ILogger<EditPostCommandHandler> logger)
+        ILogger<UpdatePostCommandHandler> logger)
     {
         _efPostRepository = efPostRepository;
         _dapperPostRepository = dapperPostRepository;
         _logger = logger;
     }
     
-    public async Task<ErrorOr<EditPostResult>> Handle(EditPostCommand command,  CancellationToken cancellationToken)
+    public async Task<ErrorOr<bool>> Handle(UpdatePostCommand command,  CancellationToken cancellationToken)
     {
         try
         {
@@ -56,7 +56,7 @@ public class EditPostCommandHandler
 
             await HandlePostTags(command);
             
-            return new EditPostResult();
+            return true;
         }
         catch (Exception e)
         {
@@ -66,7 +66,7 @@ public class EditPostCommandHandler
 
     }
 
-    private async Task HandlePostTags(EditPostCommand command)
+    private async Task HandlePostTags(UpdatePostCommand command)
     {
         var currentPostTags = await _dapperPostRepository.GetPostTags(command.Id);
         var potentialNewPostTags = command.Tags.ToList();

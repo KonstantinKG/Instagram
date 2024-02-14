@@ -3,7 +3,7 @@
 namespace Instagram.Contracts.User.GetAllUsersContracts;
 
 public record GetAllUsersResponse(
-    long Current,
-    long Total,
-    List<UserShortResponse> Users
+    long current,
+    long total,
+    List<UserResponse> users
 );

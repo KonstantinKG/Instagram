@@ -63,12 +63,11 @@ public class UpdateUserProfileCommandHandler
                     await _efUserRepository.AddUserGender(gender);
                 }
             }
-                
             
             var updatedProfile = new UserProfile {
                 Id = profile.Id,
-                Fullname = command.Fullname,
                 UserId = profile.UserId,
+                Fullname = command.Fullname,
                 Image = imagePath,
                 Bio = command.Bio,
                 Gender = gender

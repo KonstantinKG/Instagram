@@ -3,8 +3,8 @@
 namespace Instagram.Contracts.User.UpdateUserProfileContracts;
 
 public record UpdateUserProfileRequest(
-    string Fullname,
-    IFormFile? Image,
-    string? Bio,
-    string? Gender
+    string fullname,
+    IFormFile? image,
+    string? bio,
+    string? gender
 );

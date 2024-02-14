@@ -1,5 +1,5 @@
 ﻿namespace Instagram.Contracts.Post.GetPost;
 
 public record GetPostRequest(
-    Guid Id
+    Guid id
     );

@@ -21,7 +21,7 @@ public class GetPostQueryHandler
         _logger = logger;
     }
     
-    public async Task<ErrorOr<GetPostResult>> Handle(GetPostQuery query, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Post>> Handle(GetPostQuery query, CancellationToken cancellationToken)
     {
         try
         {
@@ -29,7 +29,7 @@ public class GetPostQueryHandler
             {
                 return Errors.Common.NotFound;
             }
-            return new GetPostResult(post);
+            return post;
         }
         catch (Exception e)
         {

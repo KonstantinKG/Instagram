@@ -1,10 +1,10 @@
 ﻿namespace Instagram.Contracts.Post.UpdatePost;
 
 public record UpdatePostRequest(
-    Guid Id,
-    string? Content,
-    long? LocationId,
-    bool HideStats,
-    bool HideComments,
-    List<string> Tags
+    Guid id,
+    string? content,
+    long? location_id,
+    bool hide_stats,
+    bool hide_comments,
+    List<string> tags
     );

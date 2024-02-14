@@ -3,7 +3,7 @@
 namespace Instagram.Contracts.Post.AllUserPosts;
 
 public record AllUserPostsResponse(
-    long Current,
-    long Total,
-    List<PostShortResponse> Posts
+    long current,
+    long total,
+    List<PostResponse> posts
 );

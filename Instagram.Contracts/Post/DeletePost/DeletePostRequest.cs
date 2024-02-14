@@ -1,3 +1,5 @@
 ﻿namespace Instagram.Contracts.Post.DeletePost;
 
-public record DeletePostRequest(Guid Id);
+public record DeletePostRequest(
+    Guid id
+);

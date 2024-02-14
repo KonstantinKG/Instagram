@@ -63,144 +63,192 @@ public class PostMappingConfig : IRegister
     private void RegisterPostMappings(TypeAdapterConfig config)
     {
         config.NewConfig<Post, PostResponse>()
-            .Map(dest => dest, src => src);
-        
-        config.NewConfig<Post, PostShortResponse>()
-            .Map(dest => dest, src => src);
-        
+            .Map(dest => dest.id, src => src.Id)
+            .Map(dest => dest.content, src => src.Content)
+            .Map(dest => dest.location_id, src => src.LocationId)
+            .Map(dest => dest.views, src => src.Views)
+            .Map(dest => dest.hide_stats, src => src.HideStats)
+            .Map(dest => dest.hide_comments, src => src.HideComments)
+            .Map(dest => dest.comments_count, src => src.CommentsCount)
+            .Map(dest => dest.likes_count, src => src.LikesCount)
+            .Map(dest => dest.created_at, src => src.CreatedAt)
+            .Map(dest => dest.updated_at, src => src.UpdatedAt)
+            .Map(dest => dest.galleries, src => src.Galleries)
+            .Map(dest => dest.tags, src => src.Tags)
+            .Map(dest => dest.user, src => src.User);
+
         config.NewConfig<PostGallery, PostGalleryResponse>()
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.id, src => src.Id)
+            .Map(dest => dest.file, src => src.File)
+            .Map(dest => dest.description, src => src.Description)
+            .Map(dest => dest.labels, src => src.Labels);
         
         config.NewConfig<Tag, PostTagResponse>()
-            .Map(dest => dest, src => src);
-        
-        config.NewConfig<GetPostResult, PostResponse>()
-            .Map(dest => dest, src => src.Post)
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.id, src => src.Id)
+            .Map(dest => dest.name, src => src.Name);
         
         config.NewConfig<AddPostResult, AddPostResponse>()
-            .Map(dest => dest, src => src);
-        
-        config.NewConfig<(Guid userId, UpdatePostRequest request), EditPostCommand>()
+            .Map(dest => dest.id, src => src.Id);
+
+        config.NewConfig<(Guid userId, UpdatePostRequest request), UpdatePostCommand>()
             .Map(dest => dest.UserId, src => src.userId)
-            .Map(dest => dest, src => src.request);
+            .Map(dest => dest.Id, src => src.request.id)
+            .Map(dest => dest.Content, src => src.request.content)
+            .Map(dest => dest.LocationId, src => src.request.location_id)
+            .Map(dest => dest.HideStats, src => src.request.hide_stats)
+            .Map(dest => dest.HideComments, src => src.request.hide_comments)
+            .Map(dest => dest.Tags, src => src.request.tags);
         
         config.NewConfig<AllPostsRequest, AllPostsQuery>()
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.Page, src => src.page)
+            .Map(dest => dest.Date, src => src.date);
         
         config.NewConfig<AllPostsResult, AllPostsResponse>()
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.current, src => src.Current)
+            .Map(dest => dest.total, src => src.Total)
+            .Map(dest => dest.posts, src => src.Posts);
         
         config.NewConfig<(Guid userId, UpdatePostStatusRequest request), UpdatePostStatusCommand>()
             .Map(dest => dest.UserId, src => src.userId)
-            .Map(dest => dest, src => src.request);
+            .Map(dest => dest.Id, src => src.request.id);
         
         config.NewConfig<(Guid userId, DeletePostRequest request), DeletePostCommand>()
             .Map(dest => dest.UserId, src => src.userId)
-            .Map(dest => dest, src => src.request);
+            .Map(dest => dest.Id, src => src.request.id);
     }
     
     private void RegisterPostGalleryMappings(TypeAdapterConfig config)
     {
         config.NewConfig<(Guid userId, AddPostGalleryRequest request), AddPostGalleryCommand>()
             .Map(dest => dest.UserId, src => src.userId)
-            .Map(dest => dest.File , src => new AppFileProxy(src.request.File))
-            .Map(dest => dest, src => src.request);
+            .Map(dest => dest.PostId, src => src.request.post_id)
+            .Map(dest => dest.File, src => new AppFileProxy(src.request.file))
+            .Map(dest => dest.Description, src => src.request.description)
+            .Map(dest => dest.Labels, src => src.request.labels);
         
         config.NewConfig<(Guid userId, UpdatePostGalleryRequest request), UpdatePostGalleryCommand>()
             .Map(dest => dest.UserId, src => src.userId)
-            .Map(dest => dest.File , src => new AppFileProxy(src.request.File))
-            .Map(dest => dest, src => src.request);
+            .Map(dest => dest.Id, src => src.request.id)
+            .Map(dest => dest.PostId, src => src.request.post_id)
+            .Map(dest => dest.File, src => new AppFileProxy(src.request.file))
+            .Map(dest => dest.Description, src => src.request.description)
+            .Map(dest => dest.Labels, src => src.request.labels);
         
         config.NewConfig<(Guid userId, DeletePostGalleryRequest request), DeletePostGalleryCommand>()
             .Map(dest => dest.UserId, src => src.userId)
-            .Map(dest => dest, src => src.request);
+            .Map(dest => dest.Id, src => src.request.id)
+            .Map(dest => dest.PostId, src => src.request.post_id);
     }
     
     private void RegisterPostCommentMappings(TypeAdapterConfig config)
     {
         config.NewConfig<PostComment, PostCommentResponse>()
-            .Map(dest => dest.UserResponse, src => src.User)
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.id, src => src.Id)
+            .Map(dest => dest.content, src => src.Content)
+            .Map(dest => dest.user, src => src.User)
+            .Map(dest => dest.comments, src => src.Comments);
         
         config.NewConfig<AllPostCommentsRequest, AllPostCommentsQuery>()
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.Page, src => src.page)
+            .Map(dest => dest.PostId, src => src.post_id);
         
         config.NewConfig<AllPostCommentsResult, AllPostCommentsResponse>()
-            .Map(dest => dest, src => src);
-        
-        config.NewConfig<PostComment, AllPostCommentsComment>()
-            .Map(dest => dest.User, src => src.User)
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.current, src => src.Current)
+            .Map(dest => dest.total, src => src.Total)
+            .Map(dest => dest.comments, src => src.Comments);
         
         config.NewConfig<AllPostParentCommentsRequest, AllPostParentCommentsQuery>()
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.PostId, src => src.post_id)
+            .Map(dest => dest.Page, src => src.page);
         
         config.NewConfig<AllPostParentCommentsResult, AllPostParentCommentsResponse>()
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.current, src => src.Current)
+            .Map(dest => dest.total, src => src.Total)
+            .Map(dest => dest.comments, src => src.Comments);
         
         config.NewConfig<AllPostCommentChildrenRequest, AllPostCommentChildrenQuery>()
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.CommentId, src => src.comment_id)
+            .Map(dest => dest.Page, src => src.page);
         
         config.NewConfig<AllPostCommentChildrenResult, AllPostCommentChildrenResponse>()
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.current, src => src.Current)
+            .Map(dest => dest.total, src => src.Total)
+            .Map(dest => dest.comments, src => src.Comments);
         
         config.NewConfig<(Guid userId, AddPostCommentRequest request), AddPostCommentCommand>()
             .Map(dest => dest.UserId, src => src.userId)
-            .Map(dest => dest, src => src.request);
+            .Map(dest => dest.PostId, src => src.request.post_id)
+            .Map(dest => dest.ParentId, src => src.request.parent_id)
+            .Map(dest => dest.Content, src => src.request.content);
         
         config.NewConfig<(Guid userId, UpdatePostCommentRequest request), UpdatePostCommentCommand>()
             .Map(dest => dest.UserId, src => src.userId)
-            .Map(dest => dest, src => src.request);
+            .Map(dest => dest.Id, src => src.request.id)
+            .Map(dest => dest.Content, src => src.request.content);
         
         config.NewConfig<(Guid userId, DeletePostCommentRequest request), DeletePostCommentCommand>()
             .Map(dest => dest.UserId, src => src.userId)
-            .Map(dest => dest, src => src.request);
+            .Map(dest => dest.Id, src => src.request.id);
     }
     
     private void RegisterUserPostMappings(TypeAdapterConfig config)
     {
         config.NewConfig< (Guid userId, AllUserPostsRequest request), AllUserPostsQuery>()
             .Map(dest => dest.UserId, src => src.userId)
-            .Map(dest => dest, src => src.request);
+            .Map(dest => dest.Page, src => src.request.page)
+            .Map(dest => dest.Date, src => src.request.date);
         
-        config.NewConfig<AllUserPostsResult, AllUserPostsRequest>()
-            .Map(dest => dest, src => src);
+        config.NewConfig<AllUserPostsResult, AllUserPostsResponse>()
+            .Map(dest => dest.current, src => src.Current)
+            .Map(dest => dest.total, src => src.Total)
+            .Map(dest => dest.posts, src => src.Posts);
         
         config.NewConfig< (Guid userId, GetUserPostsSliderRequest request), GetUserPostsSliderQuery>()
             .Map(dest => dest.UserId, src => src.userId)
-            .Map(dest => dest, src => src.request);
+            .Map(dest => dest.Page, src => src.request.page)
+            .Map(dest => dest.Date, src => src.request.date)
+            .Map(dest => dest.PostId, src => src.request.post_id);
 
         config.NewConfig<GetUserPostsSliderResult, GetUserPostsSliderResponse>()
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.previous, src => src.Previous)
+            .Map(dest => dest.next, src => src.Next)
+            .Map(dest => dest.post, src => src.Post);
         
         config.NewConfig<GetUserNewPostsStatusRequest, GetUserNewPostsStatusQuery>()
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.UserId, src => src.user_id)
+            .Map(dest => dest.Date, src => src.date);
 
         config.NewConfig<GetUserNewPostsStatusResult, GetUserNewPostsStatusResponse>()
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.status, src => src.Status);
     }
     
     private void RegisterHomePostMappings(TypeAdapterConfig config)
     {
         config.NewConfig<(Guid userId, AllHomePostsRequest request), AllHomePostsQuery>()
             .Map(dest => dest.UserId, src => src.userId)
-            .Map(dest => dest, src => src.request);
+            .Map(dest => dest.Page, src => src.request.page)
+            .Map(dest => dest.Date, src => src.request.date);
 
         config.NewConfig<AllHomePostsResult, AllHomePostsResponse>()
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.current, src => src.Current)
+            .Map(dest => dest.total, src => src.Total)
+            .Map(dest => dest.posts, src => src.Posts);
         
         config.NewConfig<(Guid userId, GetHomePostsSliderRequest request), GetHomePostsSliderQuery>()
             .Map(dest => dest.UserId, src => src.userId)
-            .Map(dest => dest, src => src.request);
+            .Map(dest => dest.Page, src => src.request.page)
+            .Map(dest => dest.Date, src => src.request.date)
+            .Map(dest => dest.PostId, src => src.request.post_id);
 
         config.NewConfig<GetHomePostsSliderResult, GetHomePostsSliderResponse>()
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.previous, src => src.Previous)
+            .Map(dest => dest.next, src => src.Next)
+            .Map(dest => dest.post, src => src.Post);
         
         config.NewConfig<GetHomeNewPostsStatusRequest, GetHomeNewPostsStatusQuery>()
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.Date, src => src.date);
 
         config.NewConfig<GetHomeNewPostsStatusResult, GetHomeNewPostsStatusResponse>()
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.status, src => src.Status);
     }
 }

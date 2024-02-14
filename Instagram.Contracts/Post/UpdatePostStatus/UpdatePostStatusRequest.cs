@@ -1,3 +1,5 @@
 ﻿namespace Instagram.Contracts.Post.UpdatePostStatus;
 
-public record UpdatePostStatusRequest(Guid Id);
+public record UpdatePostStatusRequest(
+    Guid id
+);

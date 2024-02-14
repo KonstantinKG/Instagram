@@ -1,7 +1,7 @@
 ﻿namespace Instagram.Contracts.Post.AllUserPosts;
 
 public record AllUserPostsRequest(
-    int Page,
-    DateTime Date,
-    Guid? UserId
+    int page,
+    DateTime date,
+    Guid? user_id
     );

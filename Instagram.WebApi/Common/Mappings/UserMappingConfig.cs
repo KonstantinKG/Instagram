@@ -12,6 +12,7 @@ using Instagram.Contracts.User.SubscribeUserContracts;
 using Instagram.Contracts.User.UnsubscribeUserContracts;
 using Instagram.Contracts.User.UpdateUserProfileContracts;
 using Instagram.Domain.Aggregates.UserAggregate;
+using Instagram.Domain.Aggregates.UserAggregate.Entities;
 using Instagram.Infrastructure.Services;
 
 using Mapster;
@@ -22,45 +23,52 @@ public class UserMappingConfig : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<GetUserRequest, GetUserQuery>()
-            .Map(dest => dest, src => src);
+        config.NewConfig<User, UserResponse>()
+            .Map(dest => dest.id, src => src.Id)
+            .Map(dest => dest.username, src => src.Username)
+            .Map(dest => dest.email, src => src.Email)
+            .Map(dest => dest.phone, src => src.Phone)
+            .Map(dest => dest.profile, src => src.Profile);
 
-        config.NewConfig<GetUserResult, UserResponse>()
-            .Map(dest => dest.Profile, src => src.User.Profile)
-            .Map(dest => dest.Profile.Gender, src => src.User.Profile.Gender != null ? src.User.Profile.Gender.Name : null)
-            .Map(dest => dest, src => src.User);
-
+        config.NewConfig<UserProfile, UserProfileResponse>()
+            .Map(dest => dest.image, src => src.Image)
+            .Map(dest => dest.bio, src => src.Bio)
+            .Map(dest => dest.full_name, src => src.Fullname)
+            .Map(dest => dest.gender, src => src.Gender);
         
-        config.NewConfig<(Guid userId, UpdateUserProfileRequest request), UpdateUserProfileCommand>()
-            .Map(dest => dest.Image , src => src.request.Image != null ? new AppFileProxy(src.request.Image) : null)
-            .Map(dest => dest.UserId, src => src.userId)
-            .Map(dest => dest, src => src.request);
+        config.NewConfig<GetUserRequest, GetUserQuery>()
+            .Map(dest => dest.Id, src => src.id);
         
         config.NewConfig<GetAllUsersRequest, GetAllUsersQuery>()
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.Page, src => src.page);
         
-        config.NewConfig<User, UserShortResponse>()
-            .Map(dest => dest.Image, src => src.Profile.Image)
-            .Map(dest => dest, src => src);
+        config.NewConfig<(Guid userId, UpdateUserProfileRequest request), UpdateUserProfileCommand>()
+            .Map(dest => dest.UserId, src => src.userId)
+            .Map(dest => dest.Fullname, src => src.request.fullname)
+            .Map(dest => dest.Image , src => src.request.image != null ? new AppFileProxy(src.request.image) : null)
+            .Map(dest => dest.Bio, src => src.request.bio)
+            .Map(dest => dest.Gender, src => src.request.gender);
         
         config.NewConfig<GetAllUsersResult, GetAllUsersResponse>()
-            .Map(dest => dest.Users, src => src.Users)
-            .Map(dest => dest, src => src);
-        
+            .Map(dest => dest.current, src => src.Current)
+            .Map(dest => dest.total, src => src.Total)
+            .Map(dest => dest.users, src => src.Users);
+
         config.NewConfig<(Guid subscriberId, SubscribeUserRequest request), SubscribeUserCommand>()
-            .Map(dest => dest.SubscriberId, src => src.subscriberId)
-            .Map(dest => dest, src => src.request);
+            .Map(dest => dest.UserId, src => src.request.user_id)
+            .Map(dest => dest.SubscriberId, src => src.subscriberId);
 
         config.NewConfig<(Guid subscriberId, UnsubscribeUserRequest request), UnsubscribeUserCommand>()
-            .Map(dest => dest.SubscriberId, src => src.subscriberId)
-            .Map(dest => dest, src => src.request);
+            .Map(dest => dest.UserId, src => src.request.user_id)
+            .Map(dest => dest.SubscriberId, src => src.subscriberId);
         
         config.NewConfig<(Guid subscriberId, AllUserSubscriptionsRequest request), AllUserSubscriptionsQuery>()
-            .Map(dest => dest.SubscriberId, src => src.subscriberId)
-            .Map(dest => dest, src => src.request);
+            .Map(dest => dest.Page, src => src.request.page)
+            .Map(dest => dest.SubscriberId, src => src.subscriberId);
         
         config.NewConfig<AllUserSubscriptionsResult, AllUserSubscriptionsResponse>()
-            .Map(dest => dest.Subscriptions, src => src.Subscriptions)
-            .Map(dest => dest, src => src);
+            .Map(dest => dest.current, src => src.Current)
+            .Map(dest => dest.total, src => src.Total)
+            .Map(dest => dest.subscriptions, src => src.Subscriptions);
     }
 }

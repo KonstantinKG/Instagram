@@ -1,4 +1,6 @@
-﻿using Instagram.WebApi.Common.Errors;
+﻿using System.Text.Json.Serialization;
+
+using Instagram.WebApi.Common.Errors;
 using Instagram.WebApi.Common.Mappings;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.OpenApi.Models;
@@ -13,7 +15,11 @@ public static class DependencyInjection
     {
         services.AddSwagger();
         services.AddMappings();
-        services.AddControllers();
+        services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            });
         services.AddSingleton<ProblemDetailsFactory, InstagramProblemDetailsFactory>();
         return services;
     }

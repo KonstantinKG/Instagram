@@ -1,5 +1,5 @@
 ﻿namespace Instagram.Contracts.Post.GetHomeNewPostsStatus;
 
 public record GetHomeNewPostsStatusResponse(
-    bool Status
+    bool status
     );

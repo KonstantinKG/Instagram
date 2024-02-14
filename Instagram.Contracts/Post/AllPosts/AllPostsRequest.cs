@@ -1,6 +1,6 @@
 ﻿namespace Instagram.Contracts.Post.AllPosts;
 
 public record AllPostsRequest(
-    int Page,
-    DateTime Date
+    int page,
+    DateTime date
     );

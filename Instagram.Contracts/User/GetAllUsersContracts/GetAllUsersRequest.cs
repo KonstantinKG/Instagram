@@ -3,5 +3,5 @@
 namespace Instagram.Contracts.User.GetAllUsersContracts;
 
 public record GetAllUsersRequest(
-    int Page
+    int page
     );

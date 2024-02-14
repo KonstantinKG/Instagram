@@ -3,18 +3,17 @@
 namespace Instagram.Contracts.Post._Common;
 
 public record PostResponse(
-    Guid Id,
-    string? Content,
-    long? LocationId,
-    long? Views,
-    bool HideStats,
-    bool HideComments,
-    long CommentsCount,
-    long LikesCount,
-    DateTime CreatedAt,
-    DateTime UpdatedAt,
-    List<PostGalleryResponse> Galleries,
-    List<PostTagResponse> Tags,
-    UserShortResponse User
+    Guid id,
+    string? content,
+    long? location_id,
+    long? views,
+    bool? hide_stats,
+    bool? hide_comments,
+    long? comments_count,
+    long? likes_count,
+    DateTime? created_at,
+    DateTime? updated_at,
+    List<PostGalleryResponse> galleries,
+    List<PostTagResponse> tags,
+    UserResponse user
 );
-    

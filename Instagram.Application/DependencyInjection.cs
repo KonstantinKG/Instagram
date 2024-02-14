@@ -23,7 +23,6 @@ public static class DependencyInjection
     private static IServiceCollection AddApplicationSettings(this IServiceCollection services, ConfigurationManager configuration)
     {
         services.Configure<ApplicationSettings>(configuration.GetSection(ApplicationSettings.SectionName));
-        services.AddSingleton<ApplicationSettings>();
         return services;
     }
 

@@ -13,6 +13,7 @@ using Instagram.Contracts.User.GetUserContracts;
 using Instagram.Contracts.User.SubscribeUserContracts;
 using Instagram.Contracts.User.UnsubscribeUserContracts;
 using Instagram.Contracts.User.UpdateUserProfileContracts;
+using Instagram.Domain.Aggregates.UserAggregate;
 
 using MapsterMapper;
 
@@ -34,10 +35,10 @@ public class UserController : ApiController
     [Route("get")]
     public async Task<IActionResult> Get([FromQuery] GetUserRequest request)
     {
-        var userId = request.Id ?? GetUserId();
+        var userId = request.id ?? GetUserId();
         var query = new GetUserQuery(userId);
         var handler = HttpContext.RequestServices.GetRequiredService<GetUserQueryHandler>();
-        ErrorOr<GetUserResult> serviceResult = await handler.Handle(query, CancellationToken.None);
+        ErrorOr<User> serviceResult = await handler.Handle(query, CancellationToken.None);
 
         return serviceResult.Match(
             result => Ok(_mapper.Map<UserResponse>(result)),

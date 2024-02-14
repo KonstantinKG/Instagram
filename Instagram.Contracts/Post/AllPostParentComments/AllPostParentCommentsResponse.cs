@@ -3,7 +3,7 @@
 namespace Instagram.Contracts.Post.AllPostParentComments;
 
 public record AllPostParentCommentsResponse(
-    long Current,
-    long Total,
-    List<PostCommentResponse> Comments
+    long current,
+    long total,
+    List<PostCommentResponse> comments
 );

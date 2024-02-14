@@ -3,8 +3,8 @@
 namespace Instagram.Contracts.Post.AddPostGallery;
 
 public record AddPostGalleryRequest(
-    Guid PostId,
-    IFormFile File,
-    string? Description,
-    string? Labels
+    Guid post_id,
+    IFormFile file,
+    string? description,
+    string? labels
     );

@@ -1,7 +1,8 @@
 ﻿namespace Instagram.Contracts.User._Common;
 
 public record UserProfileResponse(
-    string? Image,
-    string? Bio,
-    string? Gender
+    string? image,
+    string? bio,
+    string? full_name,
+    string? gender
 );

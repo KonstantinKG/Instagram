@@ -22,7 +22,7 @@ public class GetUserQueryHandler
         _logger = logger;
     }
     
-    public async Task<ErrorOr<GetUserResult>> Handle(GetUserQuery query, CancellationToken cancellationToken)
+    public async Task<ErrorOr<User>> Handle(GetUserQuery query, CancellationToken cancellationToken)
     {
         try
         {
@@ -31,7 +31,7 @@ public class GetUserQueryHandler
                 return Errors.Common.NotFound;
             }
 
-            return new GetUserResult(user);
+            return user;
         }
         catch (Exception e)
         {

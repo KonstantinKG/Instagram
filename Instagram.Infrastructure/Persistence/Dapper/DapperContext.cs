@@ -1,6 +1,8 @@
 ﻿using System.Data;
 
-using Instagram.Infrastructure.Persistence.Connections;
+using Instagram.Infrastructure.Persistence.Common;
+
+using Microsoft.Extensions.Options;
 
 using Npgsql;
 
@@ -10,9 +12,9 @@ public class DapperContext
 {
     private readonly DbConnections _dbConnections;
 
-    public DapperContext(DbConnections dbConnections)
+    public DapperContext(IOptions<DbConnections> options)
     {
-        _dbConnections = dbConnections;
+        _dbConnections = options.Value;
     }
 
     public IDbConnection CreateConnection()

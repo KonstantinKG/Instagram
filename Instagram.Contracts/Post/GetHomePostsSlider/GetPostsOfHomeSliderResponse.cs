@@ -3,7 +3,7 @@
 namespace Instagram.Contracts.Post.GetHomePostsSlider;
 
 public record GetHomePostsSliderResponse(
-    Guid? Previous,
-    Guid? Next,
-    PostShortResponse Post
+    Guid? previous,
+    Guid? next,
+    PostResponse post
     );

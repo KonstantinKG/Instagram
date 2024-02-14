@@ -1,11 +1,13 @@
 ﻿using Instagram.Application.Common.Interfaces.Persistence.DapperRepositories;
 using Instagram.Application.Common.Interfaces.Persistence.EfRepositories;
+using Instagram.Application.Common.Interfaces.Persistence.RedisRepositories;
 using Instagram.Application.Common.Interfaces.Services;
-using Instagram.Infrastructure.Persistence.Connections;
+using Instagram.Infrastructure.Persistence.Common;
 using Instagram.Infrastructure.Persistence.Dapper;
 using Instagram.Infrastructure.Persistence.Dapper.Repositories;
 using Instagram.Infrastructure.Persistence.EF;
 using Instagram.Infrastructure.Persistence.EF.Repositories;
+using Instagram.Infrastructure.Persistence.Redis;
 using Instagram.Infrastructure.Services;
 using Instagram.Infrastructure.Services.FileDownloaderService;
 
@@ -13,6 +15,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -41,10 +44,13 @@ public static class DependencyInjection
         
         var dbConnections = new DbConnections();
         configuration.Bind(DbConnections.SectionName, dbConnections);
-        services.AddSingleton(dbConnections);
+        services.AddSingleton(Options.Create(dbConnections));
 
-        services.AddScoped<DapperContext>();
+        services.AddSingleton<DapperContext>();
         services.AddDbContext<EfContext>(options => options.UseNpgsql(dbConnections.Postgres));
+
+        services.AddSingleton<RedisContext>();
+        services.AddScoped<IRedisTokenRepository, IRedisTokenRepository>();
         
         services.AddScoped<IEfUserRepository, EfUserRepository>();
         services.AddScoped<IEfPostRepository, EfPostRepository>();
@@ -77,6 +83,28 @@ public static class DependencyInjection
                     new OpenIdConnectConfigurationRetriever(),
                     new HttpDocumentRetriever()
                 );
+                
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = async context =>
+                    {
+                        var redisTokenRepository =
+                            context.HttpContext.RequestServices.GetRequiredService<IRedisTokenRepository>();
+
+                        var sessionId = context.Principal?.Claims?.FirstOrDefault(x => x.Type == "sid")?.Value;
+                        if (sessionId is null)
+                        {
+                            context.Fail(string.Empty);
+                            return;
+                        }
+
+                        var tokenPair = await redisTokenRepository.GetSessionTokens(sessionId);
+                        var accessToken = context.Request.Headers.Authorization.ToString().Substring("Bearer ".Length).Trim();
+                        
+                        if (tokenPair is null || tokenPair.AccessToken != accessToken)
+                            context.Fail(string.Empty);
+                    }
+                };
             });
 
         return services;
@@ -87,8 +115,6 @@ public static class DependencyInjection
         ConfigurationManager configuration)
     {
         services.Configure<FileDownloaderSettings>(configuration.GetSection(FileDownloaderSettings.SectionName));
-        services.AddSingleton<FileDownloaderSettings>();
-
         services.AddSingleton<IFileDownloader, FileDownloader>();
 
         return services;

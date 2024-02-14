@@ -1,5 +1,5 @@
 ﻿namespace Instagram.Contracts.User.SubscribeUserContracts;
 
 public record SubscribeUserRequest(
-    Guid UserId
+    Guid user_id
 );

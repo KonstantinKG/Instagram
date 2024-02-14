@@ -1,8 +1,11 @@
-﻿namespace Instagram.Contracts.Post._Common;
+﻿using Instagram.Contracts.User._Common;
+
+namespace Instagram.Contracts.Post._Common;
 
 public record PostCommentResponse(
-    Guid Id,
-    string Content,
-    PostCommentUserResponse UserResponse
+    Guid id,
+    string content,
+    UserResponse user,
+    List<PostCommentResponse>? comments
 );
     

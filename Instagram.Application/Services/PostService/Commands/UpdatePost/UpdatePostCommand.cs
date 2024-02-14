@@ -1,6 +1,6 @@
 ﻿namespace Instagram.Application.Services.PostService.Commands.UpdatePost;
 
-public record EditPostCommand(
+public record UpdatePostCommand(
     Guid Id,
     Guid UserId,
     string? Content,

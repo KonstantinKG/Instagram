@@ -1,5 +1,5 @@
 ﻿namespace Instagram.Contracts.Post.AddPost;
 
 public record AddPostResponse(
-    Guid Id
+    Guid id
 );

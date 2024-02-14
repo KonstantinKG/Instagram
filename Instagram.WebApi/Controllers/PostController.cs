@@ -43,6 +43,7 @@ using Instagram.Contracts.Post.UpdatePost;
 using Instagram.Contracts.Post.UpdatePostComment;
 using Instagram.Contracts.Post.UpdatePostGallery;
 using Instagram.Contracts.Post.UpdatePostStatus;
+using Instagram.Domain.Aggregates.PostAggregate;
 
 using MapsterMapper;
 
@@ -64,9 +65,9 @@ public class PostController : ApiController
     [Route("get")]
     public async Task<IActionResult> Get([FromQuery] GetPostRequest request)
     {
-        var getPostQuery = new GetPostQuery(request.Id);
+        var getPostQuery = new GetPostQuery(request.id);
         var handler = HttpContext.RequestServices.GetRequiredService<GetPostQueryHandler>();
-        ErrorOr<GetPostResult> serviceResult = await handler.Handle(getPostQuery, CancellationToken.None);
+        ErrorOr<Post> serviceResult = await handler.Handle(getPostQuery, CancellationToken.None);
 
         return serviceResult.Match(
             result => Ok(_mapper.Map<PostResponse>(result)),
@@ -94,7 +95,7 @@ public class PostController : ApiController
     public async Task<IActionResult> GetAllUserPosts([FromQuery] AllUserPostsRequest request)
     {
         
-        var userId = request.UserId ?? GetUserId();
+        var userId = request.user_id ?? GetUserId();
         var allPostsOfUserQuery = _mapper.Map<AllUserPostsQuery>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<AllUserPostsQueryHandler>();
         var pipeline = HttpContext.RequestServices.GetRequiredService<AllUserPostsQueryPipeline>();
@@ -110,7 +111,7 @@ public class PostController : ApiController
     [Route("user/slider")]
     public async Task<IActionResult> GetUserPostsSlider([FromQuery] GetUserPostsSliderRequest request)
     {
-        var userId = request.UserId ?? GetUserId();
+        var userId = request.user_id ?? GetUserId();
         var getPostsOfUserSliderQuery =_mapper.Map<GetUserPostsSliderQuery>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<GetUserPostsSliderQueryHandler>();
         var pipeline = HttpContext.RequestServices.GetRequiredService<GetUserPostsSliderQueryPipeline>();
@@ -202,10 +203,10 @@ public class PostController : ApiController
     public async Task<IActionResult> Update(UpdatePostRequest request)
     {
         var userId = GetUserId();
-        var editPostCommand = _mapper.Map<EditPostCommand>((userId, request));
-        var handler = HttpContext.RequestServices.GetRequiredService<EditPostCommandHandler>();
-        var pipeline = HttpContext.RequestServices.GetRequiredService<EditPostCommandPipeline>();
-        ErrorOr<EditPostResult> serviceResult = await pipeline.Pipe(editPostCommand, handler.Handle, CancellationToken.None);
+        var editPostCommand = _mapper.Map<UpdatePostCommand>((userId, request));
+        var handler = HttpContext.RequestServices.GetRequiredService<UpdatePostCommandHandler>();
+        var pipeline = HttpContext.RequestServices.GetRequiredService<UpdatePostCommandPipeline>();
+        ErrorOr<bool> serviceResult = await pipeline.Pipe(editPostCommand, handler.Handle, CancellationToken.None);
 
         return serviceResult.Match(
             _ => Ok(),
