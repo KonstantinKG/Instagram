@@ -8,6 +8,7 @@ using Instagram.Infrastructure.Persistence.Dapper.Repositories;
 using Instagram.Infrastructure.Persistence.EF;
 using Instagram.Infrastructure.Persistence.EF.Repositories;
 using Instagram.Infrastructure.Persistence.Redis;
+using Instagram.Infrastructure.Persistence.Redis.Repositories;
 using Instagram.Infrastructure.Services;
 using Instagram.Infrastructure.Services.FileDownloaderService;
 
@@ -50,7 +51,7 @@ public static class DependencyInjection
         services.AddDbContext<EfContext>(options => options.UseNpgsql(dbConnections.Postgres));
 
         services.AddSingleton<RedisContext>();
-        services.AddScoped<IRedisTokenRepository, IRedisTokenRepository>();
+        services.AddScoped<IRedisTokenRepository, RedisTokenRepository>();
         
         services.AddScoped<IEfUserRepository, EfUserRepository>();
         services.AddScoped<IEfPostRepository, EfPostRepository>();
