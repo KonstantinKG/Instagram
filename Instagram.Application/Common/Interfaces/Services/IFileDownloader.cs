@@ -4,5 +4,5 @@ namespace Instagram.Application.Common.Interfaces.Services;
 
 public interface IFileDownloader
 {
-    Task<string> Download(IAppFileProxy file, string path);
+    Task<string> Download(IAppFileProxy file);
 }

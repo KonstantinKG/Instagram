@@ -43,7 +43,7 @@ public class UpdateUserProfileCommandHandler
             try
             {
                 if (command.Image is not null)
-                    imagePath = await _fileDownloader.Download(command.Image, "profiles");
+                    imagePath = await _fileDownloader.Download(command.Image);
             }
             catch (FileSaveException)
             {

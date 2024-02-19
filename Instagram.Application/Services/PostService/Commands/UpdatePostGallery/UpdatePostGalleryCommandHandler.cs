@@ -45,7 +45,7 @@ public class UpdatePostGalleryCommandHandler
             if (gallery == null)
                 return Errors.Common.NotFound;
             
-            var path = await _fileDownloader.Download(command.File, "post_galleries");
+            var path = await _fileDownloader.Download(command.File);
             var updatedGallery = new PostGallery {
                 Id = command.Id,
                 PostId = command.PostId,

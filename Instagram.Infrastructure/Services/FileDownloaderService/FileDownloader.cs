@@ -16,18 +16,17 @@ public class FileDownloader : IFileDownloader
         _fileDownloaderSettings = fileDownloaderSettings.Value;
     }
 
-    public async Task<string> Download(IAppFileProxy file, string path)
+    public async Task<string> Download(IAppFileProxy file)
     {
         try
         {
-            var dirFolder = Path.Combine(_fileDownloaderSettings.SavePath, path);
-            if (!Directory.Exists(dirFolder))
-                Directory.CreateDirectory(dirFolder);
+            if (!Directory.Exists(_fileDownloaderSettings.SavePath))
+                Directory.CreateDirectory(_fileDownloaderSettings.SavePath);
 
             var fileHash = HashFileContent(file);
             var fileExtension = file.FileName().Substring(file.FileName().LastIndexOf(".", StringComparison.Ordinal));
             var uniqueIdentifier = $"{fileHash}{fileExtension}";
-            var filePath = Path.Combine(dirFolder, uniqueIdentifier);
+            var filePath = Path.Combine(_fileDownloaderSettings.SavePath, uniqueIdentifier);
             if (Path.Exists(filePath))
                 return filePath;
             

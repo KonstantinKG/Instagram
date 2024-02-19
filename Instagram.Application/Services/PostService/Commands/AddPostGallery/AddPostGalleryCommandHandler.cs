@@ -41,7 +41,7 @@ public class AddPostGalleryCommandHandler
             if (post.UserId != command.UserId)
                 return Errors.Common.AccessDenied;
 
-            var path = await _fileDownloader.Download(command.File, "post_galleries");
+            var path = await _fileDownloader.Download(command.File);
             var gallery = new PostGallery {
                 Id = Guid.NewGuid(),
                 PostId = command.PostId,
