@@ -14,18 +14,16 @@ public class UpdatePostCommentCommandHandler
 {
     private readonly IEfPostRepository _efPostRepository;
     private readonly IDapperPostRepository _dapperPostRepository;
-    private readonly IFileDownloader _fileDownloader;
     private readonly ILogger<UpdatePostCommentCommandHandler> _logger;
 
     public UpdatePostCommentCommandHandler(
         IEfPostRepository efPostRepository,
         IDapperPostRepository dapperPostRepository,
-        IFileDownloader fileDownloader, 
-        ILogger<UpdatePostCommentCommandHandler> logger)
+        ILogger<UpdatePostCommentCommandHandler> logger
+        )
     {
         _efPostRepository = efPostRepository;
         _dapperPostRepository = dapperPostRepository;
-        _fileDownloader = fileDownloader;
         _logger = logger;
     }
     

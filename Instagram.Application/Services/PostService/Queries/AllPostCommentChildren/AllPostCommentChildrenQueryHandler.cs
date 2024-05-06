@@ -1,8 +1,10 @@
 ﻿using ErrorOr;
 
 using Instagram.Application.Common.Interfaces.Persistence.DapperRepositories;
+using Instagram.Application.Services.PostService.Queries._Common;
 using Instagram.Domain.Aggregates.PostAggregate.Entities;
 using Instagram.Domain.Common.Errors;
+using Instagram.Domain.Configurations;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -12,24 +14,24 @@ namespace Instagram.Application.Services.PostService.Queries.AllPostCommentChild
 public class AllPostCommentChildrenQueryHandler
 {
     private readonly IDapperPostRepository _dapperPostRepository;
-    private readonly ApplicationSettings _applicationSettings;
+    private readonly AppConfiguration _configuration;
     private readonly ILogger<AllPostCommentChildrenQueryHandler> _logger;
 
     public AllPostCommentChildrenQueryHandler(
+        IOptions<AppConfiguration> options,
         IDapperPostRepository dapperUserRepository,
-        IOptions<ApplicationSettings> applicationOptions,
         ILogger<AllPostCommentChildrenQueryHandler> logger)
     {
+        _configuration = options.Value;
         _dapperPostRepository = dapperUserRepository;
         _logger = logger;
-        _applicationSettings = applicationOptions.Value;
     }
     
-    public async Task<ErrorOr<AllPostCommentChildrenResult>> Handle(AllPostCommentChildrenQuery query, CancellationToken cancellationToken)
+    public async Task<ErrorOr<AllResult<PostComment>>> Handle(AllPostCommentChildrenQuery query, CancellationToken cancellationToken)
     {
         try
         {
-            var limit = _applicationSettings.PaginationLimit;
+            var limit = _configuration.Application.PaginationLimit;
             var offset = (query.Page - 1) *  limit;
             var total = await _dapperPostRepository.GetTotalChildComments(query.CommentId);
             var pages = total /  limit + (total %  limit > 0 ? 1 : 0);
@@ -38,9 +40,10 @@ public class AllPostCommentChildrenQueryHandler
             if (query.Page <= total)
                 comments = await _dapperPostRepository.AllChildComments(query.CommentId, offset,  limit);
             
-            return new AllPostCommentChildrenResult(
+            return new AllResult<PostComment>(
                 query.Page,
                 pages,
+                total,
                 comments
             );
         }

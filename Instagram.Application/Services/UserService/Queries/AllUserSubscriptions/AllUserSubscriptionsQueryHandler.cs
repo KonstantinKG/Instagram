@@ -1,8 +1,10 @@
 ﻿using ErrorOr;
 
 using Instagram.Application.Common.Interfaces.Persistence.DapperRepositories;
+using Instagram.Application.Services.PostService.Queries._Common;
 using Instagram.Domain.Aggregates.UserAggregate;
 using Instagram.Domain.Common.Errors;
+using Instagram.Domain.Configurations;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -11,25 +13,25 @@ namespace Instagram.Application.Services.UserService.Queries.AllUserSubscription
 
 public class AllUserSubscriptionsQueryHandler
 {
+    private readonly AppConfiguration _configuration;
     private readonly IDapperUserRepository _dapperUserRepository;
-    private readonly ApplicationSettings _applicationSettings;
     private readonly ILogger<AllUserSubscriptionsQueryHandler> _logger;
 
     public AllUserSubscriptionsQueryHandler(
+        IOptions<AppConfiguration> options,
         IDapperUserRepository dapperUserRepository,
-        IOptions<ApplicationSettings> applicationOptions,
         ILogger<AllUserSubscriptionsQueryHandler> logger)
     {
+        _configuration = options.Value;
         _dapperUserRepository = dapperUserRepository;
-        _applicationSettings = applicationOptions.Value;
         _logger = logger;
     }
     
-    public async Task<ErrorOr<AllUserSubscriptionsResult>> Handle(AllUserSubscriptionsQuery query,  CancellationToken cancellationToken)
+    public async Task<ErrorOr<AllResult<User>>> Handle(AllUserSubscriptionsQuery query,  CancellationToken cancellationToken)
     {
         try
         {
-            var limit = _applicationSettings.PaginationLimit;
+            var limit = _configuration.Application.PaginationLimit;
             var offset = (query.Page - 1) *  limit;
             var total = await _dapperUserRepository.GetTotalUserSubscriptions(query.SubscriberId);
             var pages = total /  limit + (total %  limit > 0 ? 1 : 0);
@@ -38,9 +40,10 @@ public class AllUserSubscriptionsQueryHandler
             if (query.Page <= total)
                 subscriptions = await _dapperUserRepository.GetAllUserSubscriptions(query.SubscriberId, offset,  limit);
             
-            return new AllUserSubscriptionsResult(
+            return new AllResult<User>(
                 query.Page,
                 pages,
+                total,
                 subscriptions
             );
         }

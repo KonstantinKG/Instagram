@@ -1,11 +1,13 @@
 ﻿using ErrorOr;
 
+using Instagram.Application.Services.PostService.Queries._Common;
 using Instagram.Application.Services.UserService.Commands.SubscribeUser;
 using Instagram.Application.Services.UserService.Commands.UnsubscribeUser;
 using Instagram.Application.Services.UserService.Commands.UpdateUserProfile;
 using Instagram.Application.Services.UserService.Queries.AllUserSubscriptions;
 using Instagram.Application.Services.UserService.Queries.GetAllUsers;
 using Instagram.Application.Services.UserService.Queries.GetUser;
+using Instagram.Contracts.Common;
 using Instagram.Contracts.User._Common;
 using Instagram.Contracts.User.AllUserSubscriptions;
 using Instagram.Contracts.User.GetAllUsersContracts;
@@ -53,10 +55,10 @@ public class UserController : ApiController
         var query = _mapper.Map<GetAllUsersQuery>(request);
         var handler = HttpContext.RequestServices.GetRequiredService<GetAllUsersQueryHandler>();
         var pipeline = HttpContext.RequestServices.GetRequiredService<GetAllUsersQueryPipeline>();
-        ErrorOr<GetAllUsersResult> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
+        ErrorOr<AllResult<User>> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
 
         return serviceResult.Match(
-            result => Ok(_mapper.Map<GetAllUsersResponse>(result)),
+            result => Ok(_mapper.Map<AllResponse<UserResponse>>(result)),
             errors => Problem(errors)
         );
     }
@@ -93,7 +95,7 @@ public class UserController : ApiController
     }
     
     [HttpPut]
-    [Route("profile/update")]
+    [Route("profile")]
     public async Task<IActionResult> Edit([FromForm] UpdateUserProfileRequest profileRequest)
     {
         var userId = GetUserId();
@@ -115,10 +117,10 @@ public class UserController : ApiController
         var userId = GetUserId();
         var query = _mapper.Map<AllUserSubscriptionsQuery>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<AllUserSubscriptionsQueryHandler>();
-        ErrorOr<AllUserSubscriptionsResult> serviceResult = await handler.Handle(query, CancellationToken.None);
+        ErrorOr<AllResult<User>> serviceResult = await handler.Handle(query, CancellationToken.None);
 
         return serviceResult.Match(
-            result => Ok(_mapper.Map<AllUserSubscriptionsResponse>(result)),
+            result => Ok(_mapper.Map<AllResponse<UserResponse>>(result)),
             errors => Problem(errors)
         );
     }

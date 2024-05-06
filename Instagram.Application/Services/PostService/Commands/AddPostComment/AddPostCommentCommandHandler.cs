@@ -13,19 +13,14 @@ namespace Instagram.Application.Services.PostService.Commands.AddPostComment;
 public class AddPostCommentCommandHandler
 {
     private readonly IEfPostRepository _efPostRepository;
-    private readonly IDapperPostRepository _dapperPostRepository;
-    private readonly IFileDownloader _fileDownloader;
     private readonly ILogger<AddPostCommentCommandHandler> _logger;
 
     public AddPostCommentCommandHandler(
         IEfPostRepository efPostRepository,
-        IDapperPostRepository dapperPostRepository,
-        IFileDownloader fileDownloader,
-        ILogger<AddPostCommentCommandHandler> logger)
+        ILogger<AddPostCommentCommandHandler> logger
+        )
     {
         _efPostRepository = efPostRepository;
-        _dapperPostRepository = dapperPostRepository;
-        _fileDownloader = fileDownloader;
         _logger = logger;
     }
     

@@ -1,4 +1,4 @@
-﻿using Instagram.Infrastructure.Persistence.Common;
+﻿using Instagram.Domain.Configurations;
 
 using Microsoft.Extensions.Options;
 
@@ -10,9 +10,9 @@ public class RedisContext
 {
     private readonly Lazy<ConnectionMultiplexer> _lazyConnection;
     
-    public RedisContext(IOptions<DbConnections> options)
+    public RedisContext(IOptions<AppConfiguration> options)
     {
-        _lazyConnection = new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect(options.Value.Redis.Connection));
+        _lazyConnection = new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect(options.Value.Connections.Redis.Url));
     }
 
     public ConnectionMultiplexer Connection => _lazyConnection.Value;

@@ -16,18 +16,18 @@ public class UpdateUserProfileCommandHandler
 {
     private readonly IDapperUserRepository _dapperUserRepository;
     private readonly IEfUserRepository _efUserRepository;
-    private readonly IFileDownloader _fileDownloader;
+    private readonly FileProvider _fileProvider;
     private readonly ILogger<UpdateUserProfileCommandHandler> _logger;
 
     public UpdateUserProfileCommandHandler(
         IDapperUserRepository dapperUserRepository,
         IEfUserRepository efUserRepository,
-        IFileDownloader fileDownloader,
-        ILogger<UpdateUserProfileCommandHandler> logger)
+        ILogger<UpdateUserProfileCommandHandler> logger,
+        FileProvider fileProvider)
     {
         _dapperUserRepository = dapperUserRepository;
         _efUserRepository = efUserRepository;
-        _fileDownloader = fileDownloader;
+        _fileProvider = fileProvider;
         _logger = logger;
     }
 
@@ -36,14 +36,12 @@ public class UpdateUserProfileCommandHandler
         try
         {
             var profile = await _dapperUserRepository.GetUserProfile(command.UserId);
-            if (profile is null)
-                return Errors.Common.NotFound;
             
             string? imagePath = null;
             try
             {
                 if (command.Image is not null)
-                    imagePath = await _fileDownloader.Download(command.Image);
+                    imagePath = await _fileProvider.Save(command.Image);
             }
             catch (FileSaveException)
             {
@@ -51,7 +49,7 @@ public class UpdateUserProfileCommandHandler
             }
             
             UserGender? gender = null;
-            if (command.Gender != profile.Gender?.Name && command.Gender != null)
+            if (command.Gender != profile?.Gender?.Name && command.Gender != null)
             {
                 if (await _dapperUserRepository.GetUserGender(command.Gender) is UserGender userGender)
                 {
@@ -65,15 +63,15 @@ public class UpdateUserProfileCommandHandler
             }
             
             var updatedProfile = new UserProfile {
-                Id = profile.Id,
-                UserId = profile.UserId,
+                Id = profile != null ? profile.Id : Guid.NewGuid(),
+                UserId = command.UserId,
                 Fullname = command.Fullname,
                 Image = imagePath,
                 Bio = command.Bio,
                 Gender = gender
             };
             
-            if (updatedProfile.Different(profile))
+            if (profile == null || updatedProfile.Different(profile))
                 await _efUserRepository.UpdateUserProfile(updatedProfile);
             
             return true;

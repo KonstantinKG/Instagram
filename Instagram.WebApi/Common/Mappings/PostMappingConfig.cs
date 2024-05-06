@@ -8,6 +8,7 @@ using Instagram.Application.Services.PostService.Commands.UpdatePost;
 using Instagram.Application.Services.PostService.Commands.UpdatePostComment;
 using Instagram.Application.Services.PostService.Commands.UpdatePostGallery;
 using Instagram.Application.Services.PostService.Commands.UpdatePostStatus;
+using Instagram.Application.Services.PostService.Queries._Common;
 using Instagram.Application.Services.PostService.Queries.AllHomePosts;
 using Instagram.Application.Services.PostService.Queries.AllPostCommentChildren;
 using Instagram.Application.Services.PostService.Queries.AllPostComments;
@@ -19,6 +20,7 @@ using Instagram.Application.Services.PostService.Queries.GetHomePostsSlider;
 using Instagram.Application.Services.PostService.Queries.GetPost;
 using Instagram.Application.Services.PostService.Queries.GetUserNewPostsStatus;
 using Instagram.Application.Services.PostService.Queries.GetUserPostsSlider;
+using Instagram.Contracts.Common;
 using Instagram.Contracts.Post._Common;
 using Instagram.Contracts.Post.AddPost;
 using Instagram.Contracts.Post.AddPostComment;
@@ -103,10 +105,11 @@ public class PostMappingConfig : IRegister
             .Map(dest => dest.Page, src => src.page)
             .Map(dest => dest.Date, src => src.date);
         
-        config.NewConfig<AllPostsResult, AllPostsResponse>()
+        config.NewConfig<AllResult<Post>, AllResponse<PostResponse>>()
             .Map(dest => dest.current, src => src.Current)
+            .Map(dest => dest.pages, src => src.Pages)
             .Map(dest => dest.total, src => src.Total)
-            .Map(dest => dest.posts, src => src.Posts);
+            .Map(dest => dest.data, src => src.Data);
         
         config.NewConfig<(Guid userId, UpdatePostStatusRequest request), UpdatePostStatusCommand>()
             .Map(dest => dest.UserId, src => src.userId)
@@ -152,28 +155,18 @@ public class PostMappingConfig : IRegister
             .Map(dest => dest.Page, src => src.page)
             .Map(dest => dest.PostId, src => src.post_id);
         
-        config.NewConfig<AllPostCommentsResult, AllPostCommentsResponse>()
+        config.NewConfig<AllResult<PostComment>, AllResponse<PostCommentResponse>>()
             .Map(dest => dest.current, src => src.Current)
             .Map(dest => dest.total, src => src.Total)
-            .Map(dest => dest.comments, src => src.Comments);
+            .Map(dest => dest.data, src => src.Data);
         
         config.NewConfig<AllPostParentCommentsRequest, AllPostParentCommentsQuery>()
             .Map(dest => dest.PostId, src => src.post_id)
             .Map(dest => dest.Page, src => src.page);
         
-        config.NewConfig<AllPostParentCommentsResult, AllPostParentCommentsResponse>()
-            .Map(dest => dest.current, src => src.Current)
-            .Map(dest => dest.total, src => src.Total)
-            .Map(dest => dest.comments, src => src.Comments);
-        
         config.NewConfig<AllPostCommentChildrenRequest, AllPostCommentChildrenQuery>()
             .Map(dest => dest.CommentId, src => src.comment_id)
             .Map(dest => dest.Page, src => src.page);
-        
-        config.NewConfig<AllPostCommentChildrenResult, AllPostCommentChildrenResponse>()
-            .Map(dest => dest.current, src => src.Current)
-            .Map(dest => dest.total, src => src.Total)
-            .Map(dest => dest.comments, src => src.Comments);
         
         config.NewConfig<(Guid userId, AddPostCommentRequest request), AddPostCommentCommand>()
             .Map(dest => dest.UserId, src => src.userId)
@@ -198,21 +191,16 @@ public class PostMappingConfig : IRegister
             .Map(dest => dest.Page, src => src.request.page)
             .Map(dest => dest.Date, src => src.request.date);
         
-        config.NewConfig<AllUserPostsResult, AllUserPostsResponse>()
-            .Map(dest => dest.current, src => src.Current)
-            .Map(dest => dest.total, src => src.Total)
-            .Map(dest => dest.posts, src => src.Posts);
-        
         config.NewConfig< (Guid userId, GetUserPostsSliderRequest request), GetUserPostsSliderQuery>()
             .Map(dest => dest.UserId, src => src.userId)
             .Map(dest => dest.Page, src => src.request.page)
             .Map(dest => dest.Date, src => src.request.date)
             .Map(dest => dest.PostId, src => src.request.post_id);
 
-        config.NewConfig<GetUserPostsSliderResult, GetUserPostsSliderResponse>()
+        /*config.NewConfig<GetUserPostsSliderResult, GetUserPostsSliderResponse>()
             .Map(dest => dest.previous, src => src.Previous)
             .Map(dest => dest.next, src => src.Next)
-            .Map(dest => dest.post, src => src.Post);
+            .Map(dest => dest.post, src => src.Post);*/
         
         config.NewConfig<GetUserNewPostsStatusRequest, GetUserNewPostsStatusQuery>()
             .Map(dest => dest.UserId, src => src.user_id)
@@ -228,11 +216,6 @@ public class PostMappingConfig : IRegister
             .Map(dest => dest.UserId, src => src.userId)
             .Map(dest => dest.Page, src => src.request.page)
             .Map(dest => dest.Date, src => src.request.date);
-
-        config.NewConfig<AllHomePostsResult, AllHomePostsResponse>()
-            .Map(dest => dest.current, src => src.Current)
-            .Map(dest => dest.total, src => src.Total)
-            .Map(dest => dest.posts, src => src.Posts);
         
         config.NewConfig<(Guid userId, GetHomePostsSliderRequest request), GetHomePostsSliderQuery>()
             .Map(dest => dest.UserId, src => src.userId)
@@ -240,10 +223,10 @@ public class PostMappingConfig : IRegister
             .Map(dest => dest.Date, src => src.request.date)
             .Map(dest => dest.PostId, src => src.request.post_id);
 
-        config.NewConfig<GetHomePostsSliderResult, GetHomePostsSliderResponse>()
+        /*config.NewConfig<GetHomePostsSliderResult, GetHomePostsSliderResponse>()
             .Map(dest => dest.previous, src => src.Previous)
             .Map(dest => dest.next, src => src.Next)
-            .Map(dest => dest.post, src => src.Post);
+            .Map(dest => dest.post, src => src.Post);*/
         
         config.NewConfig<GetHomeNewPostsStatusRequest, GetHomeNewPostsStatusQuery>()
             .Map(dest => dest.Date, src => src.date);

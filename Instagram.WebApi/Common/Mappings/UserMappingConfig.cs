@@ -49,10 +49,10 @@ public class UserMappingConfig : IRegister
             .Map(dest => dest.Bio, src => src.request.bio)
             .Map(dest => dest.Gender, src => src.request.gender);
         
-        config.NewConfig<GetAllUsersResult, GetAllUsersResponse>()
+        /*config.NewConfig<GetAllUsersResult, GetAllUsersResponse>()
             .Map(dest => dest.current, src => src.Current)
             .Map(dest => dest.total, src => src.Total)
-            .Map(dest => dest.users, src => src.Users);
+            .Map(dest => dest.users, src => src.Users);*/
 
         config.NewConfig<(Guid subscriberId, SubscribeUserRequest request), SubscribeUserCommand>()
             .Map(dest => dest.UserId, src => src.request.user_id)
@@ -66,9 +66,9 @@ public class UserMappingConfig : IRegister
             .Map(dest => dest.Page, src => src.request.page)
             .Map(dest => dest.SubscriberId, src => src.subscriberId);
         
-        config.NewConfig<AllUserSubscriptionsResult, AllUserSubscriptionsResponse>()
+        /*config.NewConfig<AllUserSubscriptionsResult, AllUserSubscriptionsResponse>()
             .Map(dest => dest.current, src => src.Current)
             .Map(dest => dest.total, src => src.Total)
-            .Map(dest => dest.subscriptions, src => src.Subscriptions);
+            .Map(dest => dest.subscriptions, src => src.Subscriptions);*/
     }
 }

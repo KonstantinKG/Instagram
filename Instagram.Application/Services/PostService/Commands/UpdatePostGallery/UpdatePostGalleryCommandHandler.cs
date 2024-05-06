@@ -15,19 +15,19 @@ public class UpdatePostGalleryCommandHandler
 {
     private readonly IEfPostRepository _efPostRepository;
     private readonly IDapperPostRepository _dapperPostRepository;
-    private readonly IFileDownloader _fileDownloader;
+    private readonly FileProvider _fileProvider;
     private readonly ILogger<UpdatePostGalleryCommandHandler> _logger;
 
     public UpdatePostGalleryCommandHandler(
         IEfPostRepository efPostRepository,
         IDapperPostRepository dapperPostRepository,
-        IFileDownloader fileDownloader, 
-        ILogger<UpdatePostGalleryCommandHandler> logger)
+        ILogger<UpdatePostGalleryCommandHandler> logger,
+        FileProvider fileProvider)
     {
         _efPostRepository = efPostRepository;
         _dapperPostRepository = dapperPostRepository;
-        _fileDownloader = fileDownloader;
         _logger = logger;
+        _fileProvider = fileProvider;
     }
     
     public async Task<ErrorOr<UpdatePostGalleryResult>> Handle(UpdatePostGalleryCommand command,  CancellationToken cancellationToken)
@@ -45,7 +45,10 @@ public class UpdatePostGalleryCommandHandler
             if (gallery == null)
                 return Errors.Common.NotFound;
             
-            var path = await _fileDownloader.Download(command.File);
+            var path = await _fileProvider.Save(command.File);
+            if (path == null)
+                return Errors.Common.Unexpected;
+            
             var updatedGallery = new PostGallery {
                 Id = command.Id,
                 PostId = command.PostId,

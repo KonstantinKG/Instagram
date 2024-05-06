@@ -15,19 +15,19 @@ public class AddPostGalleryCommandHandler
 {
     private readonly IEfPostRepository _efPostRepository;
     private readonly IDapperPostRepository _dapperPostRepository;
-    private readonly IFileDownloader _fileDownloader;
+    private readonly FileProvider _fileProvider;
     private readonly ILogger<AddPostGalleryCommandHandler> _logger;
 
     public AddPostGalleryCommandHandler(
         IEfPostRepository efPostRepository,
         IDapperPostRepository dapperPostRepository,
-        IFileDownloader fileDownloader, 
-        ILogger<AddPostGalleryCommandHandler> logger)
+        ILogger<AddPostGalleryCommandHandler> logger,
+        FileProvider fileProvider)
     {
         _efPostRepository = efPostRepository;
         _dapperPostRepository = dapperPostRepository;
-        _fileDownloader = fileDownloader;
         _logger = logger;
+        _fileProvider = fileProvider;
     }
     
     public async Task<ErrorOr<AddPostGalleryResult>> Handle(AddPostGalleryCommand command,  CancellationToken cancellationToken)
@@ -41,7 +41,10 @@ public class AddPostGalleryCommandHandler
             if (post.UserId != command.UserId)
                 return Errors.Common.AccessDenied;
 
-            var path = await _fileDownloader.Download(command.File);
+            var path = await _fileProvider.Save(command.File);
+            if (path == null)
+                return Errors.Common.Unexpected;
+            
             var gallery = new PostGallery {
                 Id = Guid.NewGuid(),
                 PostId = command.PostId,

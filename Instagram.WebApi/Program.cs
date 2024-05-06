@@ -1,13 +1,20 @@
 using Instagram.Application;
+using Instagram.Domain.Configurations;
 using Instagram.Infrastructure;
 using Instagram.WebApi;
 
+using Microsoft.Extensions.Options;
+
 var builder = WebApplication.CreateBuilder(args);
 
+var configuration = new AppConfiguration();
+builder.Configuration.Bind(configuration);
+
+builder.Services.AddSingleton(Options.Create(configuration));
 builder.Services
     .AddPresentation()
-    .AddApplication(builder.Configuration)
-    .AddInfrastructure(builder.Configuration);
+    .AddApplication(configuration)
+    .AddInfrastructure(configuration);
 
 var app = builder.Build();
 

@@ -1,5 +1,6 @@
 ﻿using ErrorOr;
 
+using Instagram.Application.Services._Common;
 using Instagram.Application.Services.PostService.Commands.AddPost;
 using Instagram.Application.Services.PostService.Commands.AddPostComment;
 using Instagram.Application.Services.PostService.Commands.AddPostGallery;
@@ -10,6 +11,7 @@ using Instagram.Application.Services.PostService.Commands.UpdatePost;
 using Instagram.Application.Services.PostService.Commands.UpdatePostComment;
 using Instagram.Application.Services.PostService.Commands.UpdatePostGallery;
 using Instagram.Application.Services.PostService.Commands.UpdatePostStatus;
+using Instagram.Application.Services.PostService.Queries._Common;
 using Instagram.Application.Services.PostService.Queries.AllHomePosts;
 using Instagram.Application.Services.PostService.Queries.AllPostCommentChildren;
 using Instagram.Application.Services.PostService.Queries.AllPostComments;
@@ -21,6 +23,7 @@ using Instagram.Application.Services.PostService.Queries.GetHomePostsSlider;
 using Instagram.Application.Services.PostService.Queries.GetPost;
 using Instagram.Application.Services.PostService.Queries.GetUserNewPostsStatus;
 using Instagram.Application.Services.PostService.Queries.GetUserPostsSlider;
+using Instagram.Contracts.Common;
 using Instagram.Contracts.Post._Common;
 using Instagram.Contracts.Post.AddPost;
 using Instagram.Contracts.Post.AddPostComment;
@@ -43,7 +46,9 @@ using Instagram.Contracts.Post.UpdatePost;
 using Instagram.Contracts.Post.UpdatePostComment;
 using Instagram.Contracts.Post.UpdatePostGallery;
 using Instagram.Contracts.Post.UpdatePostStatus;
+using Instagram.Contracts.User._Common;
 using Instagram.Domain.Aggregates.PostAggregate;
+using Instagram.Domain.Aggregates.PostAggregate.Entities;
 
 using MapsterMapper;
 
@@ -82,10 +87,10 @@ public class PostController : ApiController
         var allPostsQuery = _mapper.Map<AllPostsQuery>(request);
         var handler = HttpContext.RequestServices.GetRequiredService<AllPostsQueryHandler>();
         var pipeline = HttpContext.RequestServices.GetRequiredService<AllPostsQueryPipeline>();
-        ErrorOr<AllPostsResult> serviceResult = await pipeline.Pipe(allPostsQuery, handler.Handle, CancellationToken.None);
+        ErrorOr<AllResult<Post>> serviceResult = await pipeline.Pipe(allPostsQuery, handler.Handle, CancellationToken.None);
 
         return serviceResult.Match(
-            result => Ok(_mapper.Map<AllPostsResponse>(result)),
+            result => Ok(_mapper.Map<AllResponse<PostResponse>>(result)),
             errors => Problem(errors)
         );
     }
@@ -99,10 +104,10 @@ public class PostController : ApiController
         var allPostsOfUserQuery = _mapper.Map<AllUserPostsQuery>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<AllUserPostsQueryHandler>();
         var pipeline = HttpContext.RequestServices.GetRequiredService<AllUserPostsQueryPipeline>();
-        ErrorOr<AllUserPostsResult> serviceResult = await pipeline.Pipe(allPostsOfUserQuery, handler.Handle, CancellationToken.None);
+        ErrorOr<AllResult<Post>> serviceResult = await pipeline.Pipe(allPostsOfUserQuery, handler.Handle, CancellationToken.None);
 
         return serviceResult.Match(
-            result => Ok(_mapper.Map<AllUserPostsResponse>(result)),
+            result => Ok(_mapper.Map<AllResponse<PostResponse>>(result)),
             errors => Problem(errors)
         );
     }
@@ -115,7 +120,7 @@ public class PostController : ApiController
         var getPostsOfUserSliderQuery =_mapper.Map<GetUserPostsSliderQuery>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<GetUserPostsSliderQueryHandler>();
         var pipeline = HttpContext.RequestServices.GetRequiredService<GetUserPostsSliderQueryPipeline>();
-        ErrorOr<GetUserPostsSliderResult> serviceResult = await pipeline.Pipe(getPostsOfUserSliderQuery, handler.Handle, CancellationToken.None);
+        ErrorOr<SliderResult<Post>> serviceResult = await pipeline.Pipe(getPostsOfUserSliderQuery, handler.Handle, CancellationToken.None);
 
         return serviceResult.Match(
             result => Ok(_mapper.Map<GetUserPostsSliderResponse>(result)),
@@ -145,10 +150,10 @@ public class PostController : ApiController
         var query = _mapper.Map<AllHomePostsQuery>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<AllHomePostsQueryHandler>();
         var pipeline = HttpContext.RequestServices.GetRequiredService<AllHomePostsQueryPipeline>();
-        ErrorOr<AllHomePostsResult> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
+        ErrorOr<AllResult<Post>> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
 
         return serviceResult.Match(
-            result => Ok(_mapper.Map<AllHomePostsResponse>(result)),
+            result => Ok(_mapper.Map<AllResponse<PostResponse>>(result)),
             errors => Problem(errors)
         );
     }
@@ -161,7 +166,7 @@ public class PostController : ApiController
         var query =_mapper.Map<GetHomePostsSliderQuery>((userId, request));
         var handler = HttpContext.RequestServices.GetRequiredService<GetHomePostsSliderQueryHandler>();
         var pipeline = HttpContext.RequestServices.GetRequiredService<GetHomePostsSliderQueryPipeline>();
-        ErrorOr<GetHomePostsSliderResult> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
+        ErrorOr<SliderResult<Post>> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
 
         return serviceResult.Match(
             result => Ok(_mapper.Map<GetHomePostsSliderResponse>(result)),
@@ -296,10 +301,10 @@ public class PostController : ApiController
         var query = _mapper.Map<AllPostCommentsQuery>(request);
         var handler = HttpContext.RequestServices.GetRequiredService<AllPostCommentsQueryHandler>();
         var pipeline = HttpContext.RequestServices.GetRequiredService<AllPostCommentsQueryPipeline>();
-        ErrorOr<AllPostCommentsResult> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
+        ErrorOr<AllResult<PostComment>> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
 
         return serviceResult.Match(
-            result => Ok(_mapper.Map<AllPostCommentsResponse>(result)),
+            result => Ok(_mapper.Map<AllResponse<PostCommentResponse>>(result)),
             errors => Problem(errors)
         );
     }
@@ -312,10 +317,10 @@ public class PostController : ApiController
         var query = _mapper.Map<AllPostParentCommentsQuery>(request);
         var handler = HttpContext.RequestServices.GetRequiredService<AllPostParentCommentsQueryHandler>();
         var pipeline = HttpContext.RequestServices.GetRequiredService<AllPostParentCommentsQueryPipeline>();
-        ErrorOr<AllPostParentCommentsResult> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
+        ErrorOr<AllResult<PostComment>> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
 
         return serviceResult.Match(
-            result => Ok(_mapper.Map<AllPostParentCommentsResponse>(result)),
+            result => Ok(_mapper.Map<AllResponse<PostCommentResponse>>(result)),
             errors => Problem(errors)
         );
     }
@@ -328,10 +333,10 @@ public class PostController : ApiController
         var query = _mapper.Map<AllPostCommentChildrenQuery>(request);
         var handler = HttpContext.RequestServices.GetRequiredService<AllPostCommentChildrenQueryHandler>();
         var pipeline = HttpContext.RequestServices.GetRequiredService<AllPostCommentChildrenQueryPipeline>();
-        ErrorOr<AllPostCommentChildrenResult> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
+        ErrorOr<AllResult<PostComment>> serviceResult = await pipeline.Pipe(query, handler.Handle, CancellationToken.None);
 
         return serviceResult.Match(
-            result => Ok(_mapper.Map<AllPostCommentChildrenResponse>(result)),
+            result => Ok(_mapper.Map<AllResponse<PostCommentResponse>>(result)),
             errors => Problem(errors)
         );
     }

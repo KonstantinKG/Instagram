@@ -1,8 +1,10 @@
 ﻿using ErrorOr;
 
 using Instagram.Application.Common.Interfaces.Persistence.DapperRepositories;
+using Instagram.Application.Services._Common;
 using Instagram.Domain.Aggregates.PostAggregate;
 using Instagram.Domain.Common.Errors;
+using Instagram.Domain.Configurations;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -11,25 +13,25 @@ namespace Instagram.Application.Services.PostService.Queries.GetHomePostsSlider;
 
 public class GetHomePostsSliderQueryHandler
 {
+    private readonly AppConfiguration _configuration;
     private readonly IDapperPostRepository _dapperPostRepository;
-    private readonly ApplicationSettings _applicationSettings;
     private readonly ILogger<GetHomePostsSliderQueryHandler> _logger;
 
     public GetHomePostsSliderQueryHandler(
+        IOptions<AppConfiguration> options,
         IDapperPostRepository dapperUserRepository,
-        IOptions<ApplicationSettings> applicationOptions, 
         ILogger<GetHomePostsSliderQueryHandler> logger)
     {
+        _configuration = options.Value;
         _dapperPostRepository = dapperUserRepository;
         _logger = logger;
-        _applicationSettings = applicationOptions.Value;
     }
     
-    public async Task<ErrorOr<GetHomePostsSliderResult>> Handle(GetHomePostsSliderQuery query,  CancellationToken cancellationToken)
+    public async Task<ErrorOr<SliderResult<Post>>> Handle(GetHomePostsSliderQuery query,  CancellationToken cancellationToken)
     {
         try
         {
-            var limit = _applicationSettings.PaginationLimit;
+            var limit = _configuration.Application.PaginationLimit;
             var offset = (query.Page - 1) * limit;
             int? previousOffset = query.Page == 1 ? null : offset - limit;
             var nextOffset = offset + limit;
@@ -71,7 +73,7 @@ public class GetHomePostsSliderQueryHandler
             if (currentPost == null)
                 return Errors.Common.NotFound;
             
-            return new GetHomePostsSliderResult(
+            return new SliderResult<Post>(
                 previousPostId,
                 nextPostId,
                 currentPost
